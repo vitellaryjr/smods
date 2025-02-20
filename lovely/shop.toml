@@ -108,6 +108,7 @@ if self.shop_voucher then G.GAME.current_round.voucher = nil end
 '''
 payload = '''
 if self.shop_voucher then G.GAME.current_round.voucher.spawn[self.config.center_key] = false end 
+if self.from_tag then G.GAME.current_round.voucher.spawn[G.GAME.current_round.voucher[1]] = false end
 '''
 [[patches]]
 [patches.pattern]
@@ -132,6 +133,19 @@ pattern = '''
 payload = '''
   if (G.shop_vouchers and G.shop_vouchers.cards and G.shop_vouchers.cards[1]) then
 '''
+# Maintain voucher tag jank interaction
+[[patches]]
+[patches.pattern]
+target = 'tag.lua'
+match_indent = true
+position = 'before'
+pattern = '''
+create_shop_card_ui(card, 'Voucher', G.shop_vouchers)
+'''
+payload = '''
+card.from_tag = true
+'''
+
 
 
 # Free Rerolls
