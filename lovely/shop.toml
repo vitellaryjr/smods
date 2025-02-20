@@ -120,6 +120,19 @@ G.GAME.current_round.voucher = nil
 payload = '''
 --G.GAME.current_round.voucher = nil
 '''
+# Add voucher restock message
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+match_indent = true
+position = 'at'
+pattern = '''
+  if (G.shop_vouchers and G.shop_vouchers.cards and (G.shop_vouchers.cards[1] or G.GAME.current_round.voucher)) then
+'''
+payload = '''
+  if (G.shop_vouchers and G.shop_vouchers.cards and G.shop_vouchers.cards[1]) then
+'''
+
 
 # Free Rerolls
 [[patches]]
