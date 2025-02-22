@@ -1871,6 +1871,7 @@ function SMODS.add_voucher_to_shop(key)
         card:start_materialize()
         G.shop_vouchers:emplace(card)
         G.shop_vouchers.config.card_limit = #G.shop_vouchers.cards
+        return card
 end
 
 function SMODS.change_voucher_limit(mod)
@@ -1890,6 +1891,7 @@ function SMODS.add_booster_to_shop(key)
     card.ability.booster_pos = #G.shop_booster.cards + 1
     card:start_materialize()
     G.shop_booster:emplace(card)
+    return card
 end
 
 function SMODS.change_booster_limit(mod)
