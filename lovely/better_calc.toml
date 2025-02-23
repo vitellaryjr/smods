@@ -1137,7 +1137,7 @@ G.CONTROLLER:snap_to({node = G.shop:get_UIE_by_ID('next_round_button')})
 position = 'before'
 match_indent = true
 payload = '''
-SMODS.calculate_context({starting_shop = true})
+if not nosave_shop then SMODS.calculate_context({starting_shop = true}) end
 '''
 # context.ending_shop
 [[patches]]
