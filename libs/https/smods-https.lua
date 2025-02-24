@@ -1,4 +1,45 @@
+local isThread = arg == nil
+
 local succ, https = pcall(require, "https")
+
+local userAgent
+local threadOptions
+if isThread then
+	require "love.system"
+	local channel = love.thread.getChannel("SMODS.https")
+	local ua, url, options, id = ...
+	userAgent = ua
+	local function sendMessageToConsole(level, logger, message)
+		channel:push({id = id, type = "log", level = level, msg = message, logger = logger})
+	end
+
+	function sendTraceMessage(message, logger)
+		sendMessageToConsole("TRACE", logger, message)
+	end
+
+	function sendDebugMessage(message, logger)
+		sendMessageToConsole("DEBUG", logger, message)
+	end
+
+	function sendInfoMessage(message, logger)
+		-- space in info string to align the logs in console
+		sendMessageToConsole("INFO ", logger, message)
+	end
+
+	function sendWarnMessage(message, logger)
+		-- space in warn string to align the logs in console
+		sendMessageToConsole("WARN ", logger, message)
+	end
+
+	function sendErrorMessage(message, logger)
+		sendMessageToConsole("ERROR", logger, message)
+	end
+
+	function sendFatalMessage(message, logger)
+		sendMessageToConsole("FATAL", logger, message)
+	end
+	threadOptions = {url, options, id = id}
+end
 
 if not succ then
 	if love.system.getOS() == "Windows" then -- This module is usually only accessible on windows
@@ -24,8 +65,11 @@ end
 
 local M = {}
 
-local version = require "SMODS.version"
-local userAgent = "SMODS/" .. version .. " (" .. love.system.getOS() .. ")"
+if not isThread then
+	local version = require "SMODS.version"
+	userAgent = "SMODS/" .. version .. " (" .. love.system.getOS() .. ")"
+end
+
 local methods = {GET=true, HEAD=true, POST=true, PUT=true, DELETE=true, PATCH=true}
 
 local function checkAndHandleInput(url, options, skipUserAgent)
@@ -78,6 +122,13 @@ else -- curl
 		cb:free()
 	end
 
+	local function assertCleanup(check, msg, fn, ...)
+		if not check then
+			fn(...)
+			error(msg)
+		end
+	end
+
 	function M.request(url, options)
 		options = checkAndHandleInput(url, options, true)
 		local ch = curl.curl_easy_init()
@@ -102,8 +153,8 @@ else -- curl
 				if type(v) == "number" then -- fine I'll be a little nice
 					v = tostring(v)
 				end
-				assert(type(k) == "string", "Header key should be a string")
-				assert(type(v) == "string", "Header value should be a string")
+				assertCleanup(type(k) == "string", "Header key should be a string", curlCleanup, ch, list, cb)
+				assertCleanup(type(v) == "string", "Header value should be a string", curlCleanup, ch, list, cb)
 
 				local str = k .. ": " .. v
 				list = curl.curl_slist_append(list, str)
@@ -152,8 +203,84 @@ else -- curl
 	end
 end
 
-if debug.getinfo(1).source:match("@.*") then -- For when running under watch
-	return print(M.request("http://example.com"))
-end
+local channel = love.thread.getChannel("SMODS.https")
 
+if not isThread then -- In main thread
+
+	local threads
+	local threadContent
+	local id = 1
+
+	local function pollThreads()
+		if not threads then
+			return
+		end
+		while true do
+			local msg = channel:pop()
+			if not msg then
+				break
+			end
+			local t = threads[msg.id]
+			assert(t, "Non-existant thread id (" .. tostring(msg.id) .. ")")
+			local msgType = msg.type
+			assert(type(msgType) == "string", "Thread message type is not a string")
+			if msgType == "log" then
+				assert(type(msg.msg) == "string", "Logging msg not a string")
+				assert(type(msg.level) == "string", "logging level not a string")
+				assert(type(msg.logger) == "string", "Logging logger not a string")
+				sendMessageToConsole(msg.level, msg.logger .. "(" .. tostring(msg.id) .. ")", msg.msg)
+			elseif msgType == "cb" then -- NOTE: cb removes the thread so it must be the last message
+				t.cb(msg.code, msg.body, msg.headers)
+				threads[id] = nil
+			end
+		end
+	end
+
+	local function getContent()
+		if threadContent then
+			return threadContent
+		end
+		local file = assert(NFS.read(SMODS.path.."/libs/https/smods-https.lua"))
+		local data = love.filesystem.newFileData(file, '=[SMODS _ "smods-https-thread.lua"]') -- name is a silly hack to get lovely to register the curl module
+		threadContent = data
+		return data
+	end
+
+	local function setupThreading()
+		threads = {}
+		M.threads = threads
+		local orig_love_update = love.update
+		function love.update(...)
+			pollThreads()
+			return orig_love_update(...)
+		end
+	end
+
+
+	function M.asyncRequest(url, options, cb)
+		if not threads then
+			setupThreading()
+		end
+		if type(options) == "function" and not cb then
+			cb = options
+			options = nil
+		end
+		assert(type(cb) == "function", "Callback is not a function")
+		checkAndHandleInput(url, options, true) -- That way we aren't erroring in the thread as much
+		local thread = love.thread.newThread(getContent())
+		local obj = {thread = thread, cb = cb, id = id}
+		threads[id] = obj
+		thread:start(userAgent, url, options, id)
+		id = id + 1
+	end
+
+	if debug.getinfo(1).source:match("@.*") then -- For when running under watch
+		print(M.asyncRequest("http://localhost:3000/version.lua", print))
+		-- return print(M.request("http://example.com"))
+	end
+else -- Child thread
+	local code, body, headers = M.request(threadOptions[1], threadOptions[2])
+	channel:push({id = threadOptions.id, type = "cb", code = code, body = body, headers = headers})
+	return -- Ensure nothing else happens after this
+end
 return M
