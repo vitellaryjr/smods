@@ -267,21 +267,6 @@ SMODS.DrawStep {
     order = 40,
     func = function(self, layer)
         if not self.vortex and self.sprite_facing == 'front' then
-            if self.ability.eternal then
-                G.shared_sticker_eternal.role.draw_major = self
-                G.shared_sticker_eternal:draw_shader('dissolve', nil, nil, nil, self.children.center)
-                G.shared_sticker_eternal:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center)
-            end
-            if self.ability.perishable then
-                G.shared_sticker_perishable.role.draw_major = self
-                G.shared_sticker_perishable:draw_shader('dissolve', nil, nil, nil, self.children.center)
-                G.shared_sticker_perishable:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center)
-            end
-            if self.ability.rental then
-                G.shared_sticker_rental.role.draw_major = self
-                G.shared_sticker_rental:draw_shader('dissolve', nil, nil, nil, self.children.center)
-                G.shared_sticker_rental:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center)
-            end
             if self.sticker and G.shared_stickers[self.sticker] then
                 G.shared_stickers[self.sticker].role.draw_major = self
                 G.shared_stickers[self.sticker]:draw_shader('dissolve', nil, nil, nil, self.children.center)
