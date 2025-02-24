@@ -325,23 +325,6 @@ SMODS.DrawStep {
 }
 
 SMODS.DrawStep {
-    key = 'soul?',
-    order = 55,
-    func = function(self)
-        if not self.vortex and self.sprite_facing == 'front' then
-            if (self.config.center.discovered or self.bypass_discovery_center) then
-                local scale_mod = 0.05 + 0.05*math.sin(1.8*G.TIMERS.REAL) + 0.07*math.sin((G.TIMERS.REAL - math.floor(G.TIMERS.REAL))*math.pi*14)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^3
-                local rotate_mod = 0.1*math.sin(1.219*G.TIMERS.REAL) + 0.07*math.sin((G.TIMERS.REAL)*math.pi*5)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^2
-
-                G.shared_soul.role.draw_major = self
-                G.shared_soul:draw_shader('dissolve',0, nil, nil, self.children.center,scale_mod, rotate_mod,nil, 0.1 + 0.03*math.sin(1.8*G.TIMERS.REAL),nil, 0.6)
-                G.shared_soul:draw_shader('dissolve', nil, nil, nil, self.children.center, scale_mod, rotate_mod)
-            end
-        end
-    end,
-}
-
-SMODS.DrawStep {
     key = 'floating_sprite',
     order = 60,
     func = function(self)
