@@ -60,7 +60,7 @@ if not https then
 end
 
 if not https and not curl then
-	error("Could not load a sutable backend")
+	error("Could not load a suitable backend")
 end
 
 local M = {}
