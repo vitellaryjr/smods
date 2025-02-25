@@ -250,7 +250,7 @@ SMODS.DrawStep {
     order = 30,
     func = function(self, layer)
         if not self.vortex and self.sprite_facing == 'front' then
-            local seal = G.P_SEALS[self.seal or {}] or {}
+            local seal = G.P_SEALS[self.seal] or {}
             if type(seal.draw) == 'function' then
                 seal:draw(self, layer)
             elseif self.seal then
