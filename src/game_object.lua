@@ -729,7 +729,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             G.GAME.modifiers.enable_perishables_in_shop = true
         end,
         colour = G.C.ORANGE,
-        loc_txt = {}
+        loc_txt = {},
+        shiny = true,
     }
     SMODS.Stake {
         name = "Gold Stake",
