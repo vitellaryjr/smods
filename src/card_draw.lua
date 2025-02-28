@@ -16,6 +16,19 @@ SMODS.DrawStep = SMODS.GameObject:extend {
     post_inject_class = function(self)
         table.sort(self.obj_buffer, function(_self, _other) return self.obj_table[_self].order < self.obj_table[_other].order end)
     end,
+    conditions = {},
+    check_individual_condition = function(self, card, layer, k, v)
+        if k == 'vortex' then return not not card.vortex == v end
+        if k == 'facing' then return card.sprite_facing == v end
+        return true
+    end,
+    check_conditions = function(self, card, layer)
+        if not self.layers[layer] then return end
+        for k,v in pairs(self.conditions) do
+            if not self:check_individual_condition(card, layer, k, v) then return end
+        end
+        return true
+    end
 }
 
 SMODS.DrawStep {
@@ -107,34 +120,31 @@ SMODS.DrawStep {
     key = 'vortex',
     order = -20,
     func = function(self)
-        if self.vortex then
-            if self.facing == 'back' then 
-                self.children.back:draw_shader('vortex')
-            else
-                self.children.center:draw_shader('vortex')
-                if self.children.front then 
-                    self.children.front:draw_shader('vortex')
-                end
+        if self.facing == 'back' then 
+            self.children.back:draw_shader('vortex')
+        else
+            self.children.center:draw_shader('vortex')
+            if self.children.front then 
+                self.children.front:draw_shader('vortex')
             end
-
-            love.graphics.setShader()
         end
+
+        love.graphics.setShader()
     end,
+    conditions = { vortex = true },
 }
 
 SMODS.DrawStep {
     key = 'center',
     order = -10,
     func = function(self, layer)
-        if not self.vortex and self.sprite_facing == 'front' then
-            --Draw the main part of the card
-            if (self.edition and self.edition.negative) or (self.ability.name == 'Antimatter' and (self.config.center.discovered or self.bypass_discovery_center)) then
-                self.children.center:draw_shader('negative', nil, self.ARGS.send_to_shader)
-            elseif not self:should_draw_base_shader() then
-                -- Don't render base dissolve shader.
-            elseif not self.greyed then
-                self.children.center:draw_shader('dissolve')
-            end
+        --Draw the main part of the card
+        if (self.edition and self.edition.negative) or (self.ability.name == 'Antimatter' and (self.config.center.discovered or self.bypass_discovery_center)) then
+            self.children.center:draw_shader('negative', nil, self.ARGS.send_to_shader)
+        elseif not self:should_draw_base_shader() then
+            -- Don't render base dissolve shader.
+        elseif not self.greyed then
+            self.children.center:draw_shader('dissolve')
         end
 
          --If the card is not yet discovered
@@ -164,173 +174,166 @@ SMODS.DrawStep {
             center:draw(self, layer)
         end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 
 SMODS.DrawStep {
     key = 'front',
     order = 0,
     func = function(self, layer)
-        if not self.vortex and self.sprite_facing == 'front' then
-            --Draw the main part of the card
-            if (self.edition and self.edition.negative) or (self.ability.name == 'Antimatter' and (self.config.center.discovered or self.bypass_discovery_center)) then
-                if self.children.front and (self.ability.delayed or (self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card)) then
-                    self.children.front:draw_shader('negative', nil, self.ARGS.send_to_shader)
-                end
-            elseif not self:should_draw_base_shader() then
-                -- Don't render base dissolve shader.
-            elseif not self.greyed then
-                if self.children.front and (self.ability.delayed or (self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card)) then
-                    self.children.front:draw_shader('dissolve')
+        --Draw the main part of the card
+        if (self.edition and self.edition.negative) or (self.ability.name == 'Antimatter' and (self.config.center.discovered or self.bypass_discovery_center)) then
+            if self.children.front and (self.ability.delayed or (self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card)) then
+                self.children.front:draw_shader('negative', nil, self.ARGS.send_to_shader)
+            end
+        elseif not self:should_draw_base_shader() then
+            -- Don't render base dissolve shader.
+        elseif not self.greyed then
+            if self.children.front and (self.ability.delayed or (self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card)) then
+                self.children.front:draw_shader('dissolve')
+            end
+        end
+
+        local center = self.config.center
+        if center.set == 'Default' or center.set == 'Enhanced' and not center.replace_base_card then
+            if not center.no_suit then
+                local suit = SMODS.Suits[self.base.suit] or {}
+                if suit.draw and type(suit.draw) == 'function' then
+                    suit:draw(self, layer)
                 end
             end
-
-            local center = self.config.center
-            if center.set == 'Default' or center.set == 'Enhanced' and not center.replace_base_card then
-                if not center.no_suit then
-                    local suit = SMODS.Suits[self.base.suit] or {}
-                    if suit.draw and type(suit.draw) == 'function' then
-                        suit:draw(self, layer)
-                    end
-                end
-                if not center.no_rank then
-                    local rank = SMODS.Ranks[self.base.value] or {}
-                    if rank.draw and type(rank.draw) == 'function' then
-                        rank:draw(self, layer)
-                    end
+            if not center.no_rank then
+                local rank = SMODS.Ranks[self.base.value] or {}
+                if rank.draw and type(rank.draw) == 'function' then
+                    rank:draw(self, layer)
                 end
             end
         end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 SMODS.DrawStep {
     key = 'card_type_shader',
     order = 10,
     func = function(self)
-        if not self.vortex and self.sprite_facing == 'front' then
-            if (self.ability.set == 'Voucher' or self.config.center.demo) and (self.ability.name ~= 'Antimatter' or not (self.config.center.discovered or self.bypass_discovery_center)) then
-                if self:should_draw_base_shader() then
-                    self.children.center:draw_shader('voucher', nil, self.ARGS.send_to_shader)
-                end
-            end
-            if (self.ability.set == 'Booster' or self.ability.set == 'Spectral') and self:should_draw_base_shader() then
-                self.children.center:draw_shader('booster', nil, self.ARGS.send_to_shader)
+        if (self.ability.set == 'Voucher' or self.config.center.demo) and (self.ability.name ~= 'Antimatter' or not (self.config.center.discovered or self.bypass_discovery_center)) then
+            if self:should_draw_base_shader() then
+                self.children.center:draw_shader('voucher', nil, self.ARGS.send_to_shader)
             end
         end
+        if (self.ability.set == 'Booster' or self.ability.set == 'Spectral') and self:should_draw_base_shader() then
+            self.children.center:draw_shader('booster', nil, self.ARGS.send_to_shader)
+        end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 
 SMODS.DrawStep {
     key = 'edition',
     order = 20,
     func = function(self, layer)
-        if not self.vortex and self.sprite_facing == 'front' then
-            if self.edition then
-                for k, v in pairs(G.P_CENTER_POOLS.Edition) do
-                    if self.edition[v.key:sub(3)] and v.shader then
-                        if type(v.draw) == 'function' then
-                            v:draw(self, layer)
-                        else
-                            self.children.center:draw_shader(v.shader, nil, self.ARGS.send_to_shader)
-                            if self.children.front and self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card then
-                                self.children.front:draw_shader(v.shader, nil, self.ARGS.send_to_shader)
-                            end
+        if self.edition then
+            for k, v in pairs(G.P_CENTER_POOLS.Edition) do
+                if self.edition[v.key:sub(3)] and v.shader then
+                    if type(v.draw) == 'function' then
+                        v:draw(self, layer)
+                    else
+                        self.children.center:draw_shader(v.shader, nil, self.ARGS.send_to_shader)
+                        if self.children.front and self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card then
+                            self.children.front:draw_shader(v.shader, nil, self.ARGS.send_to_shader)
                         end
                     end
                 end
             end
-            if (self.edition and self.edition.negative) or (self.ability.name == 'Antimatter' and (self.config.center.discovered or self.bypass_discovery_center)) then
-                self.children.center:draw_shader('negative_shine', nil, self.ARGS.send_to_shader)
-            end
+        end
+        if (self.edition and self.edition.negative) or (self.ability.name == 'Antimatter' and (self.config.center.discovered or self.bypass_discovery_center)) then
+            self.children.center:draw_shader('negative_shine', nil, self.ARGS.send_to_shader)
         end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 
 SMODS.DrawStep {
     key = 'seal',
     order = 30,
     func = function(self, layer)
-        if not self.vortex and self.sprite_facing == 'front' then
-            local seal = G.P_SEALS[self.seal] or {}
-            if type(seal.draw) == 'function' then
-                seal:draw(self, layer)
-            elseif self.seal then
-                G.shared_seals[self.seal].role.draw_major = self
-                G.shared_seals[self.seal]:draw_shader('dissolve', nil, nil, nil, self.children.center)
-                if self.seal == 'Gold' then G.shared_seals[self.seal]:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center) end
-            end
+        local seal = G.P_SEALS[self.seal] or {}
+        if type(seal.draw) == 'function' then
+            seal:draw(self, layer)
+        elseif self.seal then
+            G.shared_seals[self.seal].role.draw_major = self
+            G.shared_seals[self.seal]:draw_shader('dissolve', nil, nil, nil, self.children.center)
+            if self.seal == 'Gold' then G.shared_seals[self.seal]:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center) end
         end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 
 SMODS.DrawStep {
     key = 'stickers',
     order = 40,
     func = function(self, layer)
-        if not self.vortex and self.sprite_facing == 'front' then
-            if self.sticker and G.shared_stickers[self.sticker] then
-                G.shared_stickers[self.sticker].role.draw_major = self
-                G.shared_stickers[self.sticker]:draw_shader('dissolve', nil, nil, nil, self.children.center)
-                G.shared_stickers[self.sticker]:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center)
-            elseif (self.sticker_run and G.shared_stickers[self.sticker_run]) and G.SETTINGS.run_stake_stickers then
-                G.shared_stickers[self.sticker_run].role.draw_major = self
-                G.shared_stickers[self.sticker_run]:draw_shader('dissolve', nil, nil, nil, self.children.center)
-                G.shared_stickers[self.sticker_run]:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center)
-            end
+        if self.sticker and G.shared_stickers[self.sticker] then
+            G.shared_stickers[self.sticker].role.draw_major = self
+            G.shared_stickers[self.sticker]:draw_shader('dissolve', nil, nil, nil, self.children.center)
+            G.shared_stickers[self.sticker]:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center)
+        elseif (self.sticker_run and G.shared_stickers[self.sticker_run]) and G.SETTINGS.run_stake_stickers then
+            G.shared_stickers[self.sticker_run].role.draw_major = self
+            G.shared_stickers[self.sticker_run]:draw_shader('dissolve', nil, nil, nil, self.children.center)
+            G.shared_stickers[self.sticker_run]:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center)
+        end
 
-            for k, v in pairs(SMODS.Stickers) do
-                if self.ability[v.key] then
-                    if v and v.draw and type(v.draw) == 'function' then
-                        v:draw(self, layer)
-                    else
-                        G.shared_stickers[v.key].role.draw_major = self
-                        G.shared_stickers[v.key]:draw_shader('dissolve', nil, nil, nil, self.children.center)
-                        G.shared_stickers[v.key]:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center)
-                    end
+        for k, v in pairs(SMODS.Stickers) do
+            if self.ability[v.key] then
+                if v and v.draw and type(v.draw) == 'function' then
+                    v:draw(self, layer)
+                else
+                    G.shared_stickers[v.key].role.draw_major = self
+                    G.shared_stickers[v.key]:draw_shader('dissolve', nil, nil, nil, self.children.center)
+                    G.shared_stickers[v.key]:draw_shader('voucher', nil, self.ARGS.send_to_shader, nil, self.children.center)
                 end
             end
         end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 
 SMODS.DrawStep {
     key = 'soul',
     order = 50,
     func = function(self)
-        if not self.vortex and self.sprite_facing == 'front' then
-            if self.ability.name == 'The Soul' and (self.config.center.discovered or self.bypass_discovery_center) then
-                local scale_mod = 0.05 + 0.05*math.sin(1.8*G.TIMERS.REAL) + 0.07*math.sin((G.TIMERS.REAL - math.floor(G.TIMERS.REAL))*math.pi*14)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^3
-                local rotate_mod = 0.1*math.sin(1.219*G.TIMERS.REAL) + 0.07*math.sin((G.TIMERS.REAL)*math.pi*5)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^2
+        if self.ability.name == 'The Soul' and (self.config.center.discovered or self.bypass_discovery_center) then
+            local scale_mod = 0.05 + 0.05*math.sin(1.8*G.TIMERS.REAL) + 0.07*math.sin((G.TIMERS.REAL - math.floor(G.TIMERS.REAL))*math.pi*14)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^3
+            local rotate_mod = 0.1*math.sin(1.219*G.TIMERS.REAL) + 0.07*math.sin((G.TIMERS.REAL)*math.pi*5)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^2
 
-                G.shared_soul.role.draw_major = self
-                G.shared_soul:draw_shader('dissolve',0, nil, nil, self.children.center,scale_mod, rotate_mod,nil, 0.1 + 0.03*math.sin(1.8*G.TIMERS.REAL),nil, 0.6)
-                G.shared_soul:draw_shader('dissolve', nil, nil, nil, self.children.center, scale_mod, rotate_mod)
-            end
+            G.shared_soul.role.draw_major = self
+            G.shared_soul:draw_shader('dissolve',0, nil, nil, self.children.center,scale_mod, rotate_mod,nil, 0.1 + 0.03*math.sin(1.8*G.TIMERS.REAL),nil, 0.6)
+            G.shared_soul:draw_shader('dissolve', nil, nil, nil, self.children.center, scale_mod, rotate_mod)
         end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 
 SMODS.DrawStep {
     key = 'floating_sprite',
     order = 60,
     func = function(self)
-        if not self.vortex and self.sprite_facing == 'front' then
-            if self.config.center.soul_pos and (self.config.center.discovered or self.bypass_discovery_center) then
-                local scale_mod = 0.07 + 0.02*math.sin(1.8*G.TIMERS.REAL) + 0.00*math.sin((G.TIMERS.REAL - math.floor(G.TIMERS.REAL))*math.pi*14)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^3
-                local rotate_mod = 0.05*math.sin(1.219*G.TIMERS.REAL) + 0.00*math.sin((G.TIMERS.REAL)*math.pi*5)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^2
+        if self.config.center.soul_pos and (self.config.center.discovered or self.bypass_discovery_center) then
+            local scale_mod = 0.07 + 0.02*math.sin(1.8*G.TIMERS.REAL) + 0.00*math.sin((G.TIMERS.REAL - math.floor(G.TIMERS.REAL))*math.pi*14)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^3
+            local rotate_mod = 0.05*math.sin(1.219*G.TIMERS.REAL) + 0.00*math.sin((G.TIMERS.REAL)*math.pi*5)*(1 - (G.TIMERS.REAL - math.floor(G.TIMERS.REAL)))^2
 
-                if self.ability.name == 'Hologram' then
-                    self.hover_tilt = self.hover_tilt*1.5
-                    self.children.floating_sprite:draw_shader('hologram', nil, self.ARGS.send_to_shader, nil, self.children.center, 2*scale_mod, 2*rotate_mod)
-                    self.hover_tilt = self.hover_tilt/1.5
-                else
-                    self.children.floating_sprite:draw_shader('dissolve',0, nil, nil, self.children.center,scale_mod, rotate_mod,nil, 0.1 + 0.03*math.sin(1.8*G.TIMERS.REAL),nil, 0.6)
-                    self.children.floating_sprite:draw_shader('dissolve', nil, nil, nil, self.children.center, scale_mod, rotate_mod)
-                    if self.edition then 
-                        for k, v in pairs(G.P_CENTER_POOLS.Edition) do
-                            if v.apply_to_float then
-                                if self.edition[v.key:sub(3)] then
-                                    self.children.floating_sprite:draw_shader(v.shader, nil, nil, nil, self.children.center, scale_mod, rotate_mod)
-                                end
+            if self.ability.name == 'Hologram' then
+                self.hover_tilt = self.hover_tilt*1.5
+                self.children.floating_sprite:draw_shader('hologram', nil, self.ARGS.send_to_shader, nil, self.children.center, 2*scale_mod, 2*rotate_mod)
+                self.hover_tilt = self.hover_tilt/1.5
+            else
+                self.children.floating_sprite:draw_shader('dissolve',0, nil, nil, self.children.center,scale_mod, rotate_mod,nil, 0.1 + 0.03*math.sin(1.8*G.TIMERS.REAL),nil, 0.6)
+                self.children.floating_sprite:draw_shader('dissolve', nil, nil, nil, self.children.center, scale_mod, rotate_mod)
+                if self.edition then 
+                    for k, v in pairs(G.P_CENTER_POOLS.Edition) do
+                        if v.apply_to_float then
+                            if self.edition[v.key:sub(3)] then
+                                self.children.floating_sprite:draw_shader(v.shader, nil, nil, nil, self.children.center, scale_mod, rotate_mod)
                             end
                         end
                     end
@@ -338,83 +341,84 @@ SMODS.DrawStep {
             end
         end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 
 SMODS.DrawStep {
     key = 'debuff',
     order = 70,
     func = function(self)
-        if not self.vortex and self.sprite_facing == 'front' then
-            if self.debuff then
-                self.children.center:draw_shader('debuff', nil, self.ARGS.send_to_shader)
-                if self.children.front and (self.ability.delayed or (self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card)) then
-                    self.children.front:draw_shader('debuff', nil, self.ARGS.send_to_shader)
-                end
+        if self.debuff then
+            self.children.center:draw_shader('debuff', nil, self.ARGS.send_to_shader)
+            if self.children.front and (self.ability.delayed or (self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card)) then
+                self.children.front:draw_shader('debuff', nil, self.ARGS.send_to_shader)
             end
         end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 
 SMODS.DrawStep {
     key = 'greyed',
     order = 80,
     func = function(self)
-        if not self.vortex and self.sprite_facing == 'front' then
-            if self.greyed then
-                self.children.center:draw_shader('played', nil, self.ARGS.send_to_shader)
-                if self.children.front and (self.ability.delayed or (self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card)) then
-                    self.children.front:draw_shader('played', nil, self.ARGS.send_to_shader)
-                end
+        if self.greyed then
+            self.children.center:draw_shader('played', nil, self.ARGS.send_to_shader)
+            if self.children.front and (self.ability.delayed or (self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card)) then
+                self.children.front:draw_shader('played', nil, self.ARGS.send_to_shader)
             end
         end
     end,
+    conditions = { vortex = false, facing = 'front' },
 }
 
 SMODS.DrawStep {
     key = 'back',
     order = 0,
     func = function(self)
-        if not self.vortex and self.sprite_facing == 'back' then
-            local overlay = G.C.WHITE
-            if self.area and self.area.config.type == 'deck' and self.rank > 3 then
-                self.back_overlay = self.back_overlay or {}
-                self.back_overlay[1] = 0.5 + ((#self.area.cards - self.rank)%7)/50
-                self.back_overlay[2] = 0.5 + ((#self.area.cards - self.rank)%7)/50
-                self.back_overlay[3] = 0.5 + ((#self.area.cards - self.rank)%7)/50
-                self.back_overlay[4] = 1
-                overlay = self.back_overlay
-            end
+        local overlay = G.C.WHITE
+        if self.area and self.area.config.type == 'deck' and self.rank > 3 then
+            self.back_overlay = self.back_overlay or {}
+            self.back_overlay[1] = 0.5 + ((#self.area.cards - self.rank)%7)/50
+            self.back_overlay[2] = 0.5 + ((#self.area.cards - self.rank)%7)/50
+            self.back_overlay[3] = 0.5 + ((#self.area.cards - self.rank)%7)/50
+            self.back_overlay[4] = 1
+            overlay = self.back_overlay
+        end
 
-            if self.area and self.area.config.type == 'deck' then
-                self.children.back:draw(overlay)
-            else
-                self.children.back:draw_shader('dissolve')
-            end
+        if self.area and self.area.config.type == 'deck' then
+            self.children.back:draw(overlay)
+        else
+            self.children.back:draw_shader('dissolve')
         end
     end,
+    conditions = { vortex = false, facing = 'back' },
 } 
 
 SMODS.DrawStep {
     key = 'back_sticker',
     order = 10,
     func = function(self)
-        if not self.vortex and self.sprite_facing == 'back' then
-            if self.sticker and G.shared_stickers[self.sticker] then
-                G.shared_stickers[self.sticker].role.draw_major = self
-                local sticker_offset = self.sticker_offset or {}
-                G.shared_stickers[self.sticker]:draw_shader('dissolve', nil, nil, true, self.children.center, nil, self.sticker_rotation, sticker_offset.x, sticker_offset.y)
-                if self.sticker == 'Gold' then G.shared_stickers[self.sticker]:draw_shader('voucher', nil, self.ARGS.send_to_shader, true, self.children.center) end
-            end
+        if self.sticker and G.shared_stickers[self.sticker] then
+            G.shared_stickers[self.sticker].role.draw_major = self
+            local sticker_offset = self.sticker_offset or {}
+            G.shared_stickers[self.sticker]:draw_shader('dissolve', nil, nil, true, self.children.center, nil, self.sticker_rotation, sticker_offset.x, sticker_offset.y)
+            if self.sticker == 'Gold' then G.shared_stickers[self.sticker]:draw_shader('voucher', nil, self.ARGS.send_to_shader, true, self.children.center) end
         end
     end,
+    conditions = { vortex = false, facing = 'back' },
 }
 
+-- All keys in this table will not be automatically drawn with a default `draw()` call in the "others" DrawStep.
+SMODS.draw_ignore_keys = {
+    focused_ui = true, front = true, back = true, soul_parts = true, center = true, floating_sprite = true, shadow = true, use_button = true, buy_button = true, buy_and_use_button = true, debuff = true, price = true, particles = true, h_popup = true
+}
 SMODS.DrawStep {
     key = 'others',
     order = 90,
     func = function(self)
         for k, v in pairs(self.children) do
-            if not v.custom_draw and k ~= 'focused_ui' and k ~= "front" and k ~= "back" and k ~= "soul_parts" and k ~= "center" and k ~= 'floating_sprite' and k~= "shadow" and k~= "use_button" and k ~= 'buy_button' and k ~= 'buy_and_use_button' and k~= "debuff" and k ~= 'price' and k~= 'particles' and k ~= 'h_popup' then v:draw() end
+            if not v.custom_draw and not SMODS.draw_ignore_keys[k] then v:draw() end
         end
     end,
 }
@@ -441,6 +445,6 @@ SMODS.DrawStep {
 function Card:draw(layer)
     layer = layer or 'both'
     for _, k in ipairs(SMODS.DrawStep.obj_buffer) do
-        if SMODS.DrawSteps[k].layers[layer] then SMODS.DrawSteps[k].func(self, layer) end
+        if SMODS.DrawSteps[k]:check_conditions(self, layer) then SMODS.DrawSteps[k].func(self, layer) end
     end
 end
