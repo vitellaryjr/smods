@@ -1,7 +1,7 @@
 [manifest]
 version = "1.0.0"
 dump_lua = true
-priority = 0
+priority = -10
 
 
 # Luchador
@@ -361,4 +361,4 @@ pattern = '''message = localize('$')..self.ability.extra,
     dollars = self.ability.extra,'''
 position = "at"
 match_indent = true
-payload = '''message = localize('$')..self.ability.extra.dollars,'''
+payload = '''message = localize('$')..self.ability.extra,'''

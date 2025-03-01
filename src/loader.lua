@@ -157,6 +157,7 @@ function loadMods(modsDirectory)
             end
         end},
         main_file = { type = 'string', required = true },
+        config_file = {type = 'string', default = 'config.lua' },
         __ = { check = function(mod)
             if SMODS.Mods[mod.id] then error('dupe') end
         end},
@@ -583,6 +584,7 @@ function loadMods(modsDirectory)
             end
         end
     end
+    SMODS.get_optional_features()
     -- compat after loading mods
     if SMODS.compat_0_9_8.load_done then
         -- Invasive change to Card:generate_UIBox_ability_table()

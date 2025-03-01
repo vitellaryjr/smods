@@ -62,13 +62,109 @@ return {
                     'This mod has been',
                     '{C:attention}disabled!{}'
                 }
-            }
+            },
+
+
+            -- card perma bonuses
+            card_extra_chips={
+                text={
+                    "{C:chips}#1#{} extra chips",
+                },
+            },
+            card_x_chips = {
+                text = {
+                    "{X:chips,C:white}X#1#{} chips"
+                }
+            },
+            card_extra_x_chips = {
+                text = {
+                    "{X:chips,C:white}X#1#{} extra chips"
+                }
+            },
+            card_extra_mult = {
+                text = {
+                    "{C:mult}#1#{} extra Mult"
+                }
+            },
+            card_x_mult = {
+                text = {
+                    "{X:mult,C:white}X#1#{} Mult"
+                }
+            },
+            card_extra_x_mult = {
+                text = {
+                    "{X:mult,C:white}X#1#{} extra Mult"
+                }
+            },
+            card_extra_p_dollars = {
+                text = {
+                    "{C:money}#1#{} when scored",
+                }
+            },
+            card_extra_h_chips = {
+                text = {
+                    "{C:chips}#1#{} chips when held",
+                }
+            },
+            card_h_x_chips = {
+                text = {
+                    "{X:chips,C:white}X#1#{} chips when held",
+                }
+            },
+            card_extra_h_x_chips = {
+                text = {
+                    "{X:chips,C:white}X#1#{} extra chips when held",
+                }
+            },
+            card_extra_h_mult = {
+                text = {
+                    "{C:mult}#1#{} extra Mult when held",
+                }
+            },
+            card_h_x_mult = {
+                text = {
+                    "{X:mult,C:white}X#1#{} Mult when held",
+                }
+            },
+            card_extra_h_x_mult = {
+                text = {
+                    "{X:mult,C:white}X#1#{} extra Mult when held",
+                }
+            },
+            card_extra_h_dollars = {
+                text = {
+                    "{C:money}#1#{} if held at end of round",
+                },
+            },
         },
         Edition = {
             e_negative_playing_card = {
                 name = "Negative",
                 text = {
                     "{C:dark_edition}+#1#{} hand size"
+                },
+            },
+        },
+        Enhanced = {
+            m_gold={
+                name="Gold Card",
+                text={
+                    "{C:money}#1#{} if this",
+                    "card is held in hand",
+                    "at end of round",
+                },
+            },
+            m_stone={
+                name="Stone Card",
+                text={
+                    "{C:chips}#1#{} chips",
+                    "no rank or suit",
+                },
+            },
+            m_mult={
+                name="Mult Card",
+                text={
+                    "{C:mult}#1#{} Mult",
                 },
             },
         }
@@ -117,11 +213,16 @@ return {
                 'Disabled',
                 'Enabled',
                 'Bypass Restrictions'
-            }
+            },
+            b_deckskins_lc = 'Low Contrast Colors',
+            b_deckskins_hc = 'High Contrast Colors',
+            b_deckskins_def = 'Default Colors',
 		},
 		v_dictionary = {
 			c_types = '#1# Types',
 			cashout_hidden = '...and #1# more',
+            a_xchips = "X#1# Chips",
+            a_xchips_minus = "-X#1# Chips",
 		},
 	}
 }

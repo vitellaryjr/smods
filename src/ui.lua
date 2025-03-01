@@ -21,6 +21,9 @@ end
 
 local gameMainMenuRef = Game.main_menu
 function Game:main_menu(change_context)
+    for k, v in pairs(G.C.SUITS) do
+        G.FUNCS.update_suit_colours(k, G.SETTINGS.CUSTOM_DECK.Collabs[k])
+    end
     gameMainMenuRef(self, change_context)
     UIBox({
         definition = {
@@ -245,7 +248,7 @@ function buildModDescTab(mod)
             if (G.localization.descriptions.Mod or {})[mod.id] then
                 modNodes[#modNodes + 1] = {}
                 local loc_vars = mod.description_loc_vars and mod:description_loc_vars() or {}
-                localize { type = 'descriptions', key = loc_vars.key or mod.id, set = 'Mod', nodes = modNodes[#modNodes], vars = loc_vars.vars, scale = loc_vars.scale, text_colour = loc_vars.text_colour }
+                localize { type = 'descriptions', key = loc_vars.key or mod.id, set = 'Mod', nodes = modNodes[#modNodes], vars = loc_vars.vars, scale = loc_vars.scale, text_colour = loc_vars.text_colour, shadow = loc_vars.shadow }
                 modNodes[#modNodes] = desc_from_rows(modNodes[#modNodes])
                 modNodes[#modNodes].config.colour = loc_vars.background_colour or modNodes[#modNodes].config.colour
             else
@@ -945,13 +948,30 @@ function SMODS.load_mod_config(mod)
         return load(NFS.read(('config/%s.jkr'):format(mod.id)), ('=[SMODS %s "config"]'):format(mod.id))()
     end)
     local s2, default_config = pcall(function()
-        return load(NFS.read(('%sconfig.lua'):format(mod.path)), ('=[SMODS %s "default_config"]'):format(mod.id))()
+        return load(NFS.read(mod.path..(mod.config_file or 'config.lua')), ('=[SMODS %s "default_config"]'):format(mod.id))()
     end)
     if not s1 or type(config) ~= 'table' then config = {} end
     if not s2 or type(default_config) ~= 'table' then default_config = {} end
-    mod.config = {} 
-    for k, v in pairs(default_config) do mod.config[k] = v end
-    for k, v in pairs(config) do mod.config[k] = v end
+    mod.config = default_config
+    
+    local function insert_saved_config(savedCfg, defaultCfg)
+        for savedKey, savedVal in pairs(savedCfg) do
+            local savedValType = type(savedVal)
+            local defaultValType = type(defaultCfg[savedKey])
+            if not defaultCfg[savedKey] then
+                defaultCfg[savedKey] = savedVal
+            elseif savedValType ~= defaultValType then
+            elseif savedValType == "table" and defaultValType == "table" then
+                insert_saved_config(savedVal, defaultCfg[savedKey])
+            elseif savedVal ~= defaultCfg[savedKey] then
+                defaultCfg[savedKey] = savedVal
+            end
+            
+        end
+    end
+
+    insert_saved_config(config, mod.config)
+
     return mod.config
 end
 SMODS:load_mod_config()
