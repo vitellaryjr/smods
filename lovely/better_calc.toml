@@ -398,8 +398,6 @@ payload = '''
             if eval.edition then effects[#effects+1] = eval end
 
             SMODS.trigger_effects(effects, _card)
-            local deck_effect = G.GAME.selected_back:trigger_effect({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_joker = _card.ability.set == 'Joker' and _card or false, other_consumeable = _card.ability.set ~= 'Joker' and _card or false})
-            if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1] or G.deck) end
         end end
 '''
 # Joker effects
@@ -492,6 +490,27 @@ for _, _area in ipairs(SMODS.get_card_areas('jokers')) do
                     table.insert(effects, rt_eval)
                     for _, v in ipairs(rt_post) do effects[#effects+1] = v end
                 end
+            end
+        end
+    end
+end
+for _, _area in ipairs(SMODS.get_card_areas('individual')) do
+    local other_key = 'other_unknown'
+    if _card.ability.set == 'Joker' then other_key = 'other_joker' end
+    if _card.ability.consumeable then other_key = 'other_consumeable' end
+    if _card.ability.set == 'Voucher' then other_key = 'other_voucher' end
+    -- TARGET: add context.other_something identifier to your cards
+    local _eval,post = SMODS.eval_individual(_area, {full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, [other_key] = _card, other_main = _card })
+    if next(_eval) then
+        _eval.individual.juice_card = _joker
+        table.insert(effects, _eval)
+        for _, v in ipairs(post) do effects[#effects+1] = v end
+        if _eval.retriggers then
+            for rt = 1, #_eval.retriggers do
+                local rt_eval, rt_post = SMODS.eval_individual(_area, {full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, [other_key] = _card, retrigger_joker = true})
+                table.insert(effects, {_eval.retriggers[rt]})
+                table.insert(effects, rt_eval)
+                for _, v in ipairs(rt_post) do effects[#effects+1] = v end
             end
         end
     end
@@ -1528,3 +1547,13 @@ G.E_MANAGER:add_event(Event({
 
 playing_card_joker_effects({card})
 '''
+
+## Remove unneeded area check
+# Card:calculate_joker
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+position = 'at'
+pattern = 'if context.cardarea == G.jokers then'
+payload = 'do'
