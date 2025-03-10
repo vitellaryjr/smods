@@ -2,7 +2,6 @@
 version = "1.0.0"
 dump_lua = true
 priority = -10
-# temp solution, nothing matches if -10
 
 ## G.FUNCS.evaluate_play()
 # evaluate main scoring
@@ -1389,15 +1388,9 @@ for i=1, #G.play.cards do
     end
     local effects = {}
     SMODS.calculate_context({modify_scoring_hand = true, other_card =  G.play.cards[i], full_hand = G.play.cards, scoring_hand = scoring_hand}, effects)
-    SMODS.trigger_effects(effects, G.play.cards[i])
-    for _, eval in pairs(effects) do
-        if type(eval) == 'table' then
-            for key, eval2 in pairs(eval) do
-                if key == 'add_to_hand' or (type(eval2) == 'table' and eval2.add_to_hand) then splashed = true end
-                if key == 'remove_from_hand' or (type(eval2) == 'table' and eval2.remove_from_hand) then unsplashed = true end
-            end
-        end
-    end
+    local flags = SMODS.trigger_effects(effects, G.play.cards[i])
+    if flags.add_to_hand then splashed = true end
+	if flags.remove_from_hand then unsplashed = true end
     if splashed and not unsplashed then table.insert(final_scoring_hand, G.play.cards[i]) end
 end
 -- TARGET: adding to hand effects
@@ -1557,3 +1550,10 @@ match_indent = true
 position = 'at'
 pattern = 'if context.cardarea == G.jokers then'
 payload = 'do'
+
+[[patches]]
+[patches.regex]
+target = 'game.lua'
+position = 'at'
+pattern = 'G.GAME.blind:get_loc_debuff_text()'
+payload = 'SMODS.debuff_text or G.GAME.blind:get_loc_debuff_text()'

@@ -1828,3 +1828,64 @@ G.FUNCS.change_colour_palette = function(args)
 	end
 	G:save_settings()
 end
+
+-- blind calc contexts
+local disable = Blind.disable
+function Blind:disable()
+	disable(self)
+	SMODS.calculate_context({ blind_disabled = true })
+end
+
+local defeat = Blind.defeat
+function Blind:defeat(silent)
+	defeat(self, silent)
+	SMODS.calculate_context({ blind_defeated = true })
+end
+
+local press_play = Blind.press_play
+function Blind:press_play()
+	local ret = press_play(self)
+	SMODS.calculate_context({ press_play = true })
+	return ret
+end
+
+local debuff_card = Blind.debuff_card
+function Blind:debuff_card(card)
+	debuff_card(self, card)
+	local flags = SMODS.calculate_context({ debuff_card = card })
+	if flags.prevent_debuff then 
+		card:set_debuff(false)
+	elseif flags.debuff then
+		card:set_debuff(true)
+	end
+end
+
+local debuff_hand = Blind.debuff_hand
+function Blind:debuff_hand(cards, hand, handname, check)
+	local ret = debuff_hand(self, cards, hand, handname, check)
+	local _, _, _, scoring_hand = G.FUNCS.get_poker_hand_info(cards)
+	local final_scoring_hand = {}
+    for i=1, #cards do
+        local splashed = SMODS.always_scores(cards[i]) or next(find_joker('Splash'))
+        local unsplashed = SMODS.never_scores(cards[i])
+        if not splashed then
+            for _, card in pairs(scoring_hand) do
+                if card == cards[i] then splashed = true end
+            end
+        end
+        local effects = {}
+        SMODS.calculate_context({modify_scoring_hand = true, other_card =  cards[i], full_hand = cards, scoring_hand = scoring_hand}, effects)
+        local flags = SMODS.trigger_effects(effects, cards[i])
+		if flags.add_to_hand then splashed = true end
+		if flags.remove_from_hand then unsplashed = true end
+        if splashed and not unsplashed then table.insert(final_scoring_hand, G.play.cards[i]) end
+    end
+	local flags = SMODS.calculate_context({ debuff_hand = true, full_hand = cards, scoring_hand = final_scoring_hand, poker_hands = hand, scoring_name = handname, check = check })
+	if flags.prevent_debuff then return false end
+	if flags.debuff then
+		SMODS.debuff_text = flags.debuff_text
+		return true
+	end
+	SMODS.debuff_text = nil
+	return ret
+end
