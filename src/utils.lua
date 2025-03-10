@@ -1231,7 +1231,7 @@ SMODS.trigger_effects = function(effects, card)
         for key, effect in pairs(effect_table) do
             if key ~= 'smods' then
                 if type(effect) == 'table' then
-                    local calc = SMODS.calculate_effect(effect, card, key == 'edition')
+                    local calc = SMODS.calculate_effect(effect, effect.scored_card or card, key == 'edition')
                     if calc then effects.calculated = true end
                 end
             end
@@ -1389,59 +1389,34 @@ function SMODS.calculate_context(context, return_table)
         end
     end
     context.main_eval = nil
-    if context.scoring_hand then
-        for i=1, #G.play.cards do
-                if SMODS.in_scoring(G.play.cards[i], context.scoring_hand) then context.cardarea = G.play else context.cardarea = 'unscored' end
-            --calculate the played card effects
+    for _, area in ipairs(SMODS.get_card_areas('playing_cards')) do
+        if area == G.play and not context.scoring_hand then goto continue end
+        context.cardarea = area
+        for _, card in ipairs(area.cards) do
+            if area == G.play then
+                context.cardarea = SMODS.in_scoring(card, context.scoring_hand) and G.play or 'unscored'
+            end
+        --calculate the played card effects
             if return_table then
-                return_table[#return_table+1] = eval_card(G.play.cards[i], context)
-                SMODS.calculate_quantum_enhancements(G.play.cards[i], return_table, context)
+                return_table[#return_table+1] = eval_card(card, context)
+                --SMODS.calculate_quantum_enhancements(card, return_table, context)
             else
-                local effects = {eval_card(G.play.cards[i], context)}
-                SMODS.calculate_quantum_enhancements(G.play.cards[i], effects, context)
-                SMODS.trigger_effects(effects, G.play.cards[i])
+                local effects = {eval_card(card, context)}
+                SMODS.calculate_quantum_enhancements(card, effects, context)
+                SMODS.trigger_effects(effects, card)
             end
         end
+        ::continue::
     end
-    context.cardarea = G.hand
-    for i=1, #G.hand.cards do
-        --calculate the held card effects
+
+    for _, area in ipairs(SMODS.get_card_areas('individual')) do
         if return_table then
-            return_table[#return_table+1] = eval_card(G.hand.cards[i], context)
+            return_table[#return_table+1] = SMODS.eval_individual(area, context)
         else
-            local effects = {eval_card(G.hand.cards[i], context)}
-            SMODS.calculate_quantum_enhancements(G.hand.cards[i], effects, context)
-            SMODS.trigger_effects(effects, G.hand.cards[i])
+            local effects = {SMODS.eval_individual(area, context)}
+            SMODS.trigger_effects(effects, area.scored_card)
         end
     end
-    if SMODS.optional_features.cardareas.deck then
-        context.cardarea = G.deck
-        for i=1, #G.deck.cards do
-            --calculate the held card effects
-            if return_table then
-                return_table[#return_table+1] = eval_card(G.deck.cards[i], context)
-            else
-                local effects = {eval_card(G.deck.cards[i], context)}
-                SMODS.calculate_quantum_enhancements(G.deck.cards[i], effects, context)
-                SMODS.trigger_effects(effects, G.deck.cards[i])
-            end
-        end
-    end
-    if SMODS.optional_features.cardareas.discard then
-        context.cardarea = G.discard
-        for i=1, #G.discard.cards do
-            --calculate the held card effects
-            if return_table then
-                return_table[#return_table+1] = eval_card(G.discard.cards[i], context)
-            else
-                local effects = {eval_card(G.discard.cards[i], context)}
-                SMODS.calculate_quantum_enhancements(G.discard.cards[i], effects, context)
-                SMODS.trigger_effects(effects, G.discard.cards[i])
-            end
-        end
-    end
-    local effect = G.GAME.selected_back:trigger_effect(context)
-    if effect then SMODS.calculate_effect(effect, G.deck.cards[1] or G.deck) end
 end
 
 function SMODS.in_scoring(card, scoring_hand)
@@ -1712,7 +1687,50 @@ function SMODS.get_card_areas(_type, _context)
         -- TARGET: add your own CardAreas for joker evaluation
         return t
     end
+    if _type == 'individual' then
+        local t = {
+            { object = G.GAME.selected_back, scored_card = G.deck.cards[1] or G.deck },
+        }
+        if G.GAME.blind then t[#t+1] = { object = G.GAME.blind, scored_card = G.GAME.blind.children.animatedSprite } end
+        -- TARGET: add your own individual scoring targets
+        return t
+    end
     return {}
+end
+
+function Back:calculate(context)
+    return self:trigger_effect(context)
+end
+function Blind:calculate(context)
+    local obj = self.config.blind
+    if type(obj.calculate) == 'function' then
+        return obj:calculate(self, context)
+    end
+end
+
+function SMODS.eval_individual(individual, context)
+    local ret = {}
+    local post_trig = {}
+
+    local eff, triggered = individual.object:calculate(context)
+    if eff == true then eff = { remove = true } end
+    if type(eff) ~= 'table' then eff = nil end
+
+    if (eff and not eff.no_retrigger) or triggered then
+        if type(eff) == 'table' then eff.scored_card = eff.scored_card or individual.scored_card end
+        ret.individual = eff
+
+        if not (context.retrigger_joker_check or context.retrigger_joker) then
+            local retriggers = SMODS.calculate_retriggers(individual.object, context, ret)
+            if next(retriggers) then
+                ret.retriggers = retriggers
+            end
+        end
+        if not context.post_trigger and not context.retrigger_joker_check and SMODS.optional_features.post_trigger then
+            SMODS.calculate_context({blueprint_card = context.blueprint_card, post_trigger = true, other_card = individual.object, other_context = context, other_ret = ret}, post_trig)
+        end
+    end
+    return ret, post_trig
 end
 
 local flat_copy_table = function(tbl)
