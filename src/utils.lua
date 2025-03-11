@@ -862,7 +862,7 @@ function Card:can_calculate(ignore_debuff)
 end
 
 function Card:calculate_enhancement(context)
-    if not self:can_calculate() or self.ability.set ~= 'Enhanced' then return nil end
+    if self.ability.set ~= 'Enhanced' then return nil end
     local center = self.config.center
     if center.calculate and type(center.calculate) == 'function' then
         local o = center:calculate(self, context)
@@ -1100,8 +1100,8 @@ end
 -- This function handles the calculation of each effect returned to evaluate play.
 -- Can easily be hooked to add more calculation effects ala Talisman
 SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, from_edition)
-    if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
     if (key == 'chips' or key == 'h_chips' or key == 'chip_mod') and amount then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
         hand_chips = mod_chips(hand_chips + amount)
         update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
         if not effect.remove_default_message then
@@ -1121,6 +1121,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     if (key == 'mult' or key == 'h_mult' or key == 'mult_mod') and amount then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
         mult = mod_mult(mult + amount)
         update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
         if not effect.remove_default_message then
@@ -1140,6 +1141,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     if (key == 'p_dollars' or key == 'dollars' or key == 'h_dollars') and amount then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
         ease_dollars(amount)
         if not effect.remove_default_message then
             if effect.dollar_message then
@@ -1152,6 +1154,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     if (key == 'x_chips' or key == 'xchips' or key == 'Xchip_mod') and amount ~= 1 then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
         hand_chips = mod_chips(hand_chips * amount)
         update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
         if not effect.remove_default_message then
@@ -1171,6 +1174,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     if (key == 'x_mult' or key == 'xmult' or key == 'Xmult' or key == 'x_mult_mod' or key == 'Xmult_mod') and amount ~= 1 then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
         mult = mod_mult(mult * amount)
         update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
         if not effect.remove_default_message then
@@ -1190,6 +1194,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     if key == 'message' then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
         card_eval_status_text(effect.message_card or effect.juice_card or scored_card or effect.card or effect.focus, 'extra', nil, percent, nil, effect)
         return true
     end
@@ -1200,6 +1205,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     if key == 'swap' then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
         local old_mult = mult
         mult = mod_mult(hand_chips)
         hand_chips = mod_chips(old_mult)
@@ -1208,6 +1214,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     if key == 'level_up' then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
         local hand_type = effect.level_up_hand or G.GAME.last_hand_played
         level_up_hand(scored_card, hand_type, effect.instant, type(amount) == 'number' and amount or 1)
         return true
@@ -1276,11 +1283,11 @@ SMODS.calculation_keys = {
     'x_mult', 'Xmult', 'xmult', 'x_mult_mod', 'Xmult_mod',
     'p_dollars', 'dollars', 'h_dollars',
     'swap',
-    'message',
-    'level_up', 'func', 'extra',
     'saved', 'effect', 'remove',
     'debuff', 'prevent_debuff', 'debuff_text',
     'add_to_hand', 'remove_from_hand',
+    'message',
+    'level_up', 'func', 'extra',
 }
 
 SMODS.calculate_repetitions = function(card, context, reps)
@@ -1411,7 +1418,6 @@ SMODS.calculate_retriggers = function(card, context, _ret)
 end
 
 function Card:calculate_edition(context)
-    if not self:can_calculate() then return end
     if self.edition then
         local edition = G.P_CENTERS[self.edition.key]
         if edition.calculate and type(edition.calculate) == 'function' then
@@ -1541,7 +1547,7 @@ end
 function SMODS.calculate_context(context, return_table)
     local flags = {}
     context.main_eval = true
-    flags[#flags+1] = SMODS.calculate_card_areas('jokers', context, return_table, { joker_area = true})
+    flags[#flags+1] = SMODS.calculate_card_areas('jokers', context, return_table, { joker_area = true })
     context.main_eval = nil
     
     flags[#flags+1] = SMODS.calculate_card_areas('playing_cards', context, return_table)

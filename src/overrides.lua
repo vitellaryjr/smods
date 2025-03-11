@@ -1850,14 +1850,16 @@ function Blind:press_play()
 end
 
 local debuff_card = Blind.debuff_card
-function Blind:debuff_card(card)
-	debuff_card(self, card)
-	local flags = SMODS.calculate_context({ debuff_card = card })
+function Blind:debuff_card(card, from_blind)
+	local flags = SMODS.calculate_context({ debuff_card = card, ignore_debuff = true })
 	if flags.prevent_debuff then 
-		card:set_debuff(false)
+		if card.debuff then card:set_debuff(false) end
+		return
 	elseif flags.debuff then
-		card:set_debuff(true)
+		if not card.debuff then card:set_debuff(true) end
+		return
 	end
+	debuff_card(self, card, from_blind)
 end
 
 local debuff_hand = Blind.debuff_hand

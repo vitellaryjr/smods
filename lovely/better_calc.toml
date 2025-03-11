@@ -33,8 +33,8 @@ position = 'at'
 match_indent = true
 payload = '''
 function eval_card(card, context)
-    if card.ability.set ~= 'Joker' and not card:can_calculate() then return {}, {} end
     context = context or {}
+    if card.ability.set ~= 'Joker' and not card:can_calculate(context.ignore_debuff) then return {}, {} end
     local ret = {}
 '''
 
