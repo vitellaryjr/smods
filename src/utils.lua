@@ -610,7 +610,7 @@ V_MT = {
         local minorWildcard = string.match(minor, '%*')
         local patchWildcard = string.match(patch, '%*')
         if (minorFull ~= "" and minor == "") or (patchFull ~= "" and patch == "") then
-            sendWarnMessage('Trailing dot found in version "' .. str .. '".')
+            sendWarnMessage('Trailing dot found in version "' .. str .. '".', "Utils")
             major, minor, patch = -1, 0, 0
         end
         local t = {
@@ -1069,7 +1069,7 @@ end
 local function bufferCardLimitForSmallDS(cards, scaleFactor)
     local cardCount = #cards
     if type(scaleFactor) ~= "number" or scaleFactor <= 0 then
-        sendWarnMessage("scaleFactor must be a positive number")
+        sendWarnMessage("scaleFactor must be a positive number", "Utils")
         return cardCount
     end
     -- Ensure card_limit is always at least the number of cards
@@ -1500,7 +1500,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
     local flags = {}
     if _type == 'jokers' then
         for _, area in ipairs(SMODS.get_card_areas('jokers')) do
-            if args and args.joker_area then context.cardarea = area end
+            if args and args.joker_area and not args.has_area then context.cardarea = area end
             for _, _card in ipairs(area.cards) do
                 --calculate the joker effects
                 local eval, post = eval_card(_card, context)
@@ -1553,14 +1553,16 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
         end
         for _, area in ipairs(SMODS.get_card_areas('playing_cards')) do
             if area == G.play and not context.scoring_hand then goto continue end
-            context.cardarea = area
+            if not args or not args.has_area then context.cardarea = area end
             for _, card in ipairs(area.cards) do
-                if area == G.play then
-                    context.cardarea = SMODS.in_scoring(card, context.scoring_hand) and G.play or 'unscored'
-                elseif scoring_map[card] then
-                    context.cardarea = G.play
-                else
-                    context.cardarea = area
+                if not args or not args.has_area then
+                    if area == G.play then
+                        context.cardarea = SMODS.in_scoring(card, context.scoring_hand) and G.play or 'unscored'
+                    elseif scoring_map[card] then
+                        context.cardarea = G.play
+                    else
+                        context.cardarea = area
+                    end
                 end
             --calculate the played card effects
                 if return_table then
@@ -1611,12 +1613,13 @@ end
 -- Used to calculate contexts across G.jokers, scoring_hand (if present), G.play and G.GAME.selected_back
 -- Hook this function to add different areas to MOST calculations
 function SMODS.calculate_context(context, return_table)
+    local has_area = context.cardarea and true or nil
     local flags = {}
     context.main_eval = true
-    flags[#flags+1] = SMODS.calculate_card_areas('jokers', context, return_table, { joker_area = true })
+    flags[#flags+1] = SMODS.calculate_card_areas('jokers', context, return_table, { joker_area = true, has_area = has_area })
     context.main_eval = nil
     
-    flags[#flags+1] = SMODS.calculate_card_areas('playing_cards', context, return_table)
+    flags[#flags+1] = SMODS.calculate_card_areas('playing_cards', context, return_table, { has_area = has_area })
     flags[#flags+1] = SMODS.calculate_card_areas('individual', context, return_table)
     if not return_table then
         local ret = {}
@@ -1759,48 +1762,17 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
 
         -- context.destroying_card calculations
         context.destroy_card = card
+        context.destroying_card = nil
         if scoring_hand then
-            if SMODS.in_scoring(card, context.scoring_hand) then
+            if in_scoring then
                 context.cardarea = G.play
                 context.destroying_card = card
             else
                 context.cardarea = 'unscored'
-                context.destroying_card = nil
             end
         end
-        for _, area in ipairs(SMODS.get_card_areas('jokers')) do
-            local should_break
-            for _, _card in ipairs(area.cards) do
-                local eval, post = eval_card(_card, context)
-                local self_destroy = false
-                local flags = SMODS.trigger_effects({eval, post}, card)
-                if flags.remove then self_destroy = true end
-                if self_destroy then
-                    destroyed = true
-                    should_break = true
-                    break
-                end
-            end
-            if should_break then break end
-        end
-
-        for _, area in ipairs(SMODS.get_card_areas('individual')) do
-            if destroyed then break end
-            local eval, post = SMODS.eval_individual(area, context)
-            local self_destroy = false
-            local flags = SMODS.trigger_effects({eval, post}, card)
-            if flags.remove then self_destroy = true end
-            if self_destroy then destroyed = true end
-        end
-
-        if scoring_hand and in_scoring and SMODS.has_enhancement(card, 'm_glass') and card:can_calculate() and pseudorandom('glass') < G.GAME.probabilities.normal/(card.ability.name == 'Glass Card' and card.ability.extra or G.P_CENTERS.m_glass.config.extra) then
-            destroyed = true
-        end
-
-        local effects = {eval_card(card, context)}
-        local flags = SMODS.trigger_effects(effects, card)
-        local self_destroy = flags.remove
-        if self_destroy then destroyed = true end
+        local flags = SMODS.calculate_context(context)
+        if flags.remove then destroyed = true end
 
         -- TARGET: card destroyed
 
@@ -1815,20 +1787,20 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
     end
 end
 
-function SMODS.blueprint_effect(card, blueprint_card, context)
-    if card == blueprint_card then return end
-        context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
-        context.blueprint_card = context.blueprint_card or card
-        if context.blueprint > #G.jokers.cards + 1 then return end
-        local other_joker_ret = blueprint_card:calculate_joker(context)
-        context.blueprint = nil
-        local eff_card = context.blueprint_card or card
-        context.blueprint_card = nil
-        if other_joker_ret then
-            other_joker_ret.card = card
-            other_joker_ret.colour = G.C.BLUE
-            return other_joker_ret
-        end
+function SMODS.blueprint_effect(copier, copied_card, context)
+    if copied_card == copier then return end
+    context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
+    context.blueprint_card = context.blueprint_card or copier
+    if context.blueprint > #G.jokers.cards + 1 then return end
+    local other_joker_ret = copied_card:calculate_joker(context)
+    context.blueprint = nil
+    local eff_card = context.blueprint_card or copier
+    context.blueprint_card = nil
+    if other_joker_ret then
+        other_joker_ret.card = copier
+        other_joker_ret.colour = G.C.BLUE
+        return other_joker_ret
+    end
 end
 
 function SMODS.get_card_areas(_type, _context)
