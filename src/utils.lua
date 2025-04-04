@@ -983,7 +983,9 @@ end
 
 function SMODS.calculate_quantum_enhancements(card, effects, context)
     if not SMODS.optional_features.quantum_enhancements then return end
+    if context.extra_enhancement or context.check_enhancement or SMODS.extra_enhancement_calc_in_progress then return end
     context.extra_enhancement = true
+    SMODS.extra_enhancement_calc_in_progress = true
     local extra_enhancements = SMODS.get_enhancements(card, true)
     local old_ability = copy_table(card.ability)
     local old_center = card.config.center
@@ -1000,6 +1002,7 @@ function SMODS.calculate_quantum_enhancements(card, effects, context)
     card.config.center = old_center
     card.config.center_key = old_center_key
     context.extra_enhancement = nil
+    SMODS.extra_enhancement_calc_in_progress = nil
 end
 
 function SMODS.has_no_suit(card)
@@ -1551,7 +1554,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
             --calculate the played card effects
                 if return_table then
                     return_table[#return_table+1] = eval_card(card, context)
-                    --SMODS.calculate_quantum_enhancements(card, return_table, context)
+                    SMODS.calculate_quantum_enhancements(card, return_table, context)
                 else
                     local effects = {eval_card(card, context)}
                     SMODS.calculate_quantum_enhancements(card, effects, context)
