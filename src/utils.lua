@@ -555,6 +555,15 @@ function serialize_string(s)
     return string.format("%q", s)
 end
 
+function SMODS.shallow_copy(t)
+    local copy = {}
+    for k, v in next, t, nil do
+        copy[k] = v
+    end
+    setmetatable(copy, getmetatable(t))
+    return copy
+end
+
 -- Starting with `t`, insert any key-value pairs from `defaults` that don't already
 -- exist in `t` into `t`. Modifies `t`.
 -- Returns `t`, the result of the merge.

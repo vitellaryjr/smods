@@ -363,6 +363,11 @@ function serialize(t, indent) end
 --- Serializes provided string. 
 function serialize_strings(s) end
 
+---@param t table
+---@return table
+--- Return a shallow copy of table `t`.
+function SMODS.shallow_copy(t) end
+
 ---@param t false|table?
 ---@param defaults false|table?
 ---@return false|table?
