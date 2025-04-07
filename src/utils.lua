@@ -1787,7 +1787,7 @@ end
 
 function SMODS.blueprint_effect(copier, copied_card, context)
     if not copied_card or copied_card == copier or context.no_blueprint then return end
-    local context = SMODS.shallow_copy(context)
+    context = SMODS.shallow_copy(context)
     context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
     context.blueprint_card = context.blueprint_card or copier
     if context.blueprint > #G.jokers.cards + 1 then return end
