@@ -118,7 +118,7 @@ function SMODS.calculate_end_of_round_effects(context) end
 ---@param context CalcContext|table
 ---@param cards_destroyed Card[]|table[]
 ---@param scoring_hand Card[]|table[]
---- Handles calculating destroyed cards. 
+--- Handles calculating whether to destroy cards. Adds the destroyed cards to `cards_destroyed`.
 function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand) end
 
 ---@param effect table
@@ -189,7 +189,7 @@ function SMODS.calculate_quantum_enhancements(card, effects, context) end
 
 ---@param card Card|table
 ---@return boolean?
---- Check if the card shoud shatter. 
+--- Check if the card should shatter. 
 function SMODS.shatters(card) end
 
 ---@param card Card|table
