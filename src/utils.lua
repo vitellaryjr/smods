@@ -1569,7 +1569,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                 else
                     local effects = {eval_card(card, context)}
                     SMODS.calculate_quantum_enhancements(card, effects, context)
-                    local f = SMODS.trigger_effects(effects, _card)
+                    local f = SMODS.trigger_effects(effects, card)
                     for k,v in pairs(f) do flags[k] = v end
                 end
             end
