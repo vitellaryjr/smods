@@ -1600,3 +1600,17 @@ pattern = '''
 payload = '''
 {n=G.UIT.O, config={object = DynaText({string = {' '..localize(type(SMODS.saved) == 'string' and SMODS.saved or 'ph_mr_bones')..' '}, colours = {G.C.FILTER}, shadow = true, pop_in = 0, scale = 0.5*scale, silent = true})}}
 '''
+
+# Customise dissolve colours from calculate
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+position = 'before'
+pattern = '''
+local dissolve_time = 0.7*(dissolve_time_fac or 1)
+'''
+payload = '''
+dissolve_colours = dissolve_colours or (type(self.destroyed) == 'table' and self.destroyed.colours) or nil
+dissolve_time_fac = dissolve_time_fac or (type(self.destroyed) == 'table' and self.destroyed.time) or nil
+'''

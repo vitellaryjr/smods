@@ -1297,8 +1297,12 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
         return true
     end
     
-    if key == 'remove' or key == 'prevent_debuff' or key == 'add_to_hand' or key == 'remove_from_hand' or key == 'stay_flipped' or key == 'prevent_stay_flipped' then
+    if key == 'prevent_debuff' or key == 'add_to_hand' or key == 'remove_from_hand' or key == 'stay_flipped' or key == 'prevent_stay_flipped' then
         return key
+    end
+
+    if key == 'remove' then
+        return { [key] = amount }
     end
 
     if key == 'debuff' then
@@ -1778,7 +1782,7 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
             if SMODS.shatters(card) then
                 card.shattered = true
             else
-                card.destroyed = true
+                card.destroyed = flags.remove
             end
             cards_destroyed[#cards_destroyed+1] = card
         end
