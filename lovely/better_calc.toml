@@ -1587,3 +1587,16 @@ target = 'game.lua'
 position = 'at'
 pattern = 'G.GAME.blind:get_loc_debuff_text\(\)'
 payload = 'SMODS.debuff_text or G.GAME.blind:get_loc_debuff_text()'
+
+# Custom saved message
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+match_indent = true
+position = 'at'
+pattern = '''
+{n=G.UIT.O, config={object = DynaText({string = {' '..localize('ph_mr_bones')..' '}, colours = {G.C.FILTER}, shadow = true, pop_in = 0, scale = 0.5*scale, silent = true})}}
+'''
+payload = '''
+{n=G.UIT.O, config={object = DynaText({string = {' '..localize(type(SMODS.saved) == 'string' and SMODS.saved or 'ph_mr_bones')..' '}, colours = {G.C.FILTER}, shadow = true, pop_in = 0, scale = 0.5*scale, silent = true})}}
+'''
