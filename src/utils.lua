@@ -1854,7 +1854,7 @@ function SMODS.blueprint_effect(copier, copied_card, context)
     local eff_card = context.blueprint_card
     local other_joker_ret = copied_card:calculate_joker(context)
     if other_joker_ret then
-        other_joker_ret.card = eff_card
+        other_joker_ret.message_card = eff_card
         other_joker_ret.colour = G.C.BLUE
         return other_joker_ret
     end

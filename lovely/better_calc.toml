@@ -1195,7 +1195,7 @@ target = 'card.lua'
 match_indent = true
 position = 'at'
 pattern = 'other_joker_ret.card = context.blueprint_card or self'
-payload = '''other_joker_ret.card = eff_card'''
+payload = '''other_joker_ret.message_card = eff_card'''
 
 # Auto deal with negative chips card_eval_status_text()
 [[patches]]
