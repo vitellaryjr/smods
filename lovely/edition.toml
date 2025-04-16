@@ -191,7 +191,7 @@ pattern = "    not (card.ability.consumeable and #G.consumeables.cards < G.consu
 position = "at"
 match_indent = true
 payload = '''
-    not (card.ability.consumeable and #G.consumeables.cards < G.consumeables.config.card_limit + ((card.edition and card.edition.card_limit and card.edition.card_limit >= 1) and 1 or 0)) then
+    not (card.ability.consumeable and #G.consumeables.cards < G.consumeables.config.card_limit + (card.edition and card.edition.card_limit or 0)) then
 '''
 times = 1
 
@@ -203,14 +203,9 @@ pattern = "not (card.ability.set == 'Joker' and #G.jokers.cards < G.jokers.confi
 position = "at"
 match_indent = true
 payload = '''
-    not (card.ability.set == 'Joker' and #G.jokers.cards < G.jokers.config.card_limit + ((card.edition and card.edition.card_limit and card.edition.card_limit >= 1) and 1 or 0)) and
+    not (card.ability.set == 'Joker' and #G.jokers.cards < G.jokers.config.card_limit + (card.edition and card.edition.card_limit or 0)) and
 '''
 times = 1
-
-
-
-
-
 
 ## Negative playing card logic
 # CardArea:emplace()
