@@ -106,16 +106,6 @@ if context.cardarea == G.play and context.main_scoring then
     end
 
     -- TARGET: main scoring on played cards
-
-    local jokers = card:calculate_joker(context)
-    if jokers then
-        ret.jokers = jokers
-    end
-
-    local edition = card:calculate_edition(context)
-    if edition then
-        ret.edition = edition
-    end
 end
 if context.end_of_round and context.cardarea == G.hand and context.playing_card_end_of_round then
     local end_of_round = card:get_end_of_round_effect(context)
@@ -137,6 +127,11 @@ if context.cardarea == G.hand then
     local h_x_mult = card:get_chip_h_x_mult()
     if h_x_mult > 0 then
         ret.x_mult = h_x_mult
+    end
+
+    local jokers = card:calculate_joker(context)
+    if jokers then 
+        ret.jokers = jokers
     end
 '''
 match_indent = true
