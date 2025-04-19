@@ -1259,6 +1259,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
 
     if key == 'message' then
         if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
+        if effect.retrigger_juice then juice_card(effect.retrigger_juice) end
         card_eval_status_text(effect.message_card or effect.juice_card or scored_card or effect.card or effect.focus, 'extra', nil, percent, nil, effect)
         return true
     end
@@ -1429,6 +1430,7 @@ SMODS.insert_repetitions = function(ret, eval, effect_card, _type)
         if _type == 'joker_retrigger' then
             effect.retrigger_card = effect_card
             effect.message_card = effect.message_card or effect_card
+            effect.retrigger_flag = true
         elseif _type == 'individual_retrigger' then
             effect.retrigger_card = effect_card.object
             effect.message_card = effect.message_card or effect_card.scored_card
@@ -1437,7 +1439,7 @@ SMODS.insert_repetitions = function(ret, eval, effect_card, _type)
         end
         effect.message = effect.message or (not effect.remove_default_message and localize('k_again_ex'))
         for h=1, effect.repetitions do
-            table.insert(ret, { key = effect})
+            table.insert(ret, _type == "joker_retrigger" and effect or { key = effect})
         end
         eval = eval.extra
     until not eval
@@ -1474,6 +1476,7 @@ SMODS.calculate_repetitions = function(card, context, reps)
                 context.retrigger_joker = true
                 for rt = 1, #eval.retriggers do
                     context.retrigger_joker = eval.retriggers[rt].retrigger_card
+                    SMODS.insert_repetitions(reps, eval.retriggers[rt], eval.retriggers[rt].message_card or _card)
                     local rt_eval, rt_post = eval_card(_card, context)
                     if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
                     for key, value in pairs(rt_eval) do
@@ -1520,6 +1523,7 @@ SMODS.calculate_retriggers = function(card, context, _ret)
             local eval, post = eval_card(_card, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
             if next(post) then SMODS.trigger_effects({post}, _card) end
             for key, value in pairs(eval) do
+                value.retrigger_juice = card
                 SMODS.insert_repetitions(retriggers, value, _card, 'joker_retrigger')
             end
         end
@@ -1582,7 +1586,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                             rt_eval.jokers.juice_card = rt_eval.jokers.juice_card or rt_eval.jokers.card or _card
                             rt_eval.jokers.message_card = rt_eval.jokers.message_card or rt_eval.jokers.card or context.other_card
                         end
-                        table.insert(effects, {eval.retriggers[rt]})
+                        table.insert(effects, eval.retriggers[rt])
                         table.insert(effects, rt_eval)
                         for _,v in ipairs(rt_post) do effects[#effects+1] = v end
                     end
@@ -1697,6 +1701,7 @@ function SMODS.score_card(card, context)
     while j <= #reps do
         if reps[j] ~= 1 then
             local _, eff = next(reps[j])
+            if eff.retrigger_flag then SMODS.calculate_effect(eff, eff.card); j = j+1; _, eff = next(reps[j]) end
             SMODS.calculate_effect(eff, eff.card)
             percent = percent + percent_delta
         end
