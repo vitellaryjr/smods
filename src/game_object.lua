@@ -1062,6 +1062,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 key = self.key,
                 set = self.set,
                 nodes = desc_nodes,
+                AUT = full_UI_table,
                 vars =
                     specific_vars or {}
             }
@@ -1081,7 +1082,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             end
             if specific_vars and specific_vars.debuffed and not res.replace_debuff then
                 target = { type = 'other', key = 'debuffed_' ..
-                (specific_vars.playing_card and 'playing_card' or 'default'), nodes = desc_nodes }
+                (specific_vars.playing_card and 'playing_card' or 'default'), nodes = desc_nodes, AUT = full_UI_table, }
             end
             if res.main_start then
                 desc_nodes[#desc_nodes + 1] = res.main_start
@@ -1299,6 +1300,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 type = 'other',
                 key = self.key,
                 nodes = desc_nodes,
+                AUT = full_UI_table,
                 vars = {}
             }
             local res = {}
@@ -1696,6 +1698,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 set = 'Other',
                 key = self.key:lower()..'_seal',
                 nodes = desc_nodes,
+                AUT = full_UI_table,
                 vars = specific_vars or {},
             }
             local res = {}
@@ -2738,6 +2741,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 key = self.key,
                 set = self.set,
                 nodes = desc_nodes,
+                AUT = full_UI_table,
                 vars = specific_vars
             }
             local res = {}
