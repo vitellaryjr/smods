@@ -1850,10 +1850,10 @@ function SMODS.blueprint_effect(copier, copied_card, context)
     context.blueprint_card = context.blueprint_card or copier
     local eff_card = context.blueprint_card
     local other_joker_ret = copied_card:calculate_joker(context)
-    context.blueprint = (context.blueprint and (context.blueprint - 1)) or nil
+    context.blueprint = nil
     context.blueprint_card = old_context_blueprint_card
     if other_joker_ret then
-        other_joker_ret.message_card = eff_card
+        other_joker_ret.card = eff_card
         other_joker_ret.colour = G.C.BLUE
         return other_joker_ret
     end
