@@ -1561,7 +1561,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                 local eval, post = eval_card(_card, context)
                 if args and args.main_scoring and eval.jokers then
                     eval.jokers.juice_card = eval.jokers.juice_card or eval.jokers.card or _card
-                    eval.jokers.message_card = eval.jokers.message_card or eval.jokers.card or context.other_card
+                    eval.jokers.message_card = eval.jokers.message_card or context.other_card
                 end
 
                 local effects = {eval}
