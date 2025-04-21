@@ -14,6 +14,7 @@ for _, lines in ipairs(args.type == 'unlocks' and loc_target.unlock_parsed or ar
 '''
 payload = '''
 if (args.type == 'descriptions' or args.type == 'other') and type(loc_target.text) == 'table' and type(loc_target.text[1]) == 'table' then
+    args.AUT = args.AUT or {}
     args.AUT.multi_box = {}
     for i, box in ipairs(loc_target.text_parsed) do
         for _, line in ipairs(box) do
