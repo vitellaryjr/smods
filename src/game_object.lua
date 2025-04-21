@@ -916,6 +916,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
     SMODS.ConsumableTypes = {}
     SMODS.ConsumableType = SMODS.ObjectType:extend {
         ctype_buffer = {},
+        visible_buffer = {},
         set = 'ConsumableType',
         required_params = {
             'key',
@@ -926,7 +927,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         collection_rows = { 6, 6 },
         create_UIBox_your_collection = function(self)
             local type_buf = {}
-            for _, v in ipairs(SMODS.ConsumableType.ctype_buffer) do
+            for _, v in ipairs(SMODS.ConsumableType.visible_buffer) do
                 if not v.no_collection and (not G.ACTIVE_MOD_UI or modsCollectionTally(G.P_CENTER_POOLS[v]).of > 0) then type_buf[#type_buf + 1] = v end
             end
             return SMODS.card_collection_UIBox(G.P_CENTER_POOLS[self.key], self.collection_rows, { back_func = #type_buf>3 and 'your_collection_consumables' or nil })
@@ -935,6 +936,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             SMODS.ConsumableType.super.register(self)
             if self:check_dependencies() then
                 SMODS.ConsumableType.ctype_buffer[#SMODS.ConsumableType.ctype_buffer+1] = self.key
+                if not self.no_collection then SMODS.ConsumableType.visible_buffer[#SMODS.ConsumableType.visible_buffer + 1] = self.key end
             end
         end,
         inject = function(self)
