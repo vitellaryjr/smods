@@ -1584,9 +1584,9 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                         local rt_eval, rt_post = eval_card(_card, context)
                         if args and args.main_scoring and rt_eval.jokers then
                             rt_eval.jokers.juice_card = rt_eval.jokers.juice_card or rt_eval.jokers.card or _card
-                            rt_eval.jokers.message_card = rt_eval.jokers.message_card or rt_eval.jokers.card or context.other_card
+                            rt_eval.jokers.message_card = rt_eval.jokers.message_card or context.other_card
                         end
-                        table.insert(effects, eval.retriggers[rt])
+                        table.insert(effects, {key = eval.retriggers[rt]})
                         table.insert(effects, rt_eval)
                         for _,v in ipairs(rt_post) do effects[#effects+1] = v end
                     end
