@@ -829,7 +829,7 @@ function G.UIDEF.view_deck(unplayed_only)
 		suit_map[#suit_map + 1] = SMODS.Suit.obj_buffer[i]
 	end
 	for k, v in ipairs(G.playing_cards) do
-		if v.base.suit and not SMODS.has_no_suit(v) then table.insert(SUITS[v.base.suit], v) end
+		if v.base.suit then table.insert(SUITS[v.base.suit], v) end
 	end
 	local num_suits = 0
 	for j = 1, #suit_map do
