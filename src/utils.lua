@@ -1371,17 +1371,33 @@ end
 -- Used to calculate a table of effects generated in evaluate_play
 SMODS.trigger_effects = function(effects, card)
     local ret = {}
-    for i, effect_table in ipairs(effects) do
-        for key, effect in pairs(effect_table) do
-            if key ~= 'smods' then
-                if type(effect) == 'table' then
-                    local calc = SMODS.calculate_effect(effect, effect.scored_card or card, key == 'edition')
-                    for k,v in pairs(calc) do ret[k] = v end
-                end
-            end
+    for _, effect_table in ipairs(effects) do
+        -- note: these sections happen to be mutually exclusive:
+        -- Playing cards in scoring
+        for _, key in ipairs({'playing_card', 'enhancement', 'edition', 'seals'}) do
+            SMODS.calculate_effect_table_key(effect_table, key, card, ret)
         end
+        for _, key in ipairs(SMODS.Sticker.obj_buffer) do
+            SMODS.calculate_effect_table_key(effect_table, key, card, ret)
+        end
+        -- Playing cards at end of round
+        SMODS.calculate_effect_table_key(effect_table, 'end_of_round', card, ret)
+        -- Jokers
+        for _, key in ipairs({'jokers', 'retriggers'}) do
+            SMODS.calculate_effect_table_key(effect_table, key, card, ret)
+        end
+        -- todo: might want to move these keys to a customizable list/lists
     end
     return ret
+end
+
+-- Calculate one key of an effect table returned from eval_card.
+SMODS.calculate_effect_table_key = function(effect_table, key, card, ret)
+    local effect = effect_table[key]
+    if key ~= 'smods' and type(effect) == 'table' then
+        local calc = SMODS.calculate_effect(effect, effect.scored_card or card, key == 'edition')
+        for k, v in pairs(calc) do ret[k] = v end
+    end
 end
 
 SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
