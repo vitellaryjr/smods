@@ -1001,13 +1001,22 @@ function SMODS.calculate_quantum_enhancements(card, effects, context)
     local old_ability = copy_table(card.ability)
     local old_center = card.config.center
     local old_center_key = card.config.center_key
+    -- Note: For now, just trigger extra enhancements in order.
+    -- Future work: combine enhancements during 
+    -- playing card scoring (ex. Mult comes before Glass because +_mult
+    -- naturally comes before x_mult)
+    local extra_enhancements_list = {}
     for k, _ in pairs(extra_enhancements) do
         if G.P_CENTERS[k] then
-            card:set_ability(G.P_CENTERS[k], nil, 'quantum')
-            card.ability.extra_enhancement = k
-            local eval = eval_card(card, context)
-            table.insert(effects, eval)
+            table.insert(extra_enhancements_list, k)
         end
+    end
+    table.sort(extra_enhancements_list, function(a, b) return G.P_CENTERS[a].order < G.P_CENTERS[b].order end)
+    for _, k in ipairs(extra_enhancements_list) do
+        card:set_ability(G.P_CENTERS[k], nil, 'quantum')
+        card.ability.extra_enhancement = k
+        local eval = eval_card(card, context)
+        table.insert(effects, eval)
     end
     card.ability = old_ability
     card.config.center = old_center
