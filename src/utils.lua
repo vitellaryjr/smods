@@ -2274,7 +2274,9 @@ function SMODS.get_multi_boxes(multi_box)
     if multi_box then
         for i, box in ipairs(multi_box) do
             if i > 1 then multi_boxes[#multi_boxes+1] = {n=G.UIT.R, config={minh = 0.07}} end
-            multi_boxes[#multi_boxes+1] = desc_from_rows(box)
+            local _box = desc_from_rows(box)
+            print(_box)
+            multi_boxes[#multi_boxes+1] = _box
         end
     end
     return multi_boxes
