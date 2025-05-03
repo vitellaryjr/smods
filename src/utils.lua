@@ -1398,6 +1398,7 @@ SMODS.trigger_effects = function(effects, card)
         for _, key in ipairs({'jokers', 'retriggers'}) do
             SMODS.calculate_effect_table_key(effect_table, key, card, ret)
         end
+        SMODS.calculate_effect_table_key(effect_table, 'individual', card, ret)
         -- todo: might want to move these keys to a customizable list/lists
     end
     return ret
