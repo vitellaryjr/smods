@@ -222,7 +222,7 @@ if card.edition then
         ret.edition = edition
     end
 end
-if card.seal and not card.ability.extra_enhancement then
+if card.seal then
     local seals = card:calculate_seal(context)
     if seals then
         ret.seals = seals
