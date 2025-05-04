@@ -1389,8 +1389,9 @@ SMODS.trigger_effects = function(effects, card)
         for _, key in ipairs({'playing_card', 'enhancement', 'edition', 'seals'}) do
             SMODS.calculate_effect_table_key(effect_table, key, card, ret)
         end
-        for _, key in ipairs(SMODS.Sticker.obj_buffer) do
-            SMODS.calculate_effect_table_key(effect_table, key, card, ret)
+        for _, k in ipairs(SMODS.Sticker.obj_buffer) do
+            local v = SMODS.Stickers[k]
+            SMODS.calculate_effect_table_key(effect_table, v, card, ret)
         end
         -- Playing cards at end of round
         SMODS.calculate_effect_table_key(effect_table, 'end_of_round', card, ret)

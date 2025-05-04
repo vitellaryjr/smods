@@ -193,7 +193,8 @@ if card.seal then
         ret.seals = seals
     end
 end
-for k,v in pairs(SMODS.Stickers) do
+for _,k in ipairs(SMODS.Sticker.obj_buffer) do
+    local v = SMODS.Stickers[k]
     local sticker = card:calculate_sticker(context, k)
     if sticker then
         ret[v] = sticker
@@ -228,7 +229,8 @@ if card.seal then
         ret.seals = seals
     end
 end
-for k,v in pairs(SMODS.Stickers) do
+for _,k in ipairs(SMODS.Sticker.obj_buffer) do
+    local v = SMODS.Stickers[k]
     local sticker = card:calculate_sticker(context, k)
     if sticker then
         ret[v] = sticker
