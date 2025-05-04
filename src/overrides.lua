@@ -1796,18 +1796,6 @@ function get_pack(_key, _type)
    if not center then center = G.P_CENTERS['p_buffoon_normal_1'] end  return center
 end
 
---#region quantum enhancements API
--- prevent base chips from applying with extra enhancements
-local gcb = Card.get_chip_bonus
-function Card:get_chip_bonus()
-    if not self.ability.extra_enhancement then
-        return gcb(self)
-    end
-    if self.debuff then return 0 end
-    return self.ability.bonus
-end
---#endregion
-
 function playing_card_joker_effects(cards)
 	SMODS.calculate_context({playing_card_added = true, cards = cards})
 end
