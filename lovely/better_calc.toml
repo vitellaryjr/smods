@@ -1179,6 +1179,7 @@ pattern = '''context.blueprint = (context.blueprint and (context.blueprint + 1))
 context.blueprint_card = context.blueprint_card or self
 if context.blueprint > #G.jokers.cards + 1 then return end'''
 payload = '''if (context.blueprint or 0) > #G.jokers.cards then return end
+local old_context_blueprint = context.blueprint
 context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
 local old_context_blueprint_card = context.blueprint_card
 context.blueprint_card = context.blueprint_card or self
@@ -1190,16 +1191,8 @@ target = 'card.lua'
 match_indent = true
 position = 'after'
 pattern = '''local other_joker_ret = other_joker:calculate_joker(context)'''
-payload = '''context.blueprint = nil
+payload = '''context.blueprint = old_context_blueprint
 context.blueprint_card = old_context_blueprint_card'''
-
-[[patches]]
-[patches.pattern]
-target = 'card.lua'
-match_indent = true
-position = 'after'
-pattern = 'context.blueprint_card = context.blueprint_card or self'
-payload = 'local eff_card = context.blueprint_card'
 
 [[patches]]
 [patches.pattern]
