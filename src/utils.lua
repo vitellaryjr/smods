@@ -2175,8 +2175,7 @@ end
 
 function SMODS.multiplicative_stacking(base, perma)
     base = (base ~= 0 and base or 1)
-    perma = (perma ~= 0 and perma + 1 or 1)
-    local ret = base * perma
+    local ret = base * (perma + 1)
     return (ret == 1 and 0) or (ret > 0 and ret) or 0
 end
 

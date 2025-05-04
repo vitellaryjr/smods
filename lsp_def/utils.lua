@@ -508,5 +508,6 @@ function SMODS.signed_dollars(val) end
 ---@param base number
 ---@param perma number
 ---@return number
---- Returns result of multiplying `base` and `perma + 1`. 
+--- Returns result of multiplying `base` and `perma + 1`.
+--- Reproduces weird vanilla behavior of using 0 for no/negative x_mult.
 function SMODS.multiplicative_stacking(base, perma) end

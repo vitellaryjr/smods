@@ -90,7 +90,7 @@ pattern = '''\{card_limit = 4, type = 'title', highlight_limit = 0\}'''
 position = 'at'
 payload = '''{card_limit = 4, type = 'title', highlight_limit = 0, collection = true}'''
 
-## Save and load Card.unique_val
+## Save and load Card.unique_val, edition options
 # Card:save()
 [[patches]]
 [patches.pattern]
@@ -211,7 +211,7 @@ self.ability.extra_value = self.ability.extra_value or 0
 for k, v in pairs(new_ability) do
     self.ability[k] = v
 end
--- reset keys do not persist an ability change
+-- reset keys do not persist on ability change
 local reset_keys = {'name', 'effect', 'set', 'extra', 'played_this_ante', 'perma_debuff'}
 for _, mod in ipairs(SMODS.mod_list) do
     if mod.set_ability_reset_keys then
