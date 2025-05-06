@@ -1637,7 +1637,7 @@ payload = '''    SMODS.displayed_hand = text'''
 [patches.pattern]
 target = 'functions/state_events.lua'
 match_indent = true
-position = 'before'
-pattern = '''mult = mod_mult(0)'''
+position = 'after'
+pattern = '''hand_chips = mod_chips(0)'''
 payload = '''SMODS.displayed_hand = nil'''
 times = 1
