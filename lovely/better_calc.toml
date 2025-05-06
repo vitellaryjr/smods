@@ -565,7 +565,9 @@ payload = '''
 -- context.before calculations
 SMODS.calculate_context({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, before = true})
 
--- TARGET: effects before scoring starts'''
+-- TARGET: effects before scoring starts
+
+SMODS.displayed_hand = nil'''
 
 # context.final_scoring_step
 [[patches]]
@@ -1621,3 +1623,21 @@ payload = '''
 dissolve_colours = dissolve_colours or (type(self.destroyed) == 'table' and self.destroyed.colours) or nil
 dissolve_time_fac = dissolve_time_fac or (type(self.destroyed) == 'table' and self.destroyed.time) or nil
 '''
+
+# Smart level up functionality
+# G.FUNCS.evaluate_play()
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+match_indent = false
+position = 'after'
+pattern = '''delay = G.GAME.current_round.current_hand.handname ~= disp_text and 0.4 or 0}, {handname=disp_text, level=G.GAME.hands[text].level, mult = G.GAME.hands[text].mult, chips = G.GAME.hands[text].chips})'''
+payload = '''    SMODS.displayed_hand = text'''
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+match_indent = true
+position = 'before'
+pattern = '''mult = mod_mult(0)'''
+payload = '''SMODS.displayed_hand = nil'''
+times = 1
