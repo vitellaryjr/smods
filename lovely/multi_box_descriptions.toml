@@ -130,19 +130,10 @@ pattern = '''
 }}
 '''
 payload = '''
-
+if multi_boxes[1] then
+    for i=#multi_boxes, 1, -1 do
+        table.insert(ret_val.nodes[1].nodes[1].nodes[1].nodes, #ret_val.nodes[1].nodes[1].nodes[1].nodes, multi_boxes[i])
+    end
+end
 return ret_val
-'''
-
-# comment
-[[patches]]
-[patches.pattern]
-target = 'functions/UI_definitions.lua'
-match_indent = true
-position = 'after'
-pattern = '''
-desc_from_rows(AUT.main),
-'''
-payload = '''
-multi_boxes[1] and {n=G.UIT.R, nodes = multi_boxes} or nil,
 '''
