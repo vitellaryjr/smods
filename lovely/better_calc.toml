@@ -1648,5 +1648,6 @@ match_indent = false
 position = 'after'
 pattern = '''
   func = (function() G.GAME.current_round.current_hand.handname = '';return true end)
-}))'''
+}))
+delay(0.3)'''
 payload = '''    SMODS.displaying_scoring = nil'''
