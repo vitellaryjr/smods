@@ -1632,7 +1632,7 @@ target = 'functions/state_events.lua'
 match_indent = false
 position = 'after'
 pattern = '''delay = G.GAME.current_round.current_hand.handname ~= disp_text and 0.4 or 0}, {handname=disp_text, level=G.GAME.hands[text].level, mult = G.GAME.hands[text].mult, chips = G.GAME.hands[text].chips})'''
-payload = '''    SMODS.displayed_hand = text'''
+payload = '''    SMODS.displayed_hand = text; SMODS.displaying_scoring = true'''
 [[patches]]
 [patches.pattern]
 target = 'functions/state_events.lua'
@@ -1641,3 +1641,12 @@ position = 'after'
 pattern = '''hand_chips = mod_chips(0)'''
 payload = '''SMODS.displayed_hand = nil'''
 times = 1
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+match_indent = false
+position = 'after'
+pattern = '''
+  func = (function() G.GAME.current_round.current_hand.handname = '';return true end)
+}))'''
+payload = '''    SMODS.displaying_scoring = nil'''

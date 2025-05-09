@@ -177,6 +177,11 @@ function SMODS.blueprint_effect(copier, copied_card, context) end
 --- if it hasn't had mult/chips added
 SMODS.displayed_hand = nil
 
+---@type boolean?
+--- Internal global variable for smart_level_up_hand
+--- True if scoring is ongoing (chips/mult/etc. are being displayed on the left)
+SMODS.displaying_scoring = nil
+
 ---@param card? Card
 ---@param hand string
 ---@param instant boolean
