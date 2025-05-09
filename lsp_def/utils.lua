@@ -396,7 +396,7 @@ function serialize(t, indent) end
 ---@param s string
 ---@return string
 --- Serializes provided string. 
-function serialize_strings(s) end
+function serialize_string(s) end
 
 ---@param t table
 ---@return table
@@ -445,7 +445,8 @@ function SMODS.find_mod(id) end
 ---@param val any
 ---@param mode? ("index"|"i")|("value"|"v") Sets if the value is compared with the indexes or values of the table. 
 ---@param immediate? boolean
----Seatch for val anywhere deep in tbl. Return a table of finds, or the first found if args.immediate is provided.
+---@return table
+--- Searches for `val` anywhere deep in `tbl`. Return a table of finds, or the first found if args.immediate is provided.
 function SMODS.deepfind(tbl, val, mode, immediate) end
 
 --- Enables debugging Joker calculations. 
@@ -464,7 +465,7 @@ function SMODS.size_of_pool(pool) end
 
 ---@param vouchers {[number]: table, spawn: table<string, true>}?
 ---@return {[number]: table, spawn: table<string, true>} vouchers
---- Returns next vouchers to spawn. 
+--- Returns the next vouchers to spawn. 
 function SMODS.get_next_vouchers(vouchers) end
 
 ---@param key string
