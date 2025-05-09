@@ -96,10 +96,18 @@ function SMODS.get_optional_features() end
 
 ---@param context CalcContext|table 
 ---@param return_table? table 
----@return table
+---@return table? # Will use `return_table` over returning if provided.
 --- Used to calculate contexts across `G.jokers`, `scoring_hand` (if present), `G.play` and `G.GAME.selected_back`.
 --- Hook this function to add different areas to MOST calculations
 function SMODS.calculate_context(context, return_table) end
+
+---@param _type string Type of CardAreas to check
+---@param context CalcContext
+---@param return_table? table
+---@param args? table
+---@return table
+--- Calculates effects on cards across multiple cardareas based on provided `_type`.
+function SMODS.calculate_card_areas(_type, context, return_table, args) end
 
 ---@param card Card|table
 ---@param context CalcContext|table
