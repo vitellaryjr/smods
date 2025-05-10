@@ -2246,7 +2246,7 @@ function SMODS.seeing_double_check(hand, suit)
     if saw_double(suit_tally, suit) then return true else return false end
 end
 
-function SMODS.localize_box(lines, args)   
+function SMODS.localize_box(lines, args)
     local final_line = {}
     for _, part in ipairs(lines) do
         local assembled_string = ''

@@ -539,3 +539,25 @@ function SMODS.signed_dollars(val) end
 --- Returns result of multiplying `base` and `perma + 1`.
 --- Reproduces weird vanilla behavior of using 0 for no/negative x_mult.
 function SMODS.multiplicative_stacking(base, perma) end
+
+---@param card Card
+---@param suit string
+---@return boolean
+--- Checks if the suit can be smeared (e.x. Smeared Joker).
+function SMODS.smeared_check(card, suit) end
+
+---@param hand Card[]
+---@param suit string
+---@return boolean
+--- Checks if the provided `hand` meets the conditions to trigger Seeing Double.
+function SMODS.seeing_double_check(hand, suit) end
+
+---@param lines table
+---@param args table
+--- Handles localization description boxes.
+function SMODS.localize_box(lines, args) end
+
+---@param multi_box table
+---@return table multi_boxes
+--- Returns all description boxes within `multi_box`.
+function SMODS.get_multi_boxes(multi_box) end
