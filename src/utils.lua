@@ -225,7 +225,7 @@ function SMODS.handle_loc_file(path, mod_id)
 end
 
 function SMODS.insert_pool(pool, center, replace)
-    assert(pool, ("Attempted to insert object \"%s\" into an empty pool %s."):format(center.key or "UNKNOWN"))
+    assert(pool, ("Attempted to insert object \"%s\" into an empty pool."):format(center.key or "UNKNOWN"))
     if replace == nil then replace = center.taken_ownership end
     if replace then
         for k, v in ipairs(pool) do
