@@ -225,6 +225,7 @@ function SMODS.handle_loc_file(path, mod_id)
 end
 
 function SMODS.insert_pool(pool, center, replace)
+    assert(pool, ("Attempted to insert object \"%s\" into an empty pool %s."):format(center.key or "UNKNOWN"))
     if replace == nil then replace = center.taken_ownership end
     if replace then
         for k, v in ipairs(pool) do
@@ -242,6 +243,7 @@ function SMODS.insert_pool(pool, center, replace)
 end
 
 function SMODS.remove_pool(pool, key)
+    assert(pool, ("Attempted to remove object \"%s\" from an empty pool."):format(key or "UNKNOWN"))
     local j
     for i, v in ipairs(pool) do
         if v.key == key then j = i end
