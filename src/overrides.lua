@@ -651,14 +651,16 @@ function G.UIDEF.deck_preview(args)
 			if v.ability.wheel_flipped and not (v.area and v.area == G.deck) then wheel_flipped = wheel_flipped + 1 end
 			if v.ability.effect == 'Stone Card' then
 				stones = stones + 1
-			else
-				for kk, vv in pairs(suit_counts) do
-					if v.base.suit == kk then suit_counts[kk] = suit_counts[kk] + 1 end
-					if v:is_suit(kk) then mod_suit_counts[kk] = mod_suit_counts[kk] + 1 end
-				end
-				if SUITS[v.base.suit][v.base.value] then
-					table.insert(SUITS[v.base.suit][v.base.value], v)
-				end
+			end
+			local v_nr, v_ns = SMODS.has_no_rank(v), SMODS.has_no_suit(v)
+			for kk, vv in pairs(suit_counts) do
+				if v.base.suit == kk and not v_ns then suit_counts[kk] = suit_counts[kk] + 1 end
+				if v:is_suit(kk) then mod_suit_counts[kk] = mod_suit_counts[kk] + 1 end
+			end
+			if SUITS[v.base.suit][v.base.value] and not v_nr and not v_ns then
+				table.insert(SUITS[v.base.suit][v.base.value], v)
+			end
+			if not v_nr then
 				rank_counts[v.base.value] = (rank_counts[v.base.value] or 0) + 1
 			end
 		end
@@ -739,7 +741,8 @@ function G.UIDEF.deck_preview(args)
 						G.ASSET_ATLAS[SMODS.Suits[v][G.SETTINGS.colour_palettes[v] == 'hc' and "hc_ui_atlas" or G.SETTINGS.colour_palettes[v] == 'lc' and "lc_ui_atlas"]] or
 						G.ASSET_ATLAS[("ui_" .. (G.SETTINGS.colourblind_option and "2" or "1"))], SMODS.Suits[v].ui_pos)
 			else
-				t_s = Sprite(0, 0, 0.3, 0.3, G.ASSET_ATLAS[("ui_" .. (G.SETTINGS.colourblind_option and "2" or "1"))], SMODS.Suits[v].ui_pos)
+				local atlas = G.SETTINGS.colour_palettes[v] == "hc" and SMODS.Suits[v].hc_ui_atlas or SMODS.Suits[v].lc_ui_atlas
+				t_s = Sprite(0, 0, 0.3, 0.3, G.ASSET_ATLAS[atlas and atlas or ("ui_" .. (G.SETTINGS.colourblind_option and "2" or "1"))], SMODS.Suits[v].ui_pos)
 			end
 
 			t_s.states.drag.can = false
@@ -912,17 +915,18 @@ function G.UIDEF.view_deck(unplayed_only)
 	for k, v in ipairs(G.playing_cards) do
 		if v.ability.name ~= 'Stone Card' and (not unplayed_only or ((v.area and v.area == G.deck) or v.ability.wheel_flipped)) then
 			if v.ability.wheel_flipped and not (v.area and v.area == G.deck) and unplayed_only then wheel_flipped = wheel_flipped + 1 end
+			local v_nr, v_ns = SMODS.has_no_rank(v), SMODS.has_no_suit(v)
 			--For the suits
-			if v.base.suit then suit_tallies[v.base.suit] = (suit_tallies[v.base.suit] or 0) + 1 end
+			if v.base.suit and not v_ns then suit_tallies[v.base.suit] = (suit_tallies[v.base.suit] or 0) + 1 end
 			for kk, vv in pairs(mod_suit_tallies) do
 				mod_suit_tallies[kk] = (vv or 0) + (v:is_suit(kk) and 1 or 0)
 			end
 
 			--for face cards/numbered cards/aces
 			local card_id = v:get_id()
-			if v.base.value then face_tally = face_tally + ((SMODS.Ranks[v.base.value].face) and 1 or 0) end
+			if v.base.value and not v_nr then face_tally = face_tally + ((SMODS.Ranks[v.base.value].face) and 1 or 0) end
 			mod_face_tally = mod_face_tally + (v:is_face() and 1 or 0)
-			if v.base.value and not SMODS.Ranks[v.base.value].face and card_id ~= 14 then
+			if v.base.value and not v_nr and not SMODS.Ranks[v.base.value].face and card_id ~= 14 then
 				num_tally = num_tally + 1
 				if not v.debuff then mod_num_tally = mod_num_tally + 1 end
 			end
@@ -932,8 +936,8 @@ function G.UIDEF.view_deck(unplayed_only)
 			end
 
 			--ranks
-			if v.base.value then rank_tallies[v.base.value] = rank_tallies[v.base.value] + 1 end
-			if v.base.value and not v.debuff then mod_rank_tallies[v.base.value] = mod_rank_tallies[v.base.value] + 1 end
+			if v.base.value and not v_nr then rank_tallies[v.base.value] = rank_tallies[v.base.value] + 1 end
+			if v.base.value and not v_nr and not v.debuff then mod_rank_tallies[v.base.value] = mod_rank_tallies[v.base.value] + 1 end
 		end
 	end
 	local modded = face_tally ~= mod_face_tally
@@ -1414,7 +1418,7 @@ function Card:set_edition(edition, immediate, silent, delay)
 
 	local edition_type = nil
 	if type(edition) == 'string' then
-		assert(string.sub(edition, 1, 2) == 'e_')
+		assert(string.sub(edition, 1, 2) == 'e_', ("Edition \"%s\" is missing \"e_\" prefix."):format(edition))
 		edition_type = string.sub(edition, 3)
 	elseif type(edition) == 'table' then
 		if edition.type then
@@ -1422,7 +1426,7 @@ function Card:set_edition(edition, immediate, silent, delay)
 		else
 			for k, v in pairs(edition) do
 				if v then
-					assert(not edition_type)
+					assert(not edition_type, "Tried to apply more than one edition.")
 					edition_type = k
 				end
 			end
@@ -1580,10 +1584,10 @@ function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
 	for _, v in ipairs(_options) do
 		local edition_option = {}
 		if type(v) == 'string' then
-			assert(string.sub(v, 1, 2) == 'e_')
+			assert(string.sub(v, 1, 2) == 'e_', ("Edition \"%s\" is missing \"e_\" prefix."):format(v))
 			edition_option = { name = v, weight = G.P_CENTERS[v].weight }
 		elseif type(v) == 'table' then
-			assert(string.sub(v.name, 1, 2) == 'e_')
+			assert(string.sub(v.name, 1, 2) == 'e_', ("Edition \"%s\" is missing \"e_\" prefix."):format(v.name))
 			edition_option = { name = v.name, weight = v.weight }
 		end
 		table.insert(available_editions, edition_option)
@@ -1643,7 +1647,7 @@ function get_joker_win_sticker(_center, index)
 		local applied = {}
 		local _count = 0
 		local _stake = nil
-		for k, v in pairs(joker_usage.wins_by_key) do
+		for k, v in pairs(joker_usage.wins_by_key or {}) do
 			SMODS.build_stake_chain(G.P_STAKES[k], applied)
 		end
 		for i, v in ipairs(G.P_CENTER_POOLS.Stake) do
@@ -1792,25 +1796,6 @@ function get_pack(_key, _type)
     end
    if not center then center = G.P_CENTERS['p_buffoon_normal_1'] end  return center
 end
-
---#region quantum enhancements API
--- prevent base chips from applying with extra enhancements
-local gcb = Card.get_chip_bonus
-function Card:get_chip_bonus()
-    if not self.ability.extra_enhancement then
-        return gcb(self)
-    end
-    if self.debuff then return 0 end
-    return self.ability.bonus + (self.ability.perma_bonus or 0)
-end
-
--- prevent quantum enhacements from applying seal effects
-local ccs = Card.calculate_seal
-function Card:calculate_seal(context)
-	if self.ability.extra_enhancement then return end
-	return ccs(self, context)
-end
---#endregion
 
 function playing_card_joker_effects(cards)
 	SMODS.calculate_context({playing_card_added = true, cards = cards})

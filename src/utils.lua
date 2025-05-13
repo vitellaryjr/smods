@@ -67,7 +67,7 @@ function inspectFunction(func)
 end
 
 function SMODS._save_d_u(o)
-    assert(not o._discovered_unlocked_overwritten)
+    assert(not o._discovered_unlocked_overwritten, ("Internal: discovery/unlocked of object \"%s\" should not be overwritten at this stage."):format(o and o.key or "UNKNOWN"))
     o._d, o._u = o.discovered, o.unlocked
     o._saved_d_u = true
 end
@@ -225,6 +225,7 @@ function SMODS.handle_loc_file(path, mod_id)
 end
 
 function SMODS.insert_pool(pool, center, replace)
+    assert(pool, ("Attempted to insert object \"%s\" into an empty pool."):format(center.key or "UNKNOWN"))
     if replace == nil then replace = center.taken_ownership end
     if replace then
         for k, v in ipairs(pool) do
@@ -242,6 +243,7 @@ function SMODS.insert_pool(pool, center, replace)
 end
 
 function SMODS.remove_pool(pool, key)
+    assert(pool, ("Attempted to remove object \"%s\" from an empty pool."):format(key or "UNKNOWN"))
     local j
     for i, v in ipairs(pool) do
         if v.key == key then j = i end
@@ -428,7 +430,7 @@ function SMODS.restart_game()
     if love.system.getOS() ~= 'OS X' then
         love.thread.newThread("os.execute(...)\n"):start('"' .. arg[-2] .. '" ' .. table.concat(arg, " "))
     else
-        os.execute('sh "/Users/$USER/Library/Application Support/Steam/steamapps/common/Balatro/run_lovely.sh" &')
+        os.execute('sh "/Users/$USER/Library/Application Support/Steam/steamapps/common/Balatro/run_lovely_macos.sh" &')
     end
 
     love.event.quit()
@@ -442,7 +444,7 @@ function SMODS.create_mod_badges(obj, badges)
         badges.mod_set[obj.mod.id] = true
         if obj.dependencies then
             for _, v in ipairs(obj.dependencies) do
-                local m = assert(SMODS.find_mod(v)[1])
+                local m = assert(SMODS.find_mod(v)[1], ("Could not find mod \"%s\"."):format(v))
                 if not badges.mod_set[m.id] then
                     table.insert(mods, m)
                     badges.mod_set[m.id] = true
@@ -654,7 +656,7 @@ function SMODS.merge_lists(...)
     local ret = {}
     local seen = {}
     for _, li in ipairs(t) do
-        assert(type(li) == 'table')
+        assert(type(li) == 'table', ("\"%s\" is not a table."):format(tostring(li)))
         for _, v in ipairs(li) do
             if not seen[v] then
                 ret[#ret+1] = v
@@ -700,10 +702,10 @@ function SMODS.poll_seal(args)
         if v ~= "UNAVAILABLE" then
             local seal_option = {}
             if type(v) == 'string' then
-                assert(G.P_SEALS[v])
+                assert(G.P_SEALS[v], ("Could not find seal \"%s\"."):format(v))
                 seal_option = { key = v, weight = G.P_SEALS[v].weight or 5 } -- default weight set to 5 to replicate base game weighting
             elseif type(v) == 'table' then
-                assert(G.P_SEALS[v.key])
+                assert(G.P_SEALS[v.key], ("Could not find seal \"%s\"."):format(v.key))
                 seal_option = { key = v.key, weight = v.weight }
             end
             if seal_option.weight > 0 then
@@ -849,10 +851,10 @@ function SMODS.poll_enhancement(args)
         if v ~= "UNAVAILABLE" then
             local enhance_option = {}
             if type(v) == 'string' then
-                assert(G.P_CENTERS[v])
+                assert(G.P_CENTERS[v], ("Could not find enhancement \"%s\"."):format(v))
                 enhance_option = { key = v, weight = G.P_CENTERS[v].weight or 5 } -- default weight set to 5 to replicate base game weighting
             elseif type(v) == 'table' then
-                assert(G.P_CENTERS[v.key])
+                assert(G.P_CENTERS[v.key], ("Could not find enhancement \"%s\"."):format(v.key))
                 enhance_option = { key = v.key, weight = v.weight }
             end
             if enhance_option.weight > 0 then
@@ -1001,13 +1003,22 @@ function SMODS.calculate_quantum_enhancements(card, effects, context)
     local old_ability = copy_table(card.ability)
     local old_center = card.config.center
     local old_center_key = card.config.center_key
+    -- Note: For now, just trigger extra enhancements in order.
+    -- Future work: combine enhancements during 
+    -- playing card scoring (ex. Mult comes before Glass because +_mult
+    -- naturally comes before x_mult)
+    local extra_enhancements_list = {}
     for k, _ in pairs(extra_enhancements) do
         if G.P_CENTERS[k] then
-            card:set_ability(G.P_CENTERS[k], nil, 'quantum')
-            card.ability.extra_enhancement = k
-            local eval = eval_card(card, context)
-            table.insert(effects, eval)
+            table.insert(extra_enhancements_list, k)
         end
+    end
+    table.sort(extra_enhancements_list, function(a, b) return G.P_CENTERS[a].order < G.P_CENTERS[b].order end)
+    for _, k in ipairs(extra_enhancements_list) do
+        card:set_ability(G.P_CENTERS[k], nil, 'quantum')
+        card.ability.extra_enhancement = k
+        local eval = eval_card(card, context)
+        table.insert(effects, eval)
     end
     card.ability = old_ability
     card.config.center = old_center
@@ -1161,6 +1172,26 @@ G.FUNCS.update_suit_colours = function(suit, skin, palette_num)
     G.C.SUITS[suit] = new_colour_proto
 end
 
+SMODS.smart_level_up_hand = function(card, hand, instant, amount)
+    -- Cases:
+    -- Level ups in context.before on the played hand
+    --     -> direct level_up_hand(), keep displaying
+    -- Level ups in context.before on another hand AND any level up during scoring
+    --     -> restore the current chips/mult
+    -- Level ups outside anything -> always update to empty chips/mult
+    local vals_after_level
+    if SMODS.displaying_scoring and not (SMODS.displayed_hand == hand) then
+        vals_after_level = copy_table(G.GAME.current_round.current_hand)
+    end
+    if not (instant or SMODS.displayed_hand == hand) then
+        update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize(hand, 'poker_hands'),chips = G.GAME.hands[hand].chips, mult = G.GAME.hands[hand].mult, level=G.GAME.hands[hand].level})
+    end
+    level_up_hand(card, hand, instant, type(amount) == 'number' and amount or 1)
+    if not (instant or SMODS.displayed_hand == hand) then
+        update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, vals_after_level or {mult = 0, chips = 0, handname = '', level = ''})
+    end
+end
+
 -- This function handles the calculation of each effect returned to evaluate play.
 -- Can easily be hooked to add more calculation effects ala Talisman
 SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, from_edition)
@@ -1259,6 +1290,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
 
     if key == 'message' then
         if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
+        if effect.retrigger_juice then juice_card(effect.retrigger_juice) end
         card_eval_status_text(effect.message_card or effect.juice_card or scored_card or effect.card or effect.focus, 'extra', nil, percent, nil, effect)
         return true
     end
@@ -1333,7 +1365,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     if key == 'level_up' then
         if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
         local hand_type = effect.level_up_hand or G.GAME.last_hand_played
-        level_up_hand(scored_card, hand_type, effect.instant, type(amount) == 'number' and amount or 1)
+        SMODS.smart_level_up_hand(scored_card, hand_type, effect.instant, amount)
         return true
     end
 
@@ -1370,17 +1402,35 @@ end
 -- Used to calculate a table of effects generated in evaluate_play
 SMODS.trigger_effects = function(effects, card)
     local ret = {}
-    for i, effect_table in ipairs(effects) do
-        for key, effect in pairs(effect_table) do
-            if key ~= 'smods' then
-                if type(effect) == 'table' then
-                    local calc = SMODS.calculate_effect(effect, effect.scored_card or card, key == 'edition')
-                    for k,v in pairs(calc) do ret[k] = v end
-                end
-            end
+    for _, effect_table in ipairs(effects) do
+        -- note: these sections happen to be mutually exclusive:
+        -- Playing cards in scoring
+        for _, key in ipairs({'playing_card', 'enhancement', 'edition', 'seals'}) do
+            SMODS.calculate_effect_table_key(effect_table, key, card, ret)
         end
+        for _, k in ipairs(SMODS.Sticker.obj_buffer) do
+            local v = SMODS.Stickers[k]
+            SMODS.calculate_effect_table_key(effect_table, v, card, ret)
+        end
+        -- Playing cards at end of round
+        SMODS.calculate_effect_table_key(effect_table, 'end_of_round', card, ret)
+        -- Jokers
+        for _, key in ipairs({'jokers', 'retriggers'}) do
+            SMODS.calculate_effect_table_key(effect_table, key, card, ret)
+        end
+        SMODS.calculate_effect_table_key(effect_table, 'individual', card, ret)
+        -- todo: might want to move these keys to a customizable list/lists
     end
     return ret
+end
+
+-- Calculate one key of an effect table returned from eval_card.
+SMODS.calculate_effect_table_key = function(effect_table, key, card, ret)
+    local effect = effect_table[key]
+    if key ~= 'smods' and type(effect) == 'table' then
+        local calc = SMODS.calculate_effect(effect, effect.scored_card or card, key == 'edition')
+        for k, v in pairs(calc) do ret[k] = v end
+    end
 end
 
 SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
@@ -1429,6 +1479,7 @@ SMODS.insert_repetitions = function(ret, eval, effect_card, _type)
         if _type == 'joker_retrigger' then
             effect.retrigger_card = effect_card
             effect.message_card = effect.message_card or effect_card
+            effect.retrigger_flag = true
         elseif _type == 'individual_retrigger' then
             effect.retrigger_card = effect_card.object
             effect.message_card = effect.message_card or effect_card.scored_card
@@ -1437,7 +1488,7 @@ SMODS.insert_repetitions = function(ret, eval, effect_card, _type)
         end
         effect.message = effect.message or (not effect.remove_default_message and localize('k_again_ex'))
         for h=1, effect.repetitions do
-            table.insert(ret, { key = effect})
+            table.insert(ret, _type == "joker_retrigger" and effect or { retriggers = effect})
         end
         eval = eval.extra
     until not eval
@@ -1474,6 +1525,7 @@ SMODS.calculate_repetitions = function(card, context, reps)
                 context.retrigger_joker = true
                 for rt = 1, #eval.retriggers do
                     context.retrigger_joker = eval.retriggers[rt].retrigger_card
+                    SMODS.insert_repetitions(reps, eval.retriggers[rt], eval.retriggers[rt].message_card or _card)
                     local rt_eval, rt_post = eval_card(_card, context)
                     if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
                     for key, value in pairs(rt_eval) do
@@ -1520,6 +1572,7 @@ SMODS.calculate_retriggers = function(card, context, _ret)
             local eval, post = eval_card(_card, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
             if next(post) then SMODS.trigger_effects({post}, _card) end
             for key, value in pairs(eval) do
+                value.retrigger_juice = card
                 SMODS.insert_repetitions(retriggers, value, _card, 'joker_retrigger')
             end
         end
@@ -1561,7 +1614,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                 local eval, post = eval_card(_card, context)
                 if args and args.main_scoring and eval.jokers then
                     eval.jokers.juice_card = eval.jokers.juice_card or eval.jokers.card or _card
-                    eval.jokers.message_card = eval.jokers.message_card or eval.jokers.card or context.other_card
+                    eval.jokers.message_card = eval.jokers.message_card or context.other_card
                 end
 
                 local effects = {eval}
@@ -1580,9 +1633,9 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                         local rt_eval, rt_post = eval_card(_card, context)
                         if args and args.main_scoring and rt_eval.jokers then
                             rt_eval.jokers.juice_card = rt_eval.jokers.juice_card or rt_eval.jokers.card or _card
-                            rt_eval.jokers.message_card = rt_eval.jokers.message_card or rt_eval.jokers.card or context.other_card
+                            rt_eval.jokers.message_card = rt_eval.jokers.message_card or context.other_card
                         end
-                        table.insert(effects, {eval.retriggers[rt]})
+                        table.insert(effects, {retriggers = eval.retriggers[rt]})
                         table.insert(effects, rt_eval)
                         for _,v in ipairs(rt_post) do effects[#effects+1] = v end
                     end
@@ -1648,7 +1701,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                 for rt = 1, #effects[1].retriggers do
                     context.retrigger_joker = effects[1].retriggers[rt].retrigger_card
                     local rt_eval, rt_post = SMODS.eval_individual(area, context)
-                    table.insert(effects, {effects[1].retriggers[rt]})
+                    table.insert(effects, {retriggers = effects[1].retriggers[rt]})
                     table.insert(effects, rt_eval)
                     for _,v in ipairs(rt_post) do effects[#effects+1] = v end
                 end
@@ -1697,6 +1750,7 @@ function SMODS.score_card(card, context)
     while j <= #reps do
         if reps[j] ~= 1 then
             local _, eff = next(reps[j])
+            if eff.retrigger_flag then SMODS.calculate_effect(eff, eff.card); j = j+1; _, eff = next(reps[j]) end
             SMODS.calculate_effect(eff, eff.card)
             percent = percent + percent_delta
         end
@@ -1844,15 +1898,15 @@ end
 
 function SMODS.blueprint_effect(copier, copied_card, context)
     if not copied_card or copied_card == copier or context.no_blueprint then return end
-    context = SMODS.shallow_copy(context)
+    if (context.blueprint or 0) > #G.jokers.cards then return end
+    local old_context_blueprint = context.blueprint
     context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
+    local old_context_blueprint_card = context.blueprint_card
     context.blueprint_card = context.blueprint_card or copier
-    if context.blueprint > #G.jokers.cards + 1 then return end
-    -- context.blueprint_card should be constant,
-    -- but copy it anyway in case a mod still uses the old bugged
-    -- code of blueprint_effect
     local eff_card = context.blueprint_card
     local other_joker_ret = copied_card:calculate_joker(context)
+    context.blueprint = old_context_blueprint
+    context.blueprint_card = old_context_blueprint_card
     if other_joker_ret then
         other_joker_ret.card = eff_card
         other_joker_ret.colour = G.C.BLUE
@@ -2141,8 +2195,7 @@ end
 
 function SMODS.multiplicative_stacking(base, perma)
     base = (base ~= 0 and base or 1)
-    perma = (perma ~= 0 and perma + 1 or 1)
-    local ret = base * perma
+    local ret = base * (perma + 1)
     return (ret == 1 and 0) or (ret > 0 and ret) or 0
 end
 
@@ -2193,4 +2246,62 @@ function SMODS.seeing_double_check(hand, suit)
         end
     end
     if saw_double(suit_tally, suit) then return true else return false end
+end
+
+function SMODS.localize_box(lines, args)
+    local final_line = {}
+    for _, part in ipairs(lines) do
+        local assembled_string = ''
+        for _, subpart in ipairs(part.strings) do
+            assembled_string = assembled_string..(type(subpart) == 'string' and subpart or format_ui_value(args.vars[tonumber(subpart[1])]) or 'ERROR')
+        end
+        local desc_scale = G.LANG.font.DESCSCALE
+        if G.F_MOBILE_UI then desc_scale = desc_scale*1.5 end
+        if part.control.E then
+            local _float, _silent, _pop_in, _bump, _spacing = nil, true, nil, nil, nil
+            if part.control.E == '1' then
+                _float = true; _silent = true; _pop_in = 0
+            elseif part.control.E == '2' then
+                _bump = true; _spacing = 1
+            end
+            final_line[#final_line+1] = {n=G.UIT.C, config={align = "m", colour = part.control.B and args.vars.colours[tonumber(part.control.B)] or part.control.X and loc_colour(part.control.X) or nil, r = 0.05, padding = 0.03, res = 0.15}, nodes={}}
+            final_line[#final_line].nodes[1] = {n=G.UIT.O, config={
+            object = DynaText({string = {assembled_string}, colours = {part.control.V and args.vars.colours[tonumber(part.control.V)] or loc_colour(part.control.C or nil)},
+                float = _float,
+                silent = _silent,
+                pop_in = _pop_in,
+                bump = _bump,
+                spacing = _spacing,
+                scale = 0.32*(part.control.s and tonumber(part.control.s) or args.scale  or 1)*desc_scale})
+            }}
+        elseif part.control.X or part.control.B then
+            final_line[#final_line+1] = {n=G.UIT.C, config={align = "m", colour = part.control.B and args.vars.colours[tonumber(part.control.B)] or loc_colour(part.control.X), r = 0.05, padding = 0.03, res = 0.15}, nodes={
+                {n=G.UIT.T, config={
+                text = assembled_string,
+                colour = part.control.V and args.vars.colours[tonumber(part.control.V)] or loc_colour(part.control.C or nil),
+                scale = 0.32*(part.control.s and tonumber(part.control.s) or args.scale  or 1)*desc_scale}},
+            }}
+        else
+            final_line[#final_line+1] = {n=G.UIT.T, config={
+            detailed_tooltip = part.control.T and (G.P_CENTERS[part.control.T] or G.P_TAGS[part.control.T]) or nil,
+            text = assembled_string,
+            shadow = args.shadow,
+            colour = part.control.V and args.vars.colours[tonumber(part.control.V)] or not part.control.C and args.text_colour or loc_colour(part.control.C or nil, args.default_col),
+            scale = 0.32*(part.control.s and tonumber(part.control.s) or args.scale  or 1)*desc_scale},}
+        end
+    end
+    return final_line
+end
+
+function SMODS.get_multi_boxes(multi_box)
+    local multi_boxes = {}
+    if multi_box then
+        for i, box in ipairs(multi_box) do
+            if i > 1 then multi_boxes[#multi_boxes+1] = {n=G.UIT.R, config={minh = 0.07}} end
+            local _box = desc_from_rows(box)
+            print(_box)
+            multi_boxes[#multi_boxes+1] = _box
+        end
+    end
+    return multi_boxes
 end

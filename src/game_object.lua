@@ -21,7 +21,7 @@ function loadAPIs()
 
     function SMODS.GameObject:__call(o)
         o = o or {}
-        assert(o.mod == nil)
+        assert(o.mod == nil, "Created object should not have \"mod\" field defined.")
         o.mod = SMODS.current_mod
         o.original_mod = o.mod
         setmetatable(o, self)
@@ -172,7 +172,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             o.atlas = o.atlas or o.set
 
             if o._discovered_unlocked_overwritten then
-                assert(o._saved_d_u)
+                assert(o._saved_d_u, ("Internal: original discovery/unlocked state for object \"%s\" should have been saved at this point."):format(o and o.key or "UNKNOWN"))
                 o.discovered, o.unlocked = o._d, o._u
                 o._discovered_unlocked_overwritten = false
             else
@@ -425,7 +425,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 self.replace_sounds[replace] = { key = self.key, times = times, args = args }
             end
             -- TODO detect music state based on if select_music_track exists
-            assert(not self.select_music_track or self.key:find('music'))
+            assert(not self.select_music_track or self.key:find('music'), ("Object \"%s\" has a defined \"select_music_track\" but is not a music track."):format(self.key))
             SMODS.Sound.super.register(self)
         end,
         inject = function(self)
@@ -883,6 +883,11 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             for _, v in pairs(SMODS.Rarities) do
                 if v.pools and v.pools[self.key] and not injected_rarities[v.key] then SMODS.inject_rarity(self, v) end
             end
+            if self.cards then
+                for k, v in pairs(G.P_CENTERS) do
+                    if self.cards[k] then self:inject_card(v) end
+                end
+            end
         end,
         inject_card = function(self, center)
             if center.set ~= self.key then SMODS.insert_pool(G.P_CENTER_POOLS[self.key], center) end
@@ -916,6 +921,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
     SMODS.ConsumableTypes = {}
     SMODS.ConsumableType = SMODS.ObjectType:extend {
         ctype_buffer = {},
+        visible_buffer = {},
         set = 'ConsumableType',
         required_params = {
             'key',
@@ -926,7 +932,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         collection_rows = { 6, 6 },
         create_UIBox_your_collection = function(self)
             local type_buf = {}
-            for _, v in ipairs(SMODS.ConsumableType.ctype_buffer) do
+            for _, v in ipairs(SMODS.ConsumableType.visible_buffer) do
                 if not v.no_collection and (not G.ACTIVE_MOD_UI or modsCollectionTally(G.P_CENTER_POOLS[v]).of > 0) then type_buf[#type_buf + 1] = v end
             end
             return SMODS.card_collection_UIBox(G.P_CENTER_POOLS[self.key], self.collection_rows, { back_func = #type_buf>3 and 'your_collection_consumables' or nil })
@@ -935,6 +941,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             SMODS.ConsumableType.super.register(self)
             if self:check_dependencies() then
                 SMODS.ConsumableType.ctype_buffer[#SMODS.ConsumableType.ctype_buffer+1] = self.key
+                if not self.no_collection then SMODS.ConsumableType.visible_buffer[#SMODS.ConsumableType.visible_buffer + 1] = self.key end
             end
         end,
         inject = function(self)
@@ -1062,6 +1069,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 key = self.key,
                 set = self.set,
                 nodes = desc_nodes,
+                AUT = full_UI_table,
                 vars =
                     specific_vars or {}
             }
@@ -1081,7 +1089,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             end
             if specific_vars and specific_vars.debuffed and not res.replace_debuff then
                 target = { type = 'other', key = 'debuffed_' ..
-                (specific_vars.playing_card and 'playing_card' or 'default'), nodes = desc_nodes }
+                (specific_vars.playing_card and 'playing_card' or 'default'), nodes = desc_nodes, AUT = full_UI_table, }
             end
             if res.main_start then
                 desc_nodes[#desc_nodes + 1] = res.main_start
@@ -1299,6 +1307,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 type = 'other',
                 key = self.key,
                 nodes = desc_nodes,
+                AUT = full_UI_table,
                 vars = {}
             }
             local res = {}
@@ -1696,6 +1705,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 set = 'Other',
                 key = self.key:lower()..'_seal',
                 nodes = desc_nodes,
+                AUT = full_UI_table,
                 vars = specific_vars or {},
             }
             local res = {}
@@ -1813,7 +1823,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                             ranks = {'Ace', 'King', 'Queen', 'Jack', '10', '9', '8', '7', '6', '5', '4', '3', '2'},
                             display_ranks = {'King', 'Queen', 'Jack'},
                             atlas = self.hc_atlas,
-                            pos_style = 'deck'
+                            pos_style = 'deck',
+                            hc_default = true
                         } or nil,
                     }
                 }
@@ -2738,6 +2749,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 key = self.key,
                 set = self.set,
                 nodes = desc_nodes,
+                AUT = full_UI_table,
                 vars = specific_vars
             }
             local res = {}
@@ -2937,13 +2949,10 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         -- if true, enhanced card is any suit
         -- always_scores
         -- if true, card always scores
-        -- loc_subtract_extra_chips
-        -- During tooltip generation, number of chips to subtract from displayed extra chips.
-        -- Use if enhancement already displays its own chips.
         -- Future work: use ranks() and suits() for better control
         register = function(self)
             self.config = self.config or {}
-            assert(not (self.no_suit and self.any_suit))
+            assert(not (self.no_suit and self.any_suit), "Cannot have both \"no_suit\" and \"any_suit\" defined in a SMODS.Enhancement object.")
             if self.no_rank then self.overrides_base_rank = true end
             SMODS.Enhancement.super.register(self)
         end,
