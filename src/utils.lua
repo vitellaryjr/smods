@@ -2153,7 +2153,7 @@ end
 
 function SMODS.change_voucher_limit(mod)
     G.GAME.modifiers.extra_vouchers = (G.GAME.modifiers.extra_vouchers or 0) + mod
-    if mod > 0 and (G.STATE == G.STATES.SHOP or G.TAROT_INTERRUPT == G.STATES.SHOP) then
+    if mod > 0 and G.shop then
         for i=1, mod do
             SMODS.add_voucher_to_shop()
         end
@@ -2173,7 +2173,7 @@ end
 
 function SMODS.change_booster_limit(mod)
     G.GAME.modifiers.extra_boosters = (G.GAME.modifiers.extra_boosters or 0) + mod
-    if mod > 0 and (G.STATE == G.STATES.SHOP or G.TAROT_INTERRUPT == G.STATES.SHOP) then
+    if mod > 0 and G.shop then
         for i = 1, mod do
             SMODS.add_booster_to_shop()
         end
