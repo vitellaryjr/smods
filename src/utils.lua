@@ -1394,7 +1394,11 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
         return { [key] = amount, debuff_source = scored_card }
     end
 
-    if key == 'debuff_text' then 
+    if key == 'debuff_text' then
+        return { [key] = amount }
+    end
+    
+    if key == 'cards_to_draw' then
         return { [key] = amount }
     end
 end
@@ -1462,6 +1466,7 @@ SMODS.calculation_keys = {
     'debuff', 'prevent_debuff', 'debuff_text',
     'add_to_hand', 'remove_from_hand',
     'stay_flipped', 'prevent_stay_flipped',
+    'cards_to_draw',
     'message',
     'level_up', 'func', 'extra',
 }
@@ -2362,4 +2367,38 @@ function SMODS.change_discard_limit(mod)
     end
     G.hand.config.highlighted_limit = math.max(G.GAME.starting_params.discard_limit, G.GAME.starting_params.play_limit, 5)
     SMODS.hand_limit_strings.discard = G.GAME.starting_params.discard_limit ~= 5 and localize('b_limit') .. math.max(0, G.GAME.starting_params.discard_limit) or ''
+end
+
+function SMODS.draw_cards(hand_space)
+    if not (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK or G.STATE == G.STATES.SMODS_BOOSTER_OPENED) and
+        G.hand.config.card_limit <= 0 and #G.hand.cards == 0 then 
+        G.STATE = G.STATES.GAME_OVER; G.STATE_COMPLETE = false 
+        return true
+    end
+
+    local flags = SMODS.calculate_context({drawing_cards = true, amount = hand_space})
+    hand_space = math.min(#G.deck.cards, flags.cards_to_draw or hand_space)
+    delay(0.3)
+    SMODS.drawn_cards = {}
+    for i=1, hand_space do --draw cards from deckL
+        if G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK then 
+            draw_card(G.deck,G.hand, i*100/hand_space,'up', true)
+        else
+            draw_card(G.deck,G.hand, i*100/hand_space,'up', true)
+        end
+    end
+    G.E_MANAGER:add_event(Event({
+        trigger = 'before',
+        delay = 0.4,
+        func = function()
+            if #SMODS.drawn_cards > 0 then
+                SMODS.calculate_context({first_hand_drawn = not G.GAME.current_round.any_hand_drawn and G.GAME.facing_blind,
+                                        hand_drawn = G.GAME.facing_blind and SMODS.drawn_cards,
+                                        other_drawn = not G.GAME.facing_blind and SMODS.drawn_cards})
+                SMODS.drawn_cards = {}
+                if G.GAME.facing_blind then G.GAME.current_round.any_hand_drawn = true end
+            end
+            return true
+        end
+    }))
 end
