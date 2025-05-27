@@ -17,6 +17,18 @@ play_limit = 5,
 discard_limit = 5,
 no_limit = '',
 '''
+# Reset visual indicators
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+match_indent = true
+position = 'after'
+pattern = '''
+self.GAME = saveTable and saveTable.GAME or self:init_game_object()
+'''
+payload = '''
+SMODS.update_hand_limit_text(true, true)
+'''
 
 
 # Change hand limit
