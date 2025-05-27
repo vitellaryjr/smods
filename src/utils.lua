@@ -1843,6 +1843,8 @@ function SMODS.calculate_end_of_round_effects(context)
             end
 
             context.playing_card_end_of_round = true
+            print("Calculating playing_card_end_of_round for "..card.base.name)
+            print(inspect(context))
             --calculate the hand effects
             local effects = {eval_card(card, context)}
             SMODS.calculate_quantum_enhancements(card, effects, context)
@@ -1866,6 +1868,7 @@ function SMODS.calculate_end_of_round_effects(context)
 
             context.repetition = nil
             context.card_effects = nil
+            context.other_card = nil
             j = j + (flags.calculated and 1 or #reps)
 
             -- TARGET: effects after end of round evaluation
