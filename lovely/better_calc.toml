@@ -1043,7 +1043,7 @@ position = 'at'
 match_indent = true
 payload = '''
 G.E_MANAGER:add_event(Event({func = function()
-    local eval, post = eval_card(c1, {buying_card = true, card = c1})
+    local eval, post = eval_card(c1, {buying_card = true, buying_self = true, card = c1}) -- buying_card left for back compat, buying_self recommended to use
     SMODS.trigger_effects({eval, post}, c1)
     return true
     end}))
