@@ -1037,25 +1037,26 @@ function G.UIDEF.view_deck(unplayed_only)
 	local visible_suits = {}
 	local temp_list = {}
 	while i <= math.min(4, #visible_suit) do
-		while #n_nodes < suits_per_row and i <= #suit_map do
-			if not hidden_suits[visible_suit[i]] then
-				table.insert(n_nodes, tally_sprite(
-					SMODS.Suits[visible_suit[i]].ui_pos,
-					{
-						{ string = '' .. suit_tallies[visible_suit[i]], colour = flip_col },
-						{ string = '' .. mod_suit_tallies[visible_suit[i]], colour = G.C.BLUE }
-					},
-					{ localize(visible_suit[i], 'suits_plural') },
-					visible_suit[i]
-				))
-				table.insert(visible_suits, i)
-			end
-			i = i + 1
+		if not hidden_suits[visible_suit[i]] then
+			table.insert(n_nodes, tally_sprite(
+				SMODS.Suits[visible_suit[i]].ui_pos,
+				{
+					{ string = '' .. suit_tallies[visible_suit[i]], colour = flip_col },
+					{ string = '' .. mod_suit_tallies[visible_suit[i]], colour = G.C.BLUE }
+				},
+				{ localize(visible_suit[i], 'suits_plural') },
+				visible_suit[i]
+			))
+			table.insert(visible_suits, i)
 		end
-		if #n_nodes > 0 then
+		if #n_nodes == suits_per_row then
 			table.insert(temp_list, n_nodes)
 			n_nodes = {}
 		end
+		i = i + 1
+	end
+	if #n_nodes > 0 then
+		table.insert(temp_list, n_nodes)
 	end
 
 	local index = 0
@@ -1340,25 +1341,26 @@ G.FUNCS.your_suits_page = function(args)
 	local visible_suits = {}
 	local temp_list = {}
 	while i <= deck_end_index do
-		while #n_nodes < suits_per_row and i <= #visible_suit do
-			if not hidden_suits[visible_suit[i]] then
-				table.insert(n_nodes, tally_sprite(
-					SMODS.Suits[visible_suit[i]].ui_pos,
-					{
-						{ string = '' .. suit_tallies[visible_suit[i]], colour = flip_col },
-						{ string = '' .. mod_suit_tallies[visible_suit[i]], colour = G.C.BLUE }
-					},
-					{ localize(visible_suit[i], 'suits_plural') },
-					visible_suit[i]
-				))
-				table.insert(visible_suits, i)
-			end
-			i = i + 1
+		if not hidden_suits[visible_suit[i]] then
+			table.insert(n_nodes, tally_sprite(
+				SMODS.Suits[visible_suit[i]].ui_pos,
+				{
+					{ string = '' .. suit_tallies[visible_suit[i]], colour = flip_col },
+					{ string = '' .. mod_suit_tallies[visible_suit[i]], colour = G.C.BLUE }
+				},
+				{ localize(visible_suit[i], 'suits_plural') },
+				visible_suit[i]
+			))
+			table.insert(visible_suits, i)
 		end
-		if #n_nodes > 0 then
+		if #n_nodes == suits_per_row then
 			table.insert(temp_list, n_nodes)
 			n_nodes = {}
 		end
+		i = i + 1
+	end
+	if #n_nodes > 0 then
+		table.insert(temp_list, n_nodes)
 	end
 
 	local index = 0
