@@ -1952,7 +1952,6 @@ function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
 					table.insert(_options, edition)
 				end
 			end
-			print(_options)
 		end
 	end
     for _, v in ipairs(_options) do
