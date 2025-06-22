@@ -2528,3 +2528,13 @@ function SMODS.is_poker_hand_visible(handname)
     end
     return G.GAME.hands[handname].visible
 end
+
+G.FUNCS.update_blind_debuff_text = function(e)
+    if not e.config.object then return end
+    local new_str = SMODS.debuff_text or G.GAME.blind:get_loc_debuff_text()
+    if new_str ~= e.config.object.string then
+        e.config.object.config.string = {new_str}
+        e.config.object:update_text(true)
+        e.UIBox:recalculate()
+    end
+end
