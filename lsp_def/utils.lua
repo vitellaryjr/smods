@@ -605,3 +605,8 @@ function SMODS.get_probability_vars(trigger_obj, base_numerator, base_denominato
 --- 
 --- Can be hooked to run code when a listed probability succeeds and/or fails. `trigger_obj` is optionally the object that queues the probability.
 function SMODS.pseudorandom_probability(trigger_obj, seed, base_numerator, base_denominator) end
+
+---@param handname string
+---@return boolean
+---Checks if handname is visible in the poker hands menu.
+function SMODS.is_poker_hand_visible(handname) end

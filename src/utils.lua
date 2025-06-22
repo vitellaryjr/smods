@@ -2521,3 +2521,10 @@ function SMODS.pseudorandom_probability(trigger_obj, seed, base_numerator, base_
     local numerator, denominator = SMODS.get_probability_vars(trigger_obj, base_numerator, base_denominator)
     return pseudorandom(seed) < numerator / denominator
 end
+
+function SMODS.is_poker_hand_visible(handname)
+    if SMODS.PokerHands[handname].visible and type(SMODS.PokerHands[handname].visible) == "function" then
+        return not not SMODS.PokerHands[handname]:visible()
+    end
+    return G.GAME.hands[handname].visible
+end
