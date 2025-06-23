@@ -98,7 +98,7 @@ pattern = '''
 elseif context.buying_card then
 '''
 payload = '''
-elseif context.mod_probability and self.config.center_key == 'j_oops' then
+elseif context.mod_probability and not context.blueprint and self.config.center_key == 'j_oops' then
     return {
         numerator = context.numerator * 2
     }
