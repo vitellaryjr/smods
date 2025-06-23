@@ -3,6 +3,16 @@ version = "1.0.0"
 dump_lua = true
 priority = -5
 
+# Listed probabilities vars in Bloodstone (extra values don't play nicely)
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''elseif self.ability.name == 'Bloodstone' then loc_vars = {''..(G.GAME and G.GAME.probabilities.normal or 1), self.ability.extra.odds, self.ability.extra.Xmult}'''
+position = "at"
+match_indent = true
+payload = '''elseif self.ability.name == 'Bloodstone' then local a, b = SMODS.get_probability_vars(self, 1, self.ability.extra.odds); loc_vars = {a, b, self.ability.extra.Xmult}'''
+
+
 # Listed pseudorandom probabilities in cards
 [[patches]]
 [patches.regex]
@@ -38,6 +48,9 @@ pattern = '''elseif self.ability.name == 'Hallucination' then loc_vars = {G.GAME
 position = "at"
 match_indent = true
 payload = '''elseif self.ability.name == 'Hallucination' then loc_vars = {SMODS.get_probability_vars(self, 1, self.ability.extra)}'''
+
+
+
 
 # Listed probabilities vars in Glass Card and Wheel of Fortune
 # Using regex to match inside a line

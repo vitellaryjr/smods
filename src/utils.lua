@@ -2536,9 +2536,11 @@ function SMODS.merge_effects(...)
 end
 
 function SMODS.get_probability_vars(trigger_obj, base_numerator, base_denominator)
+    if not G.jokers then return base_numerator, base_denominator end
     local additive = SMODS.calculate_context({mod_probability = true, numerator = base_numerator, denominator = base_denominator})
+    additive.numerator = (additive.numberator or base_numerator) * (G.GAME and G.GAME.probabilities.normal or 1)
     local fixed = SMODS.calculate_context({fix_probability = true, numerator = additive.numerator or base_numerator, denominator = additive.denominator or base_denominator})
-    return (fixed.numerator or additive.numerator or base_numerator) * (G.GAME and G.GAME.probabilities.normal or 1), fixed.denominator or additive.denominator or base_denominator
+    return fixed.numerator or additive.numerator or base_numerator, fixed.denominator or additive.denominator or base_denominator
 end
 
 function SMODS.pseudorandom_probability(trigger_obj, seed, base_numerator, base_denominator)
