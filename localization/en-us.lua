@@ -136,6 +136,17 @@ return {
                     "{C:money}#1#{} if held at end of round",
                 },
             },
+            artist = {
+                text = {
+                    "{C:inactive}Artist",
+                },
+            },
+            artist_credit = {
+                name = "Artist",
+                text = {
+                    "{E:1}#1#{}"
+                },
+            },
         },
         Edition = {
             e_negative_playing_card = {
@@ -165,6 +176,15 @@ return {
                 name="Mult Card",
                 text={
                     "{C:mult}#1#{} Mult",
+                },
+            },
+            m_lucky={
+                name="Lucky Card",
+                text={
+                    "{C:green}#1# in #3#{} chance",
+                    "for {C:mult}+#2#{} Mult",
+                    "{C:green}#6# in #5#{} chance",
+                    "to win {C:money}$#4#",
                 },
             },
         }
@@ -218,6 +238,7 @@ return {
             b_deckskins_lc = 'Low Contrast Colors',
             b_deckskins_hc = 'High Contrast Colors',
             b_deckskins_def = 'Default Colors',
+            b_limit = 'Up to '
 		},
 		v_dictionary = {
 			c_types = '#1# Types',
