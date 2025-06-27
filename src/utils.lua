@@ -1496,7 +1496,7 @@ SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
             elseif type(calc) == 'table' then
                 for k,v in pairs(calc) do ret[k] = v end
             end
-            if not SMODS.silent_calculation then
+            if not SMODS.silent_calculation[key] then
                 percent = (percent or 0) + (percent_delta or 0.08)
             end
         end
