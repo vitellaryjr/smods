@@ -2420,7 +2420,7 @@ function SMODS.destroy_cards(cards, bypass_eternal, immediate)
     local glass_shattered = {}
     local playing_cards = {}
     for _, card in ipairs(cards) do
-        if bypass_eternal or not card.ability.eternal then
+        if bypass_eternal or not SMODS.is_eternal(card, {destroy_cards = true}) then
             card.getting_sliced = true
             if SMODS.shatters(card) then
                 card.shattered = true
