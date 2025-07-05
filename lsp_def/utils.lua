@@ -615,3 +615,10 @@ function SMODS.pseudorandom_probability(trigger_obj, seed, base_numerator, base_
 ---@return boolean
 ---Checks if handname is visible in the poker hands menu.
 function SMODS.is_poker_hand_visible(handname) end
+
+---@param card Card|table
+---@param trigger? Card|table
+---@return boolean
+--- Checks whether the card is eternal.
+--- `trigger` is the card or effect that runs the check
+function SMODS.is_eternal(card, trigger) end

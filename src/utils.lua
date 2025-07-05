@@ -2601,3 +2601,24 @@ end
 function Card:should_hide_front()
   return self.ability.effect == 'Stone Card' or self.config.center.overrides_base_rank
 end
+
+function SMODS.is_eternal(card, trigger)
+    local calc_return = {}
+    local ovr_compat = false
+    local ret = false
+    if not trigger then trigger = {} end
+    SMODS.calculate_context({check_eternal = true, other_card = card, trigger = trigger, no_blueprint = true,}, calc_return)
+    for _,eff in pairs(calc_return) do
+        for _,tab in pairs(eff) do
+            if tab.no_destroy then --Reuses key from context.joker_type_destroyed
+                ret = true
+                if type(tab.no_destroy) == 'table' then
+                    if tab.no_destroy.override_compat then ovr_compat = true end
+                end
+            end
+        end
+    end
+    if card.ability.eternal then ret = true end
+    if not card.config.center.eternal_compat and not ovr_compat then ret = false end
+    return ret
+end
