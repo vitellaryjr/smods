@@ -838,7 +838,7 @@ pattern = "G.GAME.round_resets.blind = e.config.ref_table"
 position = "before"
 payload = '''
 local _tag = e.UIBox:get_UIE_by_ID('tag_container')
-G.GAME.round_resets.blind_tag = _tag.config and _tag.config.ref_table or nil
+G.GAME.round_resets.blind_tag = _tag and _tag.config and _tag.config.ref_table or nil
 '''
 match_indent = true
 
