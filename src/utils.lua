@@ -2013,7 +2013,7 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
 end
 
 function SMODS.blueprint_effect(copier, copied_card, context)
-    if not copied_card or copied_card == copier or context.no_blueprint then return end
+    if not copied_card or copied_card == copier or copied_card.debuff or context.no_blueprint then return end
     if (context.blueprint or 0) > #G.jokers.cards then return end
     local old_context_blueprint = context.blueprint
     context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
