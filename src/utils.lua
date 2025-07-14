@@ -1837,7 +1837,9 @@ function SMODS.calculate_context(context, return_table, no_resolve)
     context.main_eval = nil
     
     flags[#flags+1] = SMODS.calculate_card_areas('playing_cards', context, return_table, { has_area = has_area })
+    context.main_eval = true
     flags[#flags+1] = SMODS.calculate_card_areas('individual', context, return_table)
+    context.main_eval = nil
     
     if SMODS.no_resolve then SMODS.no_resolve = nil end
     
