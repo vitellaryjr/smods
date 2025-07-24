@@ -1629,12 +1629,14 @@ SMODS.calculate_repetitions = function(card, context, reps)
                 context.retrigger_joker = true
                 for rt = 1, #eval.retriggers do
                     context.retrigger_joker = eval.retriggers[rt].retrigger_card
-                    SMODS.insert_repetitions(reps, eval.retriggers[rt], eval.retriggers[rt].message_card or _card)
                     local rt_eval, rt_post = eval_card(_card, context)
-                    if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
-                    for key, value in pairs(rt_eval) do
-                        if key ~= 'retriggers' then
-                            SMODS.insert_repetitions(reps, value, _card)
+                    if next(rt_eval) then
+                        SMODS.insert_repetitions(reps, eval.retriggers[rt], eval.retriggers[rt].message_card or _card)
+                        if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
+                        for key, value in pairs(rt_eval) do
+                            if key ~= 'retriggers' then
+                                SMODS.insert_repetitions(reps, value, _card)
+                            end
                         end
                     end
                 end
@@ -1655,10 +1657,12 @@ SMODS.calculate_repetitions = function(card, context, reps)
             for rt = 1, #eval.retriggers do
                 context.retrigger_joker = eval.retriggers[rt].retrigger_card
                 local rt_eval, rt_post = SMODS.eval_individual(area, context)
-                if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
-                for key, value in pairs(rt_eval) do
-                    if key ~= 'retriggers' then
-                        SMODS.insert_repetitions(reps, value, area.scored_card)
+                if next(rt_eval) then
+                    if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
+                    for key, value in pairs(rt_eval) do
+                        if key ~= 'retriggers' then
+                            SMODS.insert_repetitions(reps, value, area.scored_card)
+                        end
                     end
                 end
             end
@@ -1674,22 +1678,26 @@ SMODS.calculate_retriggers = function(card, context, _ret)
     for _, area in ipairs(SMODS.get_card_areas('jokers')) do
         for _, _card in ipairs(area.cards) do
             local eval, post = eval_card(_card, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
-            if next(post) then SMODS.trigger_effects({post}, _card) end
-            for key, value in pairs(eval) do
-                if not value.no_retrigger_juice then
-                    value.retrigger_juice = card
+            if next(eval) then
+                if next(post) then SMODS.trigger_effects({post}, _card) end
+                for key, value in pairs(eval) do
+                    if not value.no_retrigger_juice then
+                        value.retrigger_juice = card
+                    end
+                    SMODS.insert_repetitions(retriggers, value, _card, 'joker_retrigger')
                 end
-                SMODS.insert_repetitions(retriggers, value, _card, 'joker_retrigger')
             end
         end
     end
 
     for _, area in ipairs(SMODS.get_card_areas('individual')) do
         local eval, post = SMODS.eval_individual(area, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
-        if next(post) then SMODS.trigger_effects({post}, _card) end
-        for key, value in pairs(eval) do
-            if value.repetitions then
-                SMODS.insert_repetitions(retriggers, value, area, 'individual_retrigger')
+        if next(eval) then
+            if next(post) then SMODS.trigger_effects({post}, _card) end
+            for key, value in pairs(eval) do
+                if value.repetitions then
+                    SMODS.insert_repetitions(retriggers, value, area, 'individual_retrigger')
+                end
             end
         end
     end
@@ -1741,9 +1749,13 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                             rt_eval.jokers.juice_card = rt_eval.jokers.juice_card or rt_eval.jokers.card or _card
                             rt_eval.jokers.message_card = rt_eval.jokers.message_card or context.other_card
                         end
-                        table.insert(effects, {retriggers = eval.retriggers[rt]})
-                        table.insert(effects, rt_eval)
-                        for _,v in ipairs(rt_post) do effects[#effects+1] = v end
+                        if next(rt_eval) then
+                            if next(rt_eval) then
+                                table.insert(effects, {retriggers = eval.retriggers[rt]})
+                                table.insert(effects, rt_eval)
+                                for _,v in ipairs(rt_post) do effects[#effects+1] = v end
+                            end
+                        end
                     end
                     context.retrigger_joker = nil
                 end
@@ -1809,9 +1821,13 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                 for rt = 1, #effects[1].retriggers do
                     context.retrigger_joker = effects[1].retriggers[rt].retrigger_card
                     local rt_eval, rt_post = SMODS.eval_individual(area, context)
-                    table.insert(effects, {retriggers = effects[1].retriggers[rt]})
-                    table.insert(effects, rt_eval)
-                    for _,v in ipairs(rt_post) do effects[#effects+1] = v end
+                    if next(rt_eval) then
+                        if next(rt_eval) then
+                            table.insert(effects, {retriggers = effects[1].retriggers[rt]})
+                            table.insert(effects, rt_eval)
+                            for _,v in ipairs(rt_post) do effects[#effects+1] = v end
+                        end
+                    end
                 end
                 context.retrigger_joker = nil
             end
@@ -2079,7 +2095,6 @@ function SMODS.eval_individual(individual, context)
     if (eff and not eff.no_retrigger) or triggered then
         --if type(eff) == 'table' then eff.juice_card = eff.juice_card or individual.scored_card end
         ret.individual = eff
-
         if not (context.retrigger_joker_check or context.retrigger_joker) then
             local retriggers = SMODS.calculate_retriggers(individual.object, context, ret)
             if next(retriggers) then
