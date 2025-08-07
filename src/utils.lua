@@ -2750,3 +2750,28 @@ function SMODS.quip(quip_type)
     end
     return key, args
 end
+
+
+local ref_challenge_desc = G.UIDEF.challenge_description_tab
+function G.UIDEF.challenge_description_tab(args)
+	args = args or {}
+
+	if args._tab == 'Restrictions' then
+		local challenge = G.CHALLENGES[args._id]
+		if challenge.restrictions then
+            if challenge.restrictions.banned_cards and type(challenge.restrictions.banned_cards) == 'function' then
+                challenge.restrictions.banned_cards = challenge.restrictions.banned_cards()
+            end
+
+            if challenge.restrictions.banned_tags and type(challenge.restrictions.banned_tags) == 'function' then
+                challenge.restrictions.banned_tags = challenge.restrictions.banned_tags()
+            end
+
+            if challenge.restrictions.banned_other and type(challenge.restrictions.banned_other) == 'function' then
+                challenge.restrictions.banned_other = challenge.restrictions.banned_other()
+            end
+        end
+	end
+
+	return ref_challenge_desc(args)
+end
