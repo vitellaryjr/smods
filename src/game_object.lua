@@ -2917,6 +2917,16 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         apply = function(self, card, val)
             card.ability[self.key] = val
+            if val and next(self.config) then
+                card.ability[self.key] = {}
+                for k, v in pairs(self.config) do
+                    if type(v) == 'table' then
+                        card.ability[self.key][k] = copy_table(v)
+                    else
+                        card.ability[self.key][k] = v
+                    end
+                end
+            end
         end
     }
 
