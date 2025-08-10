@@ -673,3 +673,11 @@ function SMODS.is_eternal(card, trigger) end
 --- Can return scaling_value and scalar_value in results to change the scaling cards values
 --- Args must contain `ref_table`, `ref_value`, and `scalar_value`. It may optionally contain `scalar_table`, used in place of `ref_table` for the `scalar_value`, and `operation` to designate the scaling operation, which defaults to `"+"`
 function SMODS.scale_card(card, args) end
+
+
+---@param prototype_obj SMODS.GameObject|table
+---@param args table?
+---@return boolean?, table?
+--- Checks whether an object should be added to the pool.
+--- i.e. the in_pool method doesn't exist or it returns `true`
+function SMODS.add_to_pool(prototype_obj, args) end
