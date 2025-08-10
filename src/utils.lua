@@ -2064,6 +2064,16 @@ function SMODS.get_mods_scoring_targets()
     return ret
 end
 
+function SMODS.get_stake_scoring_targets()
+    local ret = {}
+    for _, stake in ipairs(G.GAME.applied_stakes or {}) do
+        if G.P_CENTER_POOLS.Stake[stake].calculate and type(G.P_CENTER_POOLS.Stake[stake].calculate) == "function" then
+            table.insert(ret, G.P_CENTER_POOLS.Stake[stake])
+        end
+    end
+    return ret
+end
+
 function SMODS.get_card_areas(_type, _context)
     if _type == 'playing_cards' then
         local t = {}
@@ -2085,6 +2095,9 @@ function SMODS.get_card_areas(_type, _context)
         }
         if G.GAME.blind then t[#t + 1] = { object = G.GAME.blind, scored_card = G.GAME.blind.children.animatedSprite } end
         if G.GAME.challenge then t[#t + 1] = { object = SMODS.Challenges[G.GAME.challenge], scored_card = G.deck.cards[1] or G.deck } end 
+        for _, stake in ipairs(SMODS.get_stake_scoring_targets()) do
+            t[#t + 1] = { object = stake, scored_card = G.deck.cards[1] or G.deck }
+        end
         for _, mod in ipairs(SMODS.get_mods_scoring_targets()) do
             t[#t + 1] = { object = mod, scored_card = G.deck.cards[1] or G.deck }
         end
