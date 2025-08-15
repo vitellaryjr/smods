@@ -1405,7 +1405,7 @@ end
 
 SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
     local ret = {}
-    for _, key in ipairs(SMODS.merge_lists({SMODS.scoring_parameter_keys, SMODS.other_calculation_keys})) do
+    for _, key in ipairs(SMODS.calculation_keys) do
         if effect[key] then
             if effect.juice_card and not SMODS.no_resolve then
                 G.E_MANAGER:add_event(Event({trigger = 'immediate', func = function ()
@@ -1430,6 +1430,7 @@ SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
     return ret
 end
 
+SMODS.calculation_keys = {}
 SMODS.scoring_parameter_keys = {
     'chips', 'h_chips', 'chip_mod',
     'mult', 'h_mult', 'mult_mod',
