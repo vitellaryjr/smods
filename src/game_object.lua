@@ -3606,8 +3606,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             end
         end,
         modify = function(self, amount)
-            hand_chips = mod_chips(hand_chips + amount)
-            self.current = self.current + amount
+            hand_chips = mod_chips(self.current + amount)
+            self.current = hand_chips
             update_hand_text({delay = 0}, {chips = self.current})
         end
     })
@@ -3657,8 +3657,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             end
         end,
         modify = function(self, amount)
-            mult = mod_mult(mult + amount)
-            self.current = self.current + amount
+            mult = mod_mult(self.current + amount)
+            self.current = mult
             update_hand_text({delay = 0}, {mult = self.current})
         end
     })
