@@ -3608,9 +3608,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 return true
             end
         end,
-        modify = function(self, amount)
-            hand_chips = mod_chips(self.current + amount)
-            self.current = hand_chips
+        modify = function(self, amount, skip)
+            if not skip then hand_chips = mod_chips(self.current + amount) end
+            self.current = (hand_chips or 0) + (skip or 0)
             update_hand_text({delay = 0}, {chips = self.current})
         end
     })
@@ -3659,9 +3659,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 return true
             end
         end,
-        modify = function(self, amount)
-            mult = mod_mult(self.current + amount)
-            self.current = mult
+        modify = function(self, amount, skip)
+            if not skip then mult = mod_mult(self.current + amount) end
+            self.current = (mult or 0) + (skip or 0)
             update_hand_text({delay = 0}, {mult = self.current})
         end
     })

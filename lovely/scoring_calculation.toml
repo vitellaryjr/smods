@@ -282,3 +282,27 @@ e.config.object = Sprite(0, 0, 2.5, 2.5, G.ASSET_ATLAS["ui_1"], {x = 2, y = 0})
 payload = '''
 e.config.object = Sprite(0, 0, e.config._w, e.config._h, G.ASSET_ATLAS["ui_1"], {x = 2, y = 0})
 '''
+
+# Patch mod_chips/mod_mult
+[[patches]]
+[patches.pattern]
+target = 'functions/misc_functions.lua'
+match_indent = true
+position = 'before'
+pattern = '''
+return _mult
+'''
+payload = '''
+SMODS.Scoring_Parameters.mult:modify(nil, _mult - (mult or 0))
+'''
+[[patches]]
+[patches.pattern]
+target = 'functions/misc_functions.lua'
+match_indent = true
+position = 'before'
+pattern = '''
+return _chips
+'''
+payload = '''
+SMODS.Scoring_Parameters.chips:modify(nil, _chips - (hand_chips or 0))
+'''
