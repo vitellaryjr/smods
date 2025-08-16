@@ -2660,9 +2660,9 @@ G.FUNCS.SMODS_scoring_calculation_function = function(e)
     end
 
     local container = e.children[1].children[2]
-    local chip_display = container.UIBox:get_UIE_by_ID('hand_chips')
-    local operator = container.UIBox:get_UIE_by_ID('hand_operator')
-    local mult_display = container.UIBox:get_UIE_by_ID('hand_mult')
+    local chip_display = container.UIBox:get_UIE_by_ID('hand_chips_container')
+    local operator = container.UIBox:get_UIE_by_ID('hand_operator_container')
+    local mult_display = container.UIBox:get_UIE_by_ID('hand_mult_container')
     
     if G.GAME.current_scoring_calculation.update_ui then
         G.GAME.current_scoring_calculation:update_ui(container, chip_display, mult_display, operator)

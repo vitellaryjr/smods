@@ -2118,7 +2118,7 @@ end
 
 function SMODS.GUI.chips_container(scale)
     return
-    {n=G.UIT.C, config={align = 'cm', id = 'hand_chips'}, nodes = {
+    {n=G.UIT.C, config={align = 'cm', id = 'hand_chips_container'}, nodes = {
         SMODS.GUI.score_container({
             type = 'chips',
             text = 'chip_text',
@@ -2129,14 +2129,14 @@ end
 
 function SMODS.GUI.operator(scale)
     return
-    {n=G.UIT.C, config={align = "cm", id = 'hand_operator'}, nodes={
+    {n=G.UIT.C, config={align = "cm", id = 'hand_operator_container'}, nodes={
         {n=G.UIT.T, config={text = "X", lang = G.LANGUAGES['en-us'], scale = scale*2, colour = G.C.UI_MULT, shadow = true}},
     }}
 end
 
 function SMODS.GUI.mult_container(scale)
     return 
-    {n=G.UIT.C, config={align = 'cm', id = 'hand_mult'}, nodes = {
+    {n=G.UIT.C, config={align = 'cm', id = 'hand_mult_container'}, nodes = {
         SMODS.GUI.score_container({
             type = 'mult'
         })
