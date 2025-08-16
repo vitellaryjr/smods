@@ -1776,10 +1776,48 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
     return flags
 end
 
+-- The context stack list, structured like so;
+-- SMODS.context_stack = {1: {context = [unique context 1], count = [number of times it was added consecutively]}, ...}
+-- (Contexts may repeat non-consecutively, though I don't think they ever should..)
+-- Allows some advanced effects, like:
+-- Individual playing cards modifying probabilities checked during individual scoring, only when they're the context.other_card 
+-- (-> By checking the context in the stack PRIOR to the mod_probability context for the .individual / .other_card flags)
+SMODS.context_stack = {}
+
+function SMODS.push_to_context_stack(context, func)
+    if not context or type(context) ~= "table" then
+        sendWarnMessage(('Called SMODS.push_to_context_stack with invalid context \'%s\', in function \'%s\''):format(context, func), 'Util')
+    end
+    local len = #SMODS.context_stack
+    if len <= 0 or SMODS.context_stack[len].context ~= context then
+        SMODS.context_stack[len+1] = {context = context, count = 1}
+    else
+        SMODS.context_stack[len].count = SMODS.context_stack[len].count + 1
+    end
+end
+
+function SMODS.pop_from_context_stack(context, func)
+    local len = #SMODS.context_stack
+    if len <= 0 or SMODS.context_stack[len].context ~= context then
+        sendWarnMessage(('Called SMODS.pop_from_context_stack with invalid context \'%s\', in function \'%s\''):format(context, func), 'Util')
+    else
+        SMODS.context_stack[len].count = SMODS.context_stack[len].count - 1
+        if SMODS.context_stack[len].count <= 0 then
+            table.remove(SMODS.context_stack, len)
+        end
+    end
+end
+
+function SMODS.get_previous_context()
+    return (SMODS.context_stack[#SMODS.context_stack-1] or {}).context
+end
+
 -- Used to calculate contexts across G.jokers, scoring_hand (if present), G.play and G.GAME.selected_back
 -- Hook this function to add different areas to MOST calculations
 function SMODS.calculate_context(context, return_table, no_resolve)
     if G.STAGE ~= G.STAGES.RUN then return end
+
+    SMODS.push_to_context_stack(context, "utils.lua : SMODS.calculate_context")
 
     local has_area = context.cardarea and true or nil
     if no_resolve then SMODS.no_resolve = true end
@@ -1794,6 +1832,8 @@ function SMODS.calculate_context(context, return_table, no_resolve)
     context.main_eval = nil
     
     if SMODS.no_resolve then SMODS.no_resolve = nil end
+    
+    SMODS.pop_from_context_stack(context, "utils.lua : SMODS.calculate_context")
     
     if not return_table then
         local ret = {}
@@ -2048,6 +2088,7 @@ function Blind:calculate(context)
 end
 
 function SMODS.eval_individual(individual, context)
+    SMODS.push_to_context_stack(context, "utils.lua : SMODS.eval_individual")
     local ret = {}
     local post_trig = {}
 
@@ -2068,6 +2109,7 @@ function SMODS.eval_individual(individual, context)
             SMODS.calculate_context({blueprint_card = context.blueprint_card, post_trigger = true, other_card = individual.object, other_context = context, other_ret = ret}, post_trig)
         end
     end
+    SMODS.pop_from_context_stack(context, "utils.lua : SMODS.eval_individual")
     return ret, post_trig
 end
 
