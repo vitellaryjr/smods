@@ -2702,58 +2702,58 @@ end
 function SMODS.scale_card(card, args)
     if not G.deck then return end
     if not args.operation then args.operation = "+" end
+    args.block_overrides = args.block_overrides or {}
+    args.ref_table = args.ref_table or card.ability.extra
+    args.scalar_table = args.scalar_table or args.ref_table
+    local initial = args.ref_table[args.ref_value]
+    local scalar_value = args.scalar_table[args.scalar_value]
+    if args.operation == '-' and scalar_value < 0 then scalar_value = scalar_value * -1 end
+    local scaling_message = args.scaling_message
+    local scaling_responses = {}
     for _, area in ipairs(SMODS.get_card_areas('jokers')) do
         for _, _card in ipairs(area.cards) do
             local obj = _card.config.center
             if obj.calc_scaling and type(obj.calc_scaling) == "function" then
-                local ret = obj:calc_scaling(_card, card, args.ref_table[args.ref_value], (args.scalar_table or args.ref_table)[args.scalar_value], args)
+                local ret = obj:calc_scaling(_card, card, initial, scalar_value, args)
                 if ret then
-                    if ret.scaling_value then args.ref_table[args.ref_value] = ret.scaling_value end
-                    if ret.scalar_value then (args.scalar_table or args.ref_table)[args.scalar_value] = ret.scalar_value end
+                    if ret.override_value and not args.block_overrides.value then initial = ret.override_value.value; SMODS.calculate_effect(ret.override_value, _card) end
+                    if ret.override_scalar_value and not args.block_overrides.scalar then scalar_value = ret.override_scalar_value.value; SMODS.calculate_effect(ret.override_scalar_value, _card) end
+                    if ret.override_message and not args.block_overrides.message then scaling_message = SMODS.merge_defaults(ret.override_message, scaling_message) end
+                    if ret.post then ret.post.source = _card; scaling_responses[#scaling_responses + 1] = ret.post end
                     SMODS.calculate_effect(ret, _card)
                 end
             end
         end
     end
+    
+    if type(args.operation) == 'function' then
+        args.operation(args.ref_table, args.ref_value, initial, scalar_value)
+    elseif args.operation == 'X' then
+        SMODS.multiplicative_scaling(args.ref_table, args.ref_value, initial, scalar_value)
+    elseif args.operation == '-' then
+        SMODS.additive_scaling(args.ref_table, args.ref_value, initial, -1 * scalar_value)
+    else
+        SMODS.additive_scaling(args.ref_table, args.ref_value, initial, scalar_value)
+    end
+    
+    scaling_message = scaling_message or {
+        message = localize(args.message_key and {type='variable',key=args.message_key,vars={args.message_key =='a_xmult' and args.ref_table[args.ref_value] or scalar_value}} or 'k_upgrade_ex'),
+        colour = args.message_colour or G.C.FILTER
+    }
+    if next(scaling_message) and not args.no_message then
+        SMODS.calculate_effect(scaling_message, card)
+    end
+    for _, ret in ipairs(scaling_responses) do
+        SMODS.calculate_effect(ret, ret.source)
+    end
 end
 
-local calculate_jokerref = Card.calculate_joker
-function Card:calculate_joker(context, ...)
-    local ret, ret2 = calculate_jokerref(self, context, ...)
-    if self.ability.name == "Caino" or self.ability.name == "Glass Joker" then
-        if context.remove_playing_cards then
-            if self.ability.name == "Caino" then
-                local faces = 0
-                for k, v in ipairs(context.removed) do
-                    if v:is_face() then
-                        faces = faces + 1
-                    end
-                end
-                if faces > 0 then
-                    SMODS.scale_card(self, {
-                        ref_table = self.ability,
-                        ref_value = "caino_xmult",
-                        scalar_value = "extra",
-                    })
-                end
-            else
-                local glasses = 0
-                for k, v in ipairs(context.removed) do
-                    if v.shattered then
-                        glasses = glasses + 1
-                    end
-                end
-                if glasses > 0 then
-                    SMODS.scale_card(self, {
-                        ref_table = self.ability,
-                        ref_value = "x_mult",
-                        scalar_value = "extra",
-                    })
-                end
-            end
-        end
-    end
-    return ret, ret2
+function SMODS.additive_scaling(ref_table, ref_value, initial, modifier)
+    ref_table[ref_value] = initial + modifier
+end
+
+function SMODS.multiplicative_scaling(ref_table, ref_value, initial, modifier)
+    ref_table[ref_value] = initial * modifier
 end
 
 function SMODS.quip(quip_type)
