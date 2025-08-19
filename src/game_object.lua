@@ -3766,7 +3766,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         register = function() error('INTERNAL CLASS, DO NOT CALL') end,
         pre_inject_class = function()
             for _, mod in ipairs(SMODS.mod_list) do
-                if mod.can_load then
+                if mod.can_load and not mod.lovely_only then
                     SMODS.handle_loc_file(mod.path, mod.id)
                 end
             end
