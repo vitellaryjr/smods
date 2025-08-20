@@ -1769,28 +1769,8 @@ function Card:set_edition(edition, immediate, silent, delay)
 	if self.edition then
 		self.ability.card_limit = self.ability.card_limit - (self.edition.card_limit or 0)
 		self.ability.extra_slots_used = self.ability.extra_slots_used - (self.edition.extra_slots_used or 0)
-		self.area:handle_card_limit(self.edition.card_limit and -self.edition.card_limit or nil, self.edition.extra_slots_used and -self.edition.extra_slots_used or nil)
-		if self.area == G.hand then 
-			G.FUNCS.draw_from_deck_to_hand(math.min((self.edition.card_limit or 0), G.hand.config.card_limit - #G.hand.cards))
-		end
+		self.area:handle_card_limit(-1 * (self.edition.card_limit or 0), -1 * (self.edition.extra_slots_used or 0))
 	end
-	
-	-- Check to see if negative is being removed and reduce card_limit accordingly
-	-- if (self.added_to_deck or self.joker_added_to_deck_but_debuffed or (self.area == G.hand and not self.debuff)) and self.edition and self.edition.card_limit then
-	-- 	if self.ability.consumeable and self.area == G.consumeables then
-	-- 		G.consumeables.config.card_limit = G.consumeables.config.card_limit - self.edition.card_limit
-	-- 	elseif self.ability.set == 'Joker' and self.area == G.jokers then
-	-- 		G.jokers.config.card_limit = G.jokers.config.card_limit - self.edition.card_limit
-	-- 	elseif self.area == G.hand then
-	-- 		if G.hand.config.real_card_limit then
-	-- 			G.hand.config.real_card_limit = G.hand.config.real_card_limit - self.edition.card_limit
-	-- 		end
-	-- 		G.hand.config.card_limit = G.hand.config.card_limit - self.edition.card_limit
-	-- 	end
-	-- -- end
-	-- if self.edition and self.edition.card_limit then
-	-- 	self.ability.card_limit = self.ability.card_limit - self.edition.card_limit
-	-- end
 
 	local old_edition = self.edition
 	if old_edition and old_edition.key then
@@ -1878,39 +1858,6 @@ function Card:set_edition(edition, immediate, silent, delay)
 		on_edition_applied(self)
 	end
 
-	
-	self.ability.card_limit = self.ability.card_limit + (self.edition.card_limit or 0)
-	self.ability.extra_slots_used = self.ability.extra_slots_used + (self.edition.extra_slots_used or 0)
-	if self.area then self.area:handle_card_limit(self.edition.card_limit, self.edition.extra_slots_used) end
-	if G.hand and self.area == G.hand then 
-		G.FUNCS.draw_from_deck_to_hand(math.min((self.edition.card_limit or 0), G.hand.config.card_limit - #G.hand.cards))
-	end
-
-	-- if self.edition.card_limit then
-	-- 	if (self.added_to_deck or self.joker_added_to_deck_but_debuffed or (self.area == G.hand and not self.debuff)) and G.jokers and G.consumeables then
-	-- 		if self.ability.consumeable then
-	-- 			G.consumeables.config.card_limit = G.consumeables.config.card_limit + self.edition.card_limit
-	-- 		elseif self.ability.set == 'Joker' then
-	-- 			G.jokers.config.card_limit = G.jokers.config.card_limit + self.edition.card_limit
-	-- 		elseif self.area == G.hand then
-	-- 			local is_in_pack = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK or (G.STATE == G.STATES.SMODS_BOOSTER_OPENED and SMODS.OPENED_BOOSTER.config.center.draw_hand))
-	-- 			G.E_MANAGER:add_event(Event({
-	-- 				trigger = 'immediate',
-	-- 				func = function()
-	-- 					if G.hand.config.real_card_limit then
-	-- 						G.hand.config.real_card_limit = G.hand.config.real_card_limit + self.edition.card_limit
-	-- 					end
-	-- 					G.hand.config.card_limit = G.hand.config.card_limit + self.edition.card_limit
-	-- 					if not is_in_pack and G.GAME.blind.in_blind and G.hand.config.card_limit > #G.hand.cards then
-	-- 						G.FUNCS.draw_from_deck_to_hand(math.min(self.edition.card_limit, G.hand.config.card_limit - #G.hand.cards))
-	-- 					end
-	-- 					return true
-	-- 				end
-	-- 			}))
-	-- 		end
-	-- 	end
-	-- end
-
 	if self.area and self.area == G.jokers then
 		if self.edition then
 			if not G.P_CENTERS['e_' .. (self.edition.type)].discovered then
@@ -1949,7 +1896,7 @@ function Card:set_edition(edition, immediate, silent, delay)
 	end
 
 	if delay then
-		self.delay_edition = old_edition
+		self.delay_edition = old_edition or {base = true}
 		G.E_MANAGER:add_event(Event({
 			trigger = 'immediate',
 			func = function()
@@ -1958,6 +1905,11 @@ function Card:set_edition(edition, immediate, silent, delay)
 			end
 		}))
 	end
+
+	self.ability.card_limit = self.ability.card_limit + (self.edition.card_limit or 0)
+	self.ability.extra_slots_used = self.ability.extra_slots_used + (self.edition.extra_slots_used or 0)
+	if self.area then self.area:handle_card_limit(self.edition.card_limit, self.edition.extra_slots_used) end
+
 
 	if G.jokers and self.area == G.jokers then
 		check_for_unlock({ type = 'modify_jokers' })

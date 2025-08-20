@@ -268,6 +268,7 @@ SMODS.DrawStep {
     order = 30,
     func = function(self, layer)
         local seal = G.P_SEALS[self.seal] or {}
+        if self.ability.delay_seal then return end
         if type(seal.draw) == 'function' then
             seal:draw(self, layer)
         elseif self.seal then
