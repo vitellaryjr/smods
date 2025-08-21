@@ -3005,19 +3005,26 @@ function CardArea:handle_card_limit(card_limit, card_slots)
     if (self.config.type == 'joker' or self.config.type == 'hand') and not self.config.fixed_limit then
         card_limit = card_limit or 0
         card_slots = card_slots or 0
-        G.E_MANAGER:add_event(Event({
-            trigger = 'immediate',
-            func = function()
-                if card_limit then
+        if card_limit ~= 0 then
+            G.E_MANAGER:add_event(Event({
+                trigger = 'immediate',
+                func = function()
                     self.config.card_limit = self.config.card_limit + card_limit
                     self.config.true_card_limit = math.max(0, self.config.true_card_limit + card_limit)
+                    return true
                 end
-                if card_slots then
+            }))
+        end
+        if card_slots ~= 0 then
+            G.E_MANAGER:add_event(Event({
+                trigger = 'immediate',
+                func = function()
                     self.config.card_limit = self.config.card_limit - card_slots
+                    return true
                 end
-                return true
-            end
-        }))
+            }))
+            
+        end
         if G.hand and self == G.hand and card_limit - card_slots > 0 then 
             G.FUNCS.draw_from_deck_to_hand(math.min(card_limit - card_slots, (self.config.card_limit + card_limit - card_slots) - #self.cards))
         end
