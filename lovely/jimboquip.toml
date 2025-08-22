@@ -99,9 +99,7 @@ function Card_Character:add_speech_bubble(text_key, align, loc_vars)
 '''
 payload = '''
 function Card_Character:add_speech_bubble(text_key, align, loc_vars, quip_args)
-    print(quip_args)
     if quip_args and quip_args.text_key then text_key = quip_args.text_key end
-    print(text_key)
 '''
 
 
