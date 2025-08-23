@@ -1268,7 +1268,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
         mult = mod_mult(hand_chips)
         hand_chips = mod_chips(old_mult)
         update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
-        scored_card:juice_up()
+        juice_card(scored_card)
         return true
     end
 
