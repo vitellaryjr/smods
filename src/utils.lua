@@ -1706,8 +1706,8 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                         local effects = {eval_card(card, context)}
                         local f = SMODS.trigger_effects(effects, card)
                         for k,v in pairs(f) do flags[k] = v end
-                        if flags.numerator then flags.numerator = flags.numerator end
-                        if flags.denominator then flags.denominator = flags.denominator end
+                        if flags.numerator then context.numerator = flags.numerator end
+                        if flags.denominator then context.denominator = flags.denominator end
                     end
                 end
                 goto continue
