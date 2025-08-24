@@ -3029,7 +3029,7 @@ function CardArea:handle_card_limit(card_limit, card_slots)
             
         end
         if G.hand and self == G.hand and card_limit - card_slots > 0 then 
-            G.FUNCS.draw_from_deck_to_hand(math.min(card_limit - card_slots, (self.config.card_limit + card_limit - card_slots) - #self.cards)) 
+            if G.STATE == G.STATES.SELECTING_HAND then G.FUNCS.draw_from_deck_to_hand(math.min(card_limit - card_slots, (self.config.card_limit + card_limit - card_slots) - #self.cards)) end
             check_for_unlock({type = 'min_hand_size'})
         end
     end
