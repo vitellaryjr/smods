@@ -557,7 +557,7 @@ end
 function SMODS.check_applied_stakes(stake, deck)
 	if next(stake.applied_stakes) then
 		for _, applied_stake in ipairs(stake.applied_stakes) do
-			if not deck.wins[G.P_STAKES[applied_stake]] then return false end
+			if not deck.wins_by_key[applied_stake] then return false end
 		end
 	end
 	return true
