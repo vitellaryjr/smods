@@ -2300,7 +2300,7 @@ function Blind:debuff_hand(cards, hand, handname, check)
         local flags = SMODS.trigger_effects(effects, cards[i])
 		if flags.add_to_hand then splashed = true end
 		if flags.remove_from_hand then unsplashed = true end
-        if splashed and not unsplashed then table.insert(final_scoring_hand, G.play.cards[i]) end
+        if splashed and not unsplashed then table.insert(final_scoring_hand, cards[i]) end
     end
 	local flags = SMODS.calculate_context({ debuff_hand = true, full_hand = cards, scoring_hand = final_scoring_hand, poker_hands = hand, scoring_name = handname, check = check })
 	if flags.prevent_debuff then return false end
