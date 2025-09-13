@@ -1344,7 +1344,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     if key == 'saved' then
         SMODS.saved = amount
         G.GAME.saved_text = amount
-        return true
+        return key
     end
 
     if key == 'effect' then
@@ -1697,6 +1697,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                     if flags.numerator then context.numerator = flags.numerator end
                     if flags.denominator then context.denominator = flags.denominator end
                     if flags.cards_to_draw then context.amount = flags.cards_to_draw end
+                    if flags.saved then context.game_over = false end
                 end
                 ::skip::
             end
@@ -1725,6 +1726,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                         if flags.numerator then context.numerator = flags.numerator end
                         if flags.denominator then context.denominator = flags.denominator end
                         if flags.cards_to_draw then context.amount = flags.cards_to_draw end
+                        if flags.saved then context.game_over = false end
                         ::skip::
                     end
                 end
@@ -1758,6 +1760,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                     if flags.numerator then context.numerator = flags.numerator end
                     if flags.denominator then context.denominator = flags.denominator end
                     if flags.cards_to_draw then context.amount = flags.cards_to_draw end
+                    if flags.saved then context.game_over = false end
                 end
                 ::skip::
             end
@@ -1800,6 +1803,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
                 for k,v in pairs(f) do flags[k] = v end
                 if flags.numerator then context.numerator = flags.numerator end
                 if flags.denominator then context.denominator = flags.denominator end
+                if flags.saved then context.game_over = false end
             end
             ::skip::
         end
