@@ -3115,7 +3115,13 @@ function CardArea:handle_card_limit(card_limit, card_slots)
                 G.E_MANAGER:add_event(Event({
                     trigger = 'immediate',
                     func = function()
-                        G.FUNCS.draw_from_deck_to_hand(card_limit)
+                        G.E_MANAGER:add_event(Event({
+                            trigger = 'immediate',
+                            func = function()                
+                                G.FUNCS.draw_from_deck_to_hand()
+                                return true
+                            end
+                        }))
                         return true
                     end
                 }))
