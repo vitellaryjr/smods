@@ -1087,7 +1087,7 @@ end
 '''
 payload = '''
 local flags = SMODS.calculate_context({drawing_cards = true, amount = hand_space})
-hand_space = math.min(#G.deck.cards, flags.cards_to_draw or hand_space)
+hand_space = math.min(#G.deck.cards, flags.cards_to_draw or flags.modify or hand_space)
 '''
 
 # Used to identify first hand of round
