@@ -1039,7 +1039,7 @@ payload = '''
 G.E_MANAGER:add_event(Event({
     trigger = 'immediate',
     func = function()                
-        SMODS.cards_to_draw = SMODS.cards_to_draw - hand_space
+        SMODS.cards_to_draw = math.max(SMODS.cards_to_draw - hand_space, 0)
         return true
     end
 }))
