@@ -2766,6 +2766,21 @@ end
 -- Scoring Calculation API
 function SMODS.set_scoring_calculation(key)
     G.GAME.current_scoring_calculation = SMODS.Scoring_Calculations[key]:new()
+    G.FUNCS.SMODS_scoring_calculation_function(G.HUD:get_UIE_by_ID('hand_text_area'))
+    G.HUD:get_UIE_by_ID('hand_operator_container').UIBox:recalculate()
+    SMODS.refresh_score_UI_list()
+end
+
+local game_start_run = Game.start_run
+function Game:start_run(args)
+    game_start_run(self, args)
+    G.E_MANAGER:add_event(Event({
+        trigger = 'immediate',
+        func = function()                
+            SMODS.refresh_score_UI_list()
+            return true
+        end
+    }))
 end
 
 G.FUNCS.SMODS_scoring_calculation_function = function(e)
@@ -2811,6 +2826,11 @@ function SMODS.get_scoring_parameter(key, flames)
     return SMODS.Scoring_Parameters[key].current or SMODS.Scoring_Parameters[key].default_value
 end
 
+function SMODS.refresh_score_UI_list()
+    for name, _ in pairs(SMODS.Scoring_Parameters) do
+        G.hand_text_area[name] = G.HUD:get_UIE_by_ID('hand_'..name)
+    end
+end
 
 -- Adds tag_triggered context
 local tag_apply = Tag.apply_to_run
