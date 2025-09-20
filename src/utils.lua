@@ -703,6 +703,10 @@ end
 
 --#endregion
 
+function SMODS.poll_edition(args)
+    args = args or {}
+    return poll_edition(args.key or 'editiongeneric', args.mod, args.no_negative, args.guaranteed, args.options)
+end
 
 function SMODS.poll_seal(args)
     args = args or {}
