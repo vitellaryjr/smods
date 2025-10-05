@@ -542,16 +542,54 @@ end
 function G.UIDEF.deck_stake_column(_deck_key)
 	local deck_usage = G.PROFILES[G.SETTINGS.profile].deck_usage[_deck_key]
 	local stake_col = {}
-	local valid_option = nil
 	local num_stakes = #G.P_CENTER_POOLS['Stake']
 	for i = #G.P_CENTER_POOLS['Stake'], 1, -1 do
 		local _wins = deck_usage and deck_usage.wins[i] or 0
-		if (deck_usage and deck_usage.wins[i - 1]) or i == 1 or G.PROFILES[G.SETTINGS.profile].all_unlocked then valid_option = true end
+		local valid_option = nil
+		if (deck_usage and deck_usage.wins[i - 1]) or (not next(G.P_CENTER_POOLS.Stake[i].applied_stakes or {})) or G.PROFILES[G.SETTINGS.profile].all_unlocked then valid_option = true end
 		stake_col[#stake_col + 1] = {n = G.UIT.R, config = {id = i, align = "cm", colour = _wins > 0 and G.C.GREY or G.C.CLEAR, outline = 0, outline_colour = G.C.WHITE, r = 0.1, minh = 2 / num_stakes, minw = valid_option and 0.45 or 0.25, func = 'RUN_SETUP_check_back_stake_highlight'}, nodes = {
 			{n = G.UIT.R, config = {align = "cm", minh = valid_option and 1.36 / num_stakes or 1.04 / num_stakes, minw = valid_option and 0.37 or 0.13, colour = _wins > 0 and get_stake_col(i) or G.C.UI.TRANSPARENT_LIGHT, r = 0.1}, nodes = {}}}}
 		if i > 1 then stake_col[#stake_col + 1] = {n = G.UIT.R, config = {align = "cm", minh = 0.8 / num_stakes, minw = 0.04 }, nodes = {} } end
 	end
 	return {n = G.UIT.ROOT, config = {align = 'cm', colour = G.C.CLEAR}, nodes = stake_col}
+end
+
+function SMODS.check_applied_stakes(stake, deck)
+	if next(stake.applied_stakes) then
+		for _, applied_stake in ipairs(stake.applied_stakes) do
+			if not deck.wins_by_key[applied_stake] then return false end
+		end
+	end
+	return true
+end
+
+function G.UIDEF.stake_option(_type)
+	
+	local middle = {n=G.UIT.R, config={align = "cm", minh = 1.7, minw = 7.3}, nodes={
+		{n=G.UIT.O, config={id = nil, func = 'RUN_SETUP_check_stake2', object = Moveable()}},
+	}}
+	
+	local stake_options = {}
+	local curr_options = {}
+	local deck_usage = G.PROFILES[G.SETTINGS.profile].deck_usage[G.GAME.viewed_back.effect.center.key]
+	G.viewed_stake = deck_usage and (deck_usage.wins_by_key[SMODS.stake_from_index(G.viewed_stake)] and G.viewed_stake or (get_deck_win_stake(G.GAME.viewed_back.effect.center.key) + 1)) or 1
+	for i=1, #G.P_CENTER_POOLS.Stake do
+		if G.PROFILES[G.SETTINGS.profile].all_unlocked or SMODS.check_applied_stakes(G.P_CENTER_POOLS.Stake[i], deck_usage or {wins_by_key = {}}) then
+			stake_options[#stake_options + 1] = i
+			curr_options[i] = #stake_options
+		end
+	end
+	
+	return {n=G.UIT.ROOT, config={align = "tm", colour = G.C.CLEAR, minh = 2.03, minw = 8.3}, nodes={
+		_type == 'Continue' and middle
+		or create_option_cycle({options = stake_options, opt_callback = 'change_stake', current_option = curr_options[G.viewed_stake] or 1,
+			colour = G.C.RED, w = 6, mid = middle})
+	}}
+end
+
+G.FUNCS.change_stake = function(args)
+	G.viewed_stake = args.to_val or args.to_key
+	G.PROFILES[G.SETTINGS.profile].MEMORY.stake = args.to_val or args.to_key
 end
 
 --#endregion
@@ -1500,17 +1538,6 @@ end
 
 function create_UIBox_current_hands(simple)
 	G.current_hands = {}
-	local index = 0
-	for _, v in ipairs(G.handlist) do
-		local ui_element = create_UIBox_current_hand_row(v, simple)
-		G.current_hands[index + 1] = ui_element
-		if ui_element then
-			index = index + 1
-		end
-		if index >= 10 then
-			break
-		end
-	end
 
 	local visible_hands = {}
 	for _, v in ipairs(G.handlist) do
@@ -1519,6 +1546,19 @@ function create_UIBox_current_hands(simple)
 		end
 	end
 
+	local index = 0
+	for _, v in ipairs(G.handlist) do
+		local ui_element = create_UIBox_current_hand_row(v, simple)
+		G.current_hands[index + 1] = ui_element
+		if ui_element then
+			index = index + 1
+		end
+		if index >= 10 and #visible_hands > 12 then -- keep pagination off until there's more than the vanilla max of 12 hands
+			break
+		end
+	end
+
+	
 	local hand_options = {}
 	for i = 1, math.ceil(#visible_hands / 10) do
 		table.insert(hand_options,
@@ -1528,7 +1568,8 @@ function create_UIBox_current_hands(simple)
 	local object = {n = G.UIT.ROOT, config = {align = "cm", colour = G.C.CLEAR}, nodes = {
 		{n = G.UIT.R, config = {align = "cm", padding = 0.04}, nodes =
 			G.current_hands},
-		{n = G.UIT.R, config = {align = "cm", padding = 0}, nodes = {
+		-- UI consistency with vanilla 
+		#visible_hands > 12 and {n = G.UIT.R, config = {align = "cm", padding = 0}, nodes = {
 			create_option_cycle({
 				options = hand_options,
 				w = 4.5,
@@ -1538,7 +1579,8 @@ function create_UIBox_current_hands(simple)
 				current_option = 1,
 				colour = G.C.RED,
 				no_pips = true
-			})}}}}
+			})}} or nil,
+		}}
 
 	local t = {n = G.UIT.ROOT, config = {align = "cm", minw = 3, padding = 0.1, r = 0.1, colour = G.C.CLEAR}, nodes = {
 		{n = G.UIT.O, config = {
@@ -1769,7 +1811,7 @@ function Card:set_edition(edition, immediate, silent, delay)
 	if self.edition then
 		self.ability.card_limit = self.ability.card_limit - (self.edition.card_limit or 0)
 		self.ability.extra_slots_used = self.ability.extra_slots_used - (self.edition.extra_slots_used or 0)
-		self.area:handle_card_limit(-1 * (self.edition.card_limit or 0), -1 * (self.edition.extra_slots_used or 0))
+		if self.area then self.area:handle_card_limit(-1 * (self.edition.card_limit or 0), -1 * (self.edition.extra_slots_used or 0)) end
 	end
 
 	local old_edition = self.edition
@@ -2146,11 +2188,9 @@ function get_pack(_key, _type)
 		local add
 		v.current_weight = v.get_weight and v:get_weight() or v.weight or 1
         if (not _type or _type == v.kind) then add = true end
-		if v.in_pool and type(v.in_pool) == 'function' then
-			local res, pool_opts = SMODS.add_to_pool(v)
-			pool_opts = pool_opts or {}
-			add = res and (add or pool_opts.override_base_checks)
-		end
+		local res, pool_opts = SMODS.add_to_pool(v)
+		pool_opts = pool_opts or {}
+		add = res and (add or pool_opts.override_base_checks)
 		if add and not G.GAME.banned_keys[v.key] then cume = cume + (v.current_weight or 1); temp_in_pool[v.key] = true end
     end
     local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..G.GAME.round_resets.ante))*cume
@@ -2262,7 +2302,7 @@ function Blind:debuff_hand(cards, hand, handname, check)
         local flags = SMODS.trigger_effects(effects, cards[i])
 		if flags.add_to_hand then splashed = true end
 		if flags.remove_from_hand then unsplashed = true end
-        if splashed and not unsplashed then table.insert(final_scoring_hand, G.play.cards[i]) end
+        if splashed and not unsplashed then table.insert(final_scoring_hand, cards[i]) end
     end
 	local flags = SMODS.calculate_context({ debuff_hand = true, full_hand = cards, scoring_hand = final_scoring_hand, poker_hands = hand, scoring_name = handname, check = check })
 	if flags.prevent_debuff then return false end
@@ -2332,11 +2372,11 @@ function Card:use_consumeable(area, copier)
 end
 
 local ease_ante_ref = ease_ante
-function ease_ante(mod, ante_end)
-	local flags = SMODS.calculate_context({modify_ante = mod, ante_end = ante_end})
-	if flags.modify then mod = mod + flags.modify end
+function ease_ante(mod)
+	local flags = SMODS.calculate_context({modify_ante = mod, ante_end = SMODS.ante_end})
+	if flags.modify then mod = flags.modify end
 	ease_ante_ref(mod)
-	SMODS.calculate_context({ante_change = mod, ante_end = ante_end})
+	SMODS.calculate_context({ante_change = mod, ante_end = SMODS.ante_end})
 end
 
 local eval_card_ref = eval_card
