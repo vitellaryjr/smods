@@ -106,7 +106,7 @@ elseif _c.generate_ui and type(_c.generate_ui) == 'function' then
     _c:generate_ui(info_queue, card, desc_nodes, specific_vars, full_UI_table)
     if desc_nodes ~= full_UI_table.main then
         -- TODO should be moved into generate_ui;
-        -- also the multiple generate_ui cases can be refactored
+        -- also the multiple generate_ui cases should be refactored
         -- to work off a base implementation
         desc_nodes.name_styled = {}
         local set = name_override and "Other" or _c.set
