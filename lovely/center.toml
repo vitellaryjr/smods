@@ -103,9 +103,8 @@ match_indent = true
 payload = '''
 elseif _c.generate_ui and type(_c.generate_ui) == 'function' then
     local specific_vars = specific_vars or {}
-    if is_info_queue then specific_vars.is_info_queue = true end
     _c:generate_ui(info_queue, card, desc_nodes, specific_vars, full_UI_table)
-    if is_info_queue then
+    if desc_nodes ~= full_UI_table.main then
         --desc_nodes.loc_name = {}
         --local set = name_override and "Other" or _c.set
         --local key = name_override or _c.key
