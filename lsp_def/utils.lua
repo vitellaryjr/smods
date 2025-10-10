@@ -716,3 +716,9 @@ function SMODS.pop_from_context_stack(context, func) end
 --- Useful for Seals/Enhancements determining whether a playing card was being individually evaluated,
 --- when a Joker called (e.g.) SMODS.pseudorandom_probability().
 function SMODS.get_previous_context() end
+
+---Check if `challenge` is unlocked.
+---@param challenge SMODS.Challenge
+---@param k? number Index of challenge in G.CHALLENGES. Only relevant for challenges defined outside SMODS
+---@return boolean
+function SMODS.challenge_is_unlocked(challenge, k) end
