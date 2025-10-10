@@ -8,32 +8,11 @@ priority = -5
 [patches.pattern]
 target = "functions/UI_definitions.lua"
 pattern = "local challenge_unlocked = G.PROFILES[G.SETTINGS.profile].challenges_unlocked and (G.PROFILES[G.SETTINGS.profile].challenges_unlocked >= k)"
-position = 'after'
-payload = """
-if v.unlocked and type(v.unlocked) == 'function' then
-	challenge_unlocked = v:unlocked()
-elseif type(v.unlocked) == 'boolean' then
-    challenge_unlocked = v.unlocked
-end
-challenge_unlocked = challenge_unlocked or G.PROFILES[G.SETTINGS.profile].all_unlocked
-
-"""
+position = 'at'
+payload = "local challenge_unlocked = SMODS.challenge_is_unlocked(v, k)"
 match_indent = true
 
 # function G.UIDEF.challenges() - fix challenge unlock count
-[[patches]]
-[patches.pattern]
-target = "functions/UI_definitions.lua"
-pattern = """
-function G.UIDEF.challenges(from_game_over)
-"""
-position = 'after'
-payload = """
-  local unlock_count = 0
-"""
-match_indent = true
-
-# function G.UIDEF.challenges() - fix challenge unlock count p2
 [[patches]]
 [patches.pattern]
 target = "functions/UI_definitions.lua"
@@ -42,16 +21,13 @@ local _ch_tab = {comp = _ch_comp, unlocked = G.PROFILES[G.SETTINGS.profile].chal
 """
 position = 'at'
 payload = """
+local unlock_count = 0
 for k, v in ipairs(G.CHALLENGES) do
-    if (v.unlocked and type(v.unlocked) == 'function' and v:unlocked())
-    or (v.unlocked == true)
-    or (G.PROFILES[G.SETTINGS.profile].all_unlocked)
-    or (not v.unlocked and (_ch_comp+5 <= k)) then
+    if SMODS.challenge_is_unlocked(v, k) then
         unlock_count = unlock_count + 1
     end
 end
-
-local _ch_tab = {comp = _ch_comp, unlocked = unlock_count or G.PROFILES[G.SETTINGS.profile].challenges_unlocked}
+local _ch_tab = {comp = _ch_comp, unlocked = unlock_count}
 """
 match_indent = true
 
