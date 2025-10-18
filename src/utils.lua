@@ -1457,11 +1457,12 @@ SMODS.other_calculation_keys = {
     'stay_flipped', 'prevent_stay_flipped',
     'cards_to_draw',
     'message',
-    'level_up', 'func', 'extra',
+    'level_up', 'func',
     'numerator', 'denominator',
     'modify',
     'no_destroy', 'prevent_trigger',
-    'replace_scoring_name', 'replace_display_name', 'replace_poker_hands'
+    'replace_scoring_name', 'replace_display_name', 'replace_poker_hands',
+    'extra'
 }
 SMODS.silent_calculation = {
     saved = true, effect = true, remove = true,
