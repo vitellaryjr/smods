@@ -3188,6 +3188,9 @@ function CardArea:handle_card_limit(card_limit, card_slots)
                 trigger = 'immediate',
                 func = function()
                     self.config.card_limit = self.config.card_limit + card_limit
+                    if self == G.hand then 
+                        check_for_unlock({type = 'min_hand_size'})
+                    end
                     return true
                 end
             }))
@@ -3202,8 +3205,8 @@ function CardArea:handle_card_limit(card_limit, card_slots)
                     return true
                 end
             }))
-            
         end
+        
         if G.hand and self == G.hand and card_limit - card_slots > 0 then
             if G.STATE == G.STATES.DRAW_TO_HAND and math.min(card_limit - card_slots, (self.config.card_limit + card_limit - card_slots) - #self.cards - (SMODS.cards_to_draw or 0)) > 0 then 
                 G.E_MANAGER:add_event(Event({
@@ -3227,7 +3230,6 @@ function CardArea:handle_card_limit(card_limit, card_slots)
                     return true
                 end
             }))
-            check_for_unlock({type = 'min_hand_size'})
         end
     end
 end
