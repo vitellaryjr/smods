@@ -2999,7 +2999,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             end
         end,
         apply = function(self, card, val)
-            if not val and card.ability[self.key] then
+            if not val and card.ability[self.key] and type(card.ability[self.key]) == 'table' then
                 if card.ability[self.key].card_limit then card.ability.card_limit = card.ability.card_limit - card.ability[self.key].card_limit end
                 if card.ability[self.key].extra_slots_used then card.ability.extra_slots_used = card.ability.extra_slots_used - card.ability[self.key].extra_slots_used end
             end
