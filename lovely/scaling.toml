@@ -111,6 +111,7 @@ SMODS.scale_card(self, {
     scalar_value = "extra",
     message_colour = G.C.RED
 })
+return nil, true
 '''
 # Ride The Bus
 [[patches]]
@@ -159,6 +160,7 @@ SMODS.scale_card(self, {
     }
 })
 self:set_cost()
+return nil, true
 '''
 
 # Runner/Square Joker/Castle
@@ -181,6 +183,7 @@ SMODS.scale_card(self, {
     ref_value = "chips",
     scalar_value = "chip_mod",
 })
+return nil, true
 '''
 
 # Wee Joker
@@ -203,11 +206,12 @@ SMODS.scale_card(self, {
     ref_table = self.ability.extra,
     ref_value = "chips",
     scalar_value = "chip_mod",
-    scaling_message = {
-        extra = {focus = self, message = localize('k_upgrade_ex')},
-        colour = G.C.CHIPS
-    }
+    no_message = true
 })
+return {
+    extra = {focus = self, message = localize('k_upgrade_ex')},
+    card = self
+}
 '''
 
 # Ice Cream
@@ -231,6 +235,7 @@ SMODS.scale_card(self, {
     operation = "-",
     message_key = 'a_chips_minus'
 })
+return nil, true
 '''
 
 # Madness
@@ -309,7 +314,6 @@ SMODS.scale_card(self, {
     scalar_value = "extra",
     message_colour = G.C.FILTER
 })
-return nil, true
 '''
 # Lucky Cat
 [[patches]]
@@ -381,6 +385,7 @@ SMODS.scale_card(self, {
     message_key = 'a_xmult',
     message_colour = G.C.RED
 })
+return nil, true
 '''
 
 # Green Joker: Subtraction
@@ -412,6 +417,7 @@ if self.ability.mult ~= 0 then
         message_key = 'a_mult_minus',
         message_colour = G.C.RED
     })
+    return nil, true
 end
 '''
 
@@ -435,6 +441,7 @@ SMODS.scale_card(self, {
     scalar_table = self.ability.extra,
     scalar_value = "hand_add"
 })
+return nil, true
 '''
 
 # Vampire
@@ -462,6 +469,7 @@ SMODS.scale_card(self, {
         ref_table[ref_value] = initial + scaling*#enhanced
     end
 })
+return nil, true
 '''
 
 # Hologram
@@ -506,6 +514,7 @@ SMODS.scale_card(self, {
     scalar_value = "increase",
     message_colour = G.C.MONEY
 })
+return nil, true
 '''
 
 # Turtle Bean
@@ -533,6 +542,7 @@ SMODS.scale_card(self, {
         G.hand:change_size(- change)
     end
 })
+return nil, true
 '''
 
 # Popcorn
@@ -557,6 +567,7 @@ SMODS.scale_card(self, {
     colour = G.C.MULT,
     operation = '-'
 })
+return nil, true
 '''
 
 # Ramen
@@ -583,6 +594,7 @@ SMODS.scale_card(self, {
     message_key = 'a_xmult_minus',
     colour = G.C.RED
 })
+return nil, true
 '''
 
 # Yorick
@@ -609,6 +621,7 @@ SMODS.scale_card(self, {
     message_key = 'a_xmult',
     message_colour = G.C.RED
 })
+return nil, true
 '''
 
 # Canio
