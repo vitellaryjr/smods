@@ -101,7 +101,7 @@ pattern = '''
 if self == G.deck and self.config.card_limit > #G.playing_cards then self.config.card_limit = #G.playing_cards end
 '''
 payload = '''
-if self == G.deck and (self.config.card_limit ~= #G.playing_cards or self.config.true_card_limit ~= #G.playing_cards) then
+if self == G.deck and (self.config.card_limit ~= #G.playing_cards or self.config.total_slots ~= #G.playing_cards) then
     self.config.card_limit = #G.playing_cards
     self.config.card_limits.total_slots = #G.playing_cards
 end
