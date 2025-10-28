@@ -3183,6 +3183,7 @@ end
 
 function CardArea:handle_card_limit(card_limit, card_slots)
     if SMODS.should_handle_limit(self) then
+        self.config.card_limits.old_slots = self.config.card_limits.total_slots or 0
         self.config.card_limits.extra_slots = self:count_property('card_limit')
         self.config.card_limits.total_slots = self:count_property('card_limit') + (self.config.card_limits.base or 0) + (self.config.card_limits.mod or 0)
         self.config.card_limits.extra_slots_used = self:count_property('extra_slots_used')
@@ -3198,8 +3199,8 @@ function CardArea:handle_card_limit(card_limit, card_slots)
                         G.E_MANAGER:add_event(Event({
                             trigger = 'immediate',
                             func = function()
-                                if (self.config.card_limits.total_slots - self.config.card_count - SMODS.cards_to_draw) > 0 then
-                                    G.FUNCS.draw_from_deck_to_hand(self.config.card_limits.total_slots - self.config.card_count - SMODS.cards_to_draw)                
+                                if (self.config.card_limits.total_slots - self.config.card_count - (SMODS.cards_to_draw or 0)) > 0 then
+                                    G.FUNCS.draw_from_deck_to_hand(self.config.card_limits.total_slots - self.config.card_count - (SMODS.cards_to_draw or 0))                
                                 end
                                 return true
                             end
@@ -3207,19 +3208,20 @@ function CardArea:handle_card_limit(card_limit, card_slots)
                         return true
                     end
                 }))
-            elseif G.STATE == G.STATES.SELECTING_HAND and #G.deck.cards > 0 then
-                if self.config.card_limits.total_slots - self.config.card_count - SMODS.cards_to_draw - (self.config.card_limits.blind_restriction or 0) > 0 then
-                    G.FUNCS.draw_from_deck_to_hand(self.config.card_limits.total_slots - self.config.card_count - SMODS.cards_to_draw - (self.config.card_limits.blind_restriction or 0))
+            elseif G.STATE == G.STATES.SELECTING_HAND and #G.deck.cards > 0 and self.config.card_limits.old_slots < self.config.card_limits.total_slots then
+                if (self.config.card_limits.total_slots - self.config.card_limits.old_slots) > 0 then
+                    G.FUNCS.draw_from_deck_to_hand((self.config.card_limits.total_slots - self.config.card_limits.old_slots))
                 end
             end
             return
         end
     else
         self.config.card_count = #self.cards 
+        self.config.card_limits.total_slots = self.config.card_limits.base
     end
 end
 
 -- Function used to determine whether the current blind modifies the number of cards drawn
 function SMODS.blind_modifies_draw(key)
-    if key == 'bl_serpent' then return true end
+    if SMODS.Blinds.modifies_draw[key] then return true end
 end

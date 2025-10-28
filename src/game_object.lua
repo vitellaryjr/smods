@@ -1720,6 +1720,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 self.order = 30 + i
             end
             G.P_BLINDS[self.key] = self
+            if self.modifies_draw then SMODS.Blinds.modifies_draw[self.key] = true end
         end
     }
     SMODS.Blind:take_ownership('eye', {
@@ -1750,6 +1751,10 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         get_loc_debuff_text = function() return G.GAME.blind.loc_debuff_text end,
     })
+
+    SMODS.Blinds.modifies_draw = {
+        bl_serpent = true
+    }
 
     -------------------------------------------------------------------------------------------------
     ----- API CODE GameObject.Seal
