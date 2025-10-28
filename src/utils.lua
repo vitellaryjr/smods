@@ -420,7 +420,7 @@ function SMODS.debuff_card(card, debuff, source)
     if debuff == 'reset' then card.ability.debuff_sources = {}; return end
     card.ability.debuff_sources = card.ability.debuff_sources or {}
     card.ability.debuff_sources[source] = debuff
-    card:set_debuff()
+    SMODS.recalc_debuff(card)
 end
 
 -- Recalculate whether a card should be debuffed
