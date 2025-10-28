@@ -3216,8 +3216,8 @@ function CardArea:handle_card_limit(card_limit, card_slots)
             return
         end
     else
-        self.config.card_count = #self.cards 
-        self.config.card_limits.total_slots = math.max(#self.cards, self.config.card_limits.total_slots or self.config.card_limits.base)
+        self.config.card_count = #self.cards
+        if not self.config.card_limits.total_slots then self.config.card_limits.total_slots = self.config.card_limits.base end
     end
 end
 
