@@ -417,7 +417,11 @@ end
 function SMODS.debuff_card(card, debuff, source)
     debuff = debuff or nil
     source = source and tostring(source) or nil
-    if debuff == 'reset' then card.ability.debuff_sources = {}; return end
+    if debuff == 'reset' then
+        sendWarnMessage("SMODS.debuff_card(card, 'reset', source) is deprecated")
+        card.ability.debuff_sources = {};
+        return
+    end
     card.ability.debuff_sources = card.ability.debuff_sources or {}
     card.ability.debuff_sources[source] = debuff
     SMODS.recalc_debuff(card)
