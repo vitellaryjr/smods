@@ -253,7 +253,7 @@ pattern = "local hand_space = e or*"
 position = "at"
 payload = """local hand_space = e
 local cards_to_draw = {}
-if not hand_space then
+local space_taken = 0
     local limit = G.hand.config.card_limit - #G.hand.cards - (SMODS.cards_to_draw or 0)
     local unfixed = not G.hand.config.fixed_limit
     local n = 0
@@ -264,12 +264,12 @@ if not hand_space then
         else    
             limit = limit - 1 + mod
             table.insert(cards_to_draw, card)
+            space_taken = space_taken + (1 - mod)
             if limit <= 0 then break end
         end
         n = n + 1
     end
     hand_space = #cards_to_draw
-end
 """
 match_indent = true
 

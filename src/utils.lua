@@ -3182,7 +3182,7 @@ function SMODS.should_handle_limit(area)
     end
 end
 
-function CardArea:handle_card_limit(card_limit, card_slots)
+function CardArea:handle_card_limit()
     if SMODS.should_handle_limit(self) then
         self.config.card_limits.old_slots = self.config.card_limits.total_slots or 0
         self.config.card_limits.extra_slots = self:count_property('card_limit')
