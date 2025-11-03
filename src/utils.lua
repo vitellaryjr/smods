@@ -3200,7 +3200,7 @@ function CardArea:handle_card_limit()
                         G.E_MANAGER:add_event(Event({
                             trigger = 'immediate',
                             func = function()
-                                if (self.config.card_limits.total_slots - self.config.card_count - (SMODS.cards_to_draw or 0)) > 0 then
+                                if (self.config.card_limits.total_slots - self.config.card_count - (SMODS.cards_to_draw or 0)) > 0 and #G.deck.cards > (SMODS.cards_to_draw or 0) then
                                     G.FUNCS.draw_from_deck_to_hand(self.config.card_limits.total_slots - self.config.card_count - (SMODS.cards_to_draw or 0))                
                                 end
                                 return true
