@@ -133,6 +133,7 @@ else
         scalar_value = "extra",
         no_message = true
     })
+    return nil, true
 end
 '''
 
@@ -339,6 +340,7 @@ SMODS.scale_card(self, {
     scalar_value = "extra",
     message_colour = G.C.FILTER
 })
+return nil, true
 '''
 # Lucky Cat
 [[patches]]
@@ -384,10 +386,11 @@ else
         scalar_value = "extra",
         no_message = true
     })
+    return nil, true
 end
 '''
 
-# Hit the Road/Lucky Cat/Obelisk
+# Hit the Road/Lucky Cat
 [[patches]]
 [patches.pattern]
 target = "card.lua"
