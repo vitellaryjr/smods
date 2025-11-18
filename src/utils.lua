@@ -1926,7 +1926,7 @@ function SMODS.calculate_context(context, return_table, no_resolve)
 end
 
 function SMODS.in_scoring(card, scoring_hand)
-    if SMODS.always_scores(card) then return true end
+    -- if SMODS.always_scores(card) then return true end
     for _, _card in pairs(scoring_hand) do
         if card == _card then return true end
     end
