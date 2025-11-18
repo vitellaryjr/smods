@@ -391,7 +391,7 @@ function SMODS.create_card(t)
     -- or should that be left to the person calling SMODS.create_card to use it correctly?
     if t.edition then _card:set_edition(t.edition) end
     if t.enhancement then _card:set_ability(G.P_CENTERS[t.enhancement]) end
-    if t.seal then _card:set_seal(t.seal, nil, true) end
+    if t.seal then _card:set_seal(t.seal); _card.ability.delay_seal = false end
     if t.stickers then
         for i, v in ipairs(t.stickers) do
             _card:add_sticker(v, t.force_stickers)
