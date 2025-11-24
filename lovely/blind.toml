@@ -266,7 +266,7 @@ position = 'after'
 match_indent = true
 payload = '''
 if self.config.blind.atlas then
-    self.children.animatedSprite.atlas = SMOD.get_atlas(self.config.blind.atlas)
+    self.children.animatedSprite.atlas = SMODS.get_atlas(self.config.blind.atlas)
 end'''
 
 # create_UIBox_blind_choice()
