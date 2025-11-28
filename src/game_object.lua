@@ -1187,7 +1187,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         rarity = 1,
         unlocked = true,
         discovered = false,
-        blueprint_compat = false,
+        blueprint_compat = true,
         perishable_compat = true,
         eternal_compat = true,
         pos = { x = 0, y = 0 },
