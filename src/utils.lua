@@ -3196,13 +3196,16 @@ end
 
 function CardArea:handle_card_limit()
     if SMODS.should_handle_limit(self) then
-        self.config.card_limits.old_slots = self.config.card_limits.total_slots or 0
-        self.config.card_limits.extra_slots = self:count_property('card_limit')
-        self.config.card_limits.total_slots = self.config.card_limits.extra_slots + (self.config.card_limits.base or 0) + (self.config.card_limits.mod or 0)
-        self.config.card_limits.extra_slots_used = self:count_property('extra_slots_used')
-        self.config.card_count = #self.cards + self.config.card_limits.extra_slots_used
+        if G.STATE == G.STATES.SELECTING_HAND or G.STATE == G.STATES.DRAW_TO_HAND then 
+            self.config.card_limits.old_slots = self.config.card_limits.total_slots or 0
+            self.config.card_limits.extra_slots = self:count_property('card_limit')
+            self.config.card_limits.total_slots = self.config.card_limits.extra_slots + (self.config.card_limits.base or 0) + (self.config.card_limits.mod or 0)
+            self.config.card_limits.extra_slots_used = self:count_property('extra_slots_used')
+            self.config.card_count = #self.cards + self.config.card_limits.extra_slots_used
+        end
+        if not self.config.card_limits.total_slots then self.config.card_limits.total_slots = (self.config.card_limits.extra_slots or 0) + (self.config.card_limits.base or 0) + (self.config.card_limits.mod or 0) end
         
-        if G.hand and self == G.hand and self.config.card_count + (SMODS.cards_to_draw or 0) < self.config.card_limits.total_slots then
+        if G.hand and self == G.hand and (self.config.card_count or 0) + (SMODS.cards_to_draw or 0) < (self.config.card_limits.total_slots or 0) then
             if G.STATE == G.STATES.DRAW_TO_HAND and not SMODS.blind_modifies_draw(G.GAME.blind.config.blind.key) and not SMODS.draw_queued then
                 SMODS.draw_queued = true
                 G.E_MANAGER:add_event(Event({
@@ -3286,7 +3289,7 @@ function SMODS.upgrade_poker_hands(args)
 
     if not args.func then
         for _, hand in ipairs(args.hands) do
-            SMODS.smart_level_up_hand(args.from, hand, instant, args.level_up or 1)
+            level_up_hand(args.from, hand, instant, args.level_up or 1)
         end
         return
     end
