@@ -2606,7 +2606,7 @@ function SMODS.destroy_cards(cards, bypass_eternal, immediate, skip_anim)
                     if cards[i].shattered then
                         cards[i]:shatter()
                     elseif cards[i].destroyed then
-                        cards[i]:start_dissolve()
+                        cards[i]:start_dissolve(nil, i == #cards)
                     end
                     return true
                 end
