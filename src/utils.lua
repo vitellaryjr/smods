@@ -3196,14 +3196,10 @@ end
 
 function CardArea:handle_card_limit()
     if SMODS.should_handle_limit(self) then
-        if G.STATE == G.STATES.SELECTING_HAND or G.STATE == G.STATES.DRAW_TO_HAND then 
-            self.config.card_limits.old_slots = self.config.card_limits.total_slots or 0
-            self.config.card_limits.extra_slots = self:count_property('card_limit')
-            self.config.card_limits.total_slots = self.config.card_limits.extra_slots + (self.config.card_limits.base or 0) + (self.config.card_limits.mod or 0)
-            self.config.card_limits.extra_slots_used = self:count_property('extra_slots_used')
-            self.config.card_count = #self.cards + self.config.card_limits.extra_slots_used
-        end
-        if not self.config.card_limits.total_slots then self.config.card_limits.total_slots = (self.config.card_limits.extra_slots or 0) + (self.config.card_limits.base or 0) + (self.config.card_limits.mod or 0) end
+        self.config.card_limits.extra_slots = self:count_property('card_limit')
+        self.config.card_limits.total_slots = self.config.card_limits.extra_slots + (self.config.card_limits.base or 0) + (self.config.card_limits.mod or 0)
+        self.config.card_limits.extra_slots_used = self:count_property('extra_slots_used')
+        self.config.card_count = #self.cards + self.config.card_limits.extra_slots_used
         
         if G.hand and self == G.hand and (self.config.card_count or 0) + (SMODS.cards_to_draw or 0) < (self.config.card_limits.total_slots or 0) then
             if G.STATE == G.STATES.DRAW_TO_HAND and not SMODS.blind_modifies_draw(G.GAME.blind.config.blind.key) and not SMODS.draw_queued then
@@ -3228,6 +3224,9 @@ function CardArea:handle_card_limit()
                 if (self.config.card_limits.total_slots - self.config.card_limits.old_slots) > 0 then
                     G.FUNCS.draw_from_deck_to_hand((self.config.card_limits.total_slots - self.config.card_limits.old_slots))
                 end
+            end
+            if self == G.hand and G.STATE == G.STATES.SELECTING_HAND or G.STATE == G.STATES.DRAW_TO_HAND then 
+                self.config.card_limits.old_slots = self.config.card_limits.total_slots or 0
             end
             return
         end
