@@ -3306,7 +3306,9 @@ function SMODS.upgrade_poker_hands(args)
         end
     end
         
+    local displayed = false
     for _, hand in ipairs(args.hands) do
+        displayed = hand == SMODS.displayed_hand
         if not instant then
             update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize(hand, 'poker_hands'), level=G.GAME.hands[hand].level})
             for name, p in pairs(SMODS.Scoring_Parameters) do
@@ -3339,7 +3341,7 @@ function SMODS.upgrade_poker_hands(args)
         if not instant then delay(1.3) end
     end
 
-    if not instant then
+    if not instant and not displayed then
         update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, vals_after_level or {mult = 0, chips = 0, handname = '', level = ''})
     end
 end
