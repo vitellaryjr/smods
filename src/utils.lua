@@ -1820,6 +1820,8 @@ function SMODS.update_context_flags(context, flags)
     if flags.numerator then context.numerator = flags.numerator end
     if flags.denominator then context.denominator = flags.denominator end
     if flags.cards_to_draw then context.amount = flags.cards_to_draw end
+    if flags.cost then context.cost = flags.cost end
+    if flags.sell_cost then context.sell_cost = flags.sell_cost end
     if flags.saved then context.game_over = false end
     if flags.modify then
         -- insert general modified value updating here
