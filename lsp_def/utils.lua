@@ -242,10 +242,7 @@ SMODS.displaying_scoring = nil
 ---@param hand PokerHands|string
 ---@param instant boolean
 ---@param amount? number
--- Like level_up_hand(), but takes care of calling update_hand_text().
--- Tries to avoid calling update_hand_text() if unnecessary.\
--- Smart effect is already handled inside `SMODS.upgrade_poker_hands`.
--- Downgrading this to plain wrapper for backwards compat.
+-- Internal function left around for back compat. Replaced by `SMODS.upgrade_poker_hands`.
 function SMODS.smart_level_up_hand(card, hand, instant, amount) end
 
 ---@param _type CardAreaTypes|string
