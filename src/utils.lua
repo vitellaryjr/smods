@@ -830,6 +830,7 @@ function SMODS.poll_rarity(_pool_key, _rand_key)
             SMODS.remove_pool(available_rarities, v.key)
         end
     end
+    G.ARGS.TEMP_POOL = EMPTY(G.ARGS.TEMP_POOL)
 
     -- Calculate total rates of rarities
     local total_weight = 0
