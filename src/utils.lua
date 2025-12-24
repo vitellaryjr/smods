@@ -3256,6 +3256,12 @@ function SMODS.create_sprite(X, Y, W, H, atlas, pos)
     return SMODS.get_atlas_sprite_class(atlas_key)(X, Y, W, H, atlas, pos)
 end
 
+local animate = AnimatedSprite.animate
+function AnimatedSprite:animate()
+    if not self.current_animation.frames then return end
+    animate(self)
+end
+
 function SMODS.is_active_blind(key, ignore_disabled)
     return G.GAME and G.GAME.blind and G.GAME.facing_blind and (G.GAME.blind.name == key or G.GAME.blind.config.key == key) and (not G.GAME.blind.disabled or ignore_disabled)
 end
