@@ -166,8 +166,8 @@ function SMODS.UIScrollBox:sync_scroll_offset()
 end
 function SMODS.UIScrollBox:sync_scroll_progress()
 	local dx, dy = self:get_scroll_distance()
-	self.scroll_progress.x = (dx == 0 and 0) or ((self.offset.x or 0) / dx)
-	self.scroll_progress.y = (dy == 0 and 0) or ((self.offset.y or 0) / dy)
+	self.scroll_progress.x = (dx == 0 and 0) or ((self.scroll_offset.x or 0) / dx)
+	self.scroll_progress.y = (dy == 0 and 0) or ((self.scroll_offset.y or 0) / dy)
 end
 function SMODS.UIScrollBox:set_scroll_offset(t)
 	self.scroll_offset = SMODS.merge_defaults(t, { x = 0, y = 0 })
