@@ -477,6 +477,7 @@ function loadMods(modsDirectory)
                 name = name:match("^(.*).zip$")
             end
             local path = SMODS.MODS_DIR.. "/" .. flags.name .. "/"
+            if flags.name:find('smods') then smods_dupe = true end
             local mod = {
                 name = name,
                 id = "lovely-compat-" .. flags.name,
