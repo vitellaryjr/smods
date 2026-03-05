@@ -49,7 +49,7 @@ payload = '''
 if delay_sprites ~= 'quantum' then
     SMODS.clean_up_children(self.children)
     if self.canvas_text then SMODS.clean_up_canvas_text(self) end
-    if self.ability and (self.ability.set == 'Enhanced' or self.ability.set == 'Default') and not self:should_hide_front() then self:set_sprites(nil, self.config.card) end
+    if self.ability and (center.set == 'Enhanced' or center.set == 'Default') and not self:should_hide_front() then self:set_sprites(nil, self.config.card) end
     self:set_sprites(center)
 end
 '''
