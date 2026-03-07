@@ -2331,8 +2331,7 @@ create_UIBox_your_collection_poker_hands = function (args)
         ((G.ACTIVE_MOD_UI.ui_config or {}).collection_back_colour or (G.ACTIVE_MOD_UI.ui_config or {}).back_colour),
         outline_colour = G.ACTIVE_MOD_UI and ((G.ACTIVE_MOD_UI.ui_config or {}).collection_outline_colour or
             (G.ACTIVE_MOD_UI.ui_config or {}).outline_colour),
-        back_func = (args and args.back_func) or G.ACTIVE_MOD_UI and "openModUI_" .. G.ACTIVE_MOD_UI.id or
-            'your_collection_other_gameobjects',
+        back_func = (args and args.back_func) or 'your_collection_other_gameobjects',
         snap_back = args and args.snap_back,
         infotip = args and args.infotip,
         contents = {
