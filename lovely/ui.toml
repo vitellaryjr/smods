@@ -424,6 +424,18 @@ payload = '''
 '''
 match_indent = true
 
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''
+local desc = generate_card_ui(_center, full_UI_table, nil, _center.set, nil)
+'''
+position = "before"
+payload = '''
+full_UI_table.from_detailed_tooltip = true
+'''
+match_indent = true
+
 # Support starting modifiers (rules.modifiers) without UI for Challenges
 [[patches]]
 [patches.pattern]
