@@ -1196,7 +1196,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             return true
         end,
         create_fake_card = function(self)
-	        return { ability = copy_table(self.config), fake_card = true }
+	        return { ability = copy_table(self.config), fake_card = self.key }
         end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
             if not card then
@@ -1894,7 +1894,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             desc_nodes.background_colour = res.background_colour
         end,
         create_fake_card = function(self)
-	        return { ability = { seal = copy_table(self.config) }, fake_card = true }
+	        return { ability = { seal = copy_table(self.config) }, fake_card = self.key }
         end,
     }
     for _,v in ipairs { 'Purple', 'Gold', 'Blue', 'Red' } do
@@ -3412,7 +3412,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             return self.weight
         end,
         create_fake_card = function(self)
-	        return { edition = copy_table(self.config), fake_card = true }
+	        return { edition = copy_table(self.config), fake_card = self.key }
         end,
         card_limit_key = function(self, card)
             local area = (card.area or {}).config or {}
