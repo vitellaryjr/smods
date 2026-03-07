@@ -557,6 +557,15 @@ match_indent = true
 position = 'at'
 payload = '''elseif not nc then draw_card(G.hand, G.play, 1, 'up', true, card, nil, mute) end'''
 
+# Card:check_use - allow Ankh to be selectable from packs even if slots are full
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = "function Card:check_use()"
+match_indent = true
+position = 'after'
+payload = '''
+    if self.area == G.pack_cards and G.pack_cards and booster_obj and SMODS.card_select_area(self, booster_obj) and self:selectable_from_pack(booster_obj) then return end'''
 
 # Card:load()
 [[patches]]
