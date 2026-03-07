@@ -2691,6 +2691,5 @@ G.FUNCS.change_viewed_back = function(...)
 	for _, card in pairs(G.sticker_card.area.cards) do
 		card.original_T = copy_table(card.T)
 	end
-    local ret = g_funcs_change_viewed_back_ref(...)
-	return ret
+	return g_funcs_change_viewed_back_ref(...)
 end
