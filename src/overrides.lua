@@ -2684,3 +2684,13 @@ function add_tag(_tag)
 	end
 	add_tag_ref(_tag)
 end
+
+-- Fix visual glitch in deck select
+local g_funcs_change_viewed_back_ref = G.FUNCS.change_viewed_back
+G.FUNCS.change_viewed_back = function(...)
+	for _, card in pairs(G.sticker_card.area.cards) do
+		card.original_T = copy_table(card.T)
+	end
+    local ret = g_funcs_change_viewed_back_ref(...)
+	return ret
+end
