@@ -761,6 +761,7 @@ function SMODS.get_atlas(atlas_key) end
 function SMODS.get_atlas_sprite_class(atlas_key) end
 
 ---@param ... any The same parameters as Sprite() takes individually. The atlas may be an atlas_key instead.
+---@return Sprite|AnimatedSprite|table
 --- This function creates a Sprite or AnimatedSprite depending on the atlas passed
 function SMODS.create_sprite(X, Y, W, H, atlas, pos) end
 
