@@ -111,6 +111,13 @@
 ---@field old? string Key of the old center after a card's ability is set.
 ---@field new? string Key of the new center after a card's ability is set.
 ---@field unchanged? boolean `true` if the key of the old center is the same as the new one after a card's ability is set.
+---@field create_shop_card? true Check if `true` for when the shop is creating a card.
+---@field set? string Set of the card the shop is creating.
+---@field modify_shop_card? true Check if `true` for modifying a card in the shop after its creation.
+---@field create_booster_card? true Check if `true` for when a booster is creating a card.
+---@field modify_booster_card? true Check if `true` for modifying a card in a booster after its creation.
+---@field booster? Card|table Booster object.
+---@field index? integer Index of the card to be created by a booster.
 ---@field poker_hand_changed? boolean `true` if a poker hand's values are being altered.
 ---@field old_level? integer Level of the poker hand before the alteration, if it was changed.
 ---@field new_level? integer Level of the poker hand after the alteration, if it was changed.
@@ -752,11 +759,11 @@ function SMODS.is_getter_context(context) end
 --- skipping the evaluation of the object and preventing an infinite loop.
 function SMODS.check_looping_context(eval_object) end
 
----@param atlas_key string The key of the atlas 
+---@param atlas_key string The key of the atlas
 --- This function gets an atlas from G.ASSET_ATLAS or G.ANIMATION_ATLAS
 function SMODS.get_atlas(atlas_key) end
 
----@param atlas_key string The key of the atlas 
+---@param atlas_key string The key of the atlas
 --- This function returns the Sprite or the AnimatedSprite class depending on the atlas type
 function SMODS.get_atlas_sprite_class(atlas_key) end
 
