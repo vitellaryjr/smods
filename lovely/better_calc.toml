@@ -823,7 +823,7 @@ payload = '''
 SMODS.calculate_context{round_eval = true}
 '''
 
-# Add better `add_round_eval_row` support
+# Add better `add_round_eval_row` support   
 [[patches]]
 [patches.pattern]
 target = 'functions/common_events.lua'
@@ -1075,7 +1075,7 @@ end
 payload = '''
 G.E_MANAGER:add_event(Event({
     trigger = 'immediate',
-    func = function()
+    func = function()                
         SMODS.cards_to_draw = SMODS.cards_to_draw - hand_space
         return true
     end
@@ -1733,7 +1733,7 @@ target = 'functions/state_events.lua'
 match_indent = false
 position = 'after'
 pattern = '''delay = G.GAME.current_round.current_hand.handname ~= disp_text and 0.4 or 0}, {handname=disp_text, level=G.GAME.hands[text].level, mult = G.GAME.hands[text].mult, chips = G.GAME.hands[text].chips})'''
-payload = '''
+payload = '''    
 for name, parameter in pairs(SMODS.Scoring_Parameters) do
     if name ~= 'chips' and name ~= 'mult' then update_hand_text({immediate = true}, {[name] = parameter.current}) end
 end
@@ -1777,10 +1777,10 @@ G.E_MANAGER:add_event(Event({
                     G.jokers:remove_card(self)
                     self:remove()
                     self = nil
-                return true; end}))
+                return true; end})) 
         return true
     end
-}))
+})) 
 '''
 payload = '''
 SMODS.destroy_cards(self, nil, nil, true)
@@ -1813,10 +1813,10 @@ payload = '''
                             G.jokers:remove_card(self)
                             self:remove()
                             self = nil
-                        return true; end}))
+                        return true; end})) 
                 return true
             end
-        }))
+        })) 
         return
     end
 '''
@@ -1846,10 +1846,10 @@ payload = '''
                             G.jokers:remove_card(self)
                             self:remove()
                             self = nil
-                        return true; end}))
+                        return true; end})) 
                 return true
             end
-        }))
+        })) 
         return
     end
 '''
@@ -1863,7 +1863,7 @@ target = 'card.lua'
 match_indent = true
 position = 'at'
 pattern = '''
-if my_pos and G.jokers.cards[my_pos+1] and not self.getting_sliced and not G.jokers.cards[my_pos+1].ability.eternal and not G.jokers.cards[my_pos+1].getting_sliced then
+if my_pos and G.jokers.cards[my_pos+1] and not self.getting_sliced and not G.jokers.cards[my_pos+1].ability.eternal and not G.jokers.cards[my_pos+1].getting_sliced then 
 '''
 payload = '''
 if my_pos and G.jokers.cards[my_pos+1] and not self.getting_sliced and not SMODS.is_eternal(G.jokers.cards[my_pos+1], self) and not G.jokers.cards[my_pos+1].getting_sliced then
@@ -1996,7 +1996,7 @@ if other_joker and other_joker ~= self then
     context.blueprint_card = context.blueprint_card or self
     if context.blueprint > #G.jokers.cards + 1 then return end
     local other_joker_ret = other_joker:calculate_joker(context)
-    if other_joker_ret then
+    if other_joker_ret then 
         other_joker_ret.card = context.blueprint_card or self
         other_joker_ret.colour = G.C.BLUE
         return other_joker_ret
@@ -2023,7 +2023,7 @@ if other_joker and other_joker ~= self then
     context.blueprint_card = context.blueprint_card or self
     if context.blueprint > #G.jokers.cards + 1 then return end
     local other_joker_ret = other_joker:calculate_joker(context)
-    if other_joker_ret then
+    if other_joker_ret then 
         other_joker_ret.card = context.blueprint_card or self
         other_joker_ret.colour = G.C.RED
         return other_joker_ret
