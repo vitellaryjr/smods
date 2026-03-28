@@ -167,7 +167,7 @@ return {
             },
             card_extra_h_score = {
                 text = {
-                    "{C:purple}#1#{} de puntuación extra  mientras esté en tu mano",
+                    "{C:purple}#1#{} de puntuación extra mientras esté en tu mano",
                 },
             },
             card_extra_x_score = {
@@ -177,7 +177,7 @@ return {
             },
             card_extra_h_x_score = {
                 text = {
-                    "{X:purple,C:white}X#1#{} puntuación extra  mientras esté en tu mano",
+                    "{X:purple,C:white}X#1#{} puntuación extra mientras esté en tu mano",
                 },
             },
             artist = {
@@ -338,9 +338,9 @@ return {
             cashout_hidden = '...y #1# más',
             a_xchips = "X#1# fichas",
             a_xchips_minus = "-X#1# fichas",
-            a_score="#1# de puntuación",
-            a_xscore="X#1# puntuación",
-            a_xscore_minus="-X#1# puntuación",
+            a_score = "#1# de puntuación",
+            a_xscore = "X#1# puntuación",
+            a_xscore_minus = "-X#1# puntuación",
             smods_version_mismatch = {
                 "¡Tu versión de Steamodded ha cambiado",
                 "desde que has comenzado esta partida!",
