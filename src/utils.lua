@@ -1378,39 +1378,35 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     local key_return_flags = {
-        'prevent_debuff',
-        'add_to_hand',
-        'remove_from_hand',
-        'stay_flipped',
-        'prevent_stay_flipped',
-        'prevent_trigger'
+        prevent_debuff = true,
+        add_to_hand = true,
+        remove_from_hand = true,
+        stay_flipped = true,
+        prevent_stay_flipped = true,
+        prevent_trigger = true,
     }
 
-    for _, flag in ipairs(key_return_flags) do
-        if key == flag then
-            return key
-        end
+    if key_return_flags[key] then
+        return key
     end
 
     local amount_return_flags = {
-        'remove',
-        'debuff_text',
-        'cards_to_draw',
-        'numerator',
-        'denominator',
-        'no_destroy',
-        'replace_scoring_name',
-        'replace_display_name',
-        'replace_poker_hands',
-        'modify',
-        'shop_create_flags',
-        'booster_create_flags'
+        remove = true,
+        debuff_text = true,
+        cards_to_draw = true,
+        numerator = true,
+        denominator = true,
+        no_destroy = true,
+        replace_scoring_name = true,
+        replace_display_name = true,
+        replace_poker_hands = true,
+        modify = true,
+        shop_create_flags = true,
+        booster_create_flags = true
     }
 
-    for _, flag in ipairs(amount_return_flags) do
-        if key == flag then
-            return { [key] = amount }
-        end
+    if amount_return_flags[key] then
+        return { [key] = amount }
     end
 
     if key == 'debuff' then
