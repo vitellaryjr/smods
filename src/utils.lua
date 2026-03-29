@@ -1548,7 +1548,7 @@ SMODS.insert_repetitions = function(ret, eval, effect_card, _type)
         end
         effect.message = effect.message or (not effect.remove_default_message and localize('k_again_ex'))
         for h=1, effect.repetitions do
-            table.insert(ret, _type == "joker_retrigger" and effect or { retriggers = effect})
+            table.insert(ret, _type and effect or { retriggers = effect})
         end
         eval = eval.extra
     until not eval
