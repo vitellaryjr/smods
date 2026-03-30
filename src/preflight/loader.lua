@@ -204,6 +204,9 @@ function loadMods(modsDirectory)
                 t[i] = x
             end
         end},
+        icon_path = {type = "string"},
+        icon_width = {type = "number"},
+        icon_fps = {type = "number"},
         main_file = { type = 'string', required = true },
         config_file = {type = 'string', default = 'config.lua' },
         __ = { check = function(mod)
@@ -688,8 +691,22 @@ local function load_mods()
         end)
         for _, mod in ipairs(SMODS.mod_priorities[priority]) do
             SMODS.mod_list[#SMODS.mod_list + 1] = mod -- keep mod list in prioritized load order
+            SMODS.current_mod = mod
+            if mod.icon_path then
+                local data = SMODS.NFS.newFileData(mod.path.."/assets/1x/"..mod.icon_path)
+                local image_data = love.graphics.newImage(data)
+                local atlas_table = mod.icon_width and mod.icon_width ~= image_data:getWidth() and 'ANIMATION_ATLAS' or "ASSET_ATLAS"
+                SMODS.Atlas {
+                    key = "modicon",
+                    path = mod.icon_path,
+                    px = mod.icon_width or image_data:getWidth(),
+                    py = image_data:getHeight(),
+                    atlas_table = atlas_table,
+                    fps = mod.icon_fps,
+                    image = image_data
+                }
+            end
             if mod.can_load and not mod.lovely_only then
-                SMODS.current_mod = mod
                 if mod.outdated then
                     SMODS.compat_0_9_8.with_compat(function()
                         mod.config = {}
@@ -703,7 +720,6 @@ local function load_mods()
                     SMODS.load_mod_config(mod)
                     assert(load(NFS.read(mod.path..mod.main_file), ('=[SMODS %s "%s"]'):format(mod.id, mod.main_file)))()
                 end
-                SMODS.current_mod = nil
             elseif not mod.lovely_only then
                 sendTraceMessage(string.format("Mod %s was unable to load: %s%s%s%s", mod.id,
                 mod.load_issues.outdated and
@@ -713,7 +729,8 @@ local function load_mods()
                 ('Missing Dependencies: ' .. inspect(mod.load_issues.dependencies) .. '\n') or '',
                 next(mod.load_issues.conflicts) and
                 ('Unresolved Conflicts: ' .. inspect(mod.load_issues.conflicts) .. '\n') or ''
-            ), 'Loader')
+                ), 'Loader')
+                SMODS.current_mod = nil
             end
         end
     end
