@@ -258,6 +258,42 @@ return {
                     '{C:chips}#1#{} Chips'
                 }
             },
+            generic_card_limit = {
+                name = "Kartenkapazität",
+                text = {
+                    '{C:dark_edition}#1#{} Slot im Bereich'
+                }
+            },
+            generic_card_limit_plural = {
+                name = "Kartenkapazität",
+                text = {
+                    '{C:dark_edition}#1#{} Slots im Bereich'
+                }
+            },
+            generic_card_limit_pc = {
+                name = "Hand Size",
+                text = {
+                    '{C:dark_edition}#1#{} Handgröße'
+                }
+            },
+            generic_card_limit_pc_plural = {
+                name = "Hand Size",
+                text = {
+                    '{C:dark_edition}#1#{} Handgröße'
+                }
+            },
+            generic_extra_slots = {
+                name = "Slot-Verbrauch",
+                text = {
+                    'Füllt {C:dark_edition}#1#{} Slots'
+                }
+            },
+            generic_extra_slots_pc = {
+                name = "Hand-Platz",
+                text = {
+                    'Füllt {C:dark_edition}#1#{} Slots in der Hand'
+                }
+            },
             artist = {
                 text = {
                     "{C:inactive}Künstler",
@@ -354,12 +390,19 @@ return {
             b_limit = 'Bis zu ',
             b_retrigger_single = 'weiteres Mal',
             b_retrigger_plural = 'weitere Male',
+            k_enhanced = 'Kartenverstärkung',
 		},
 		v_dictionary = {
 			c_types = '#1# Typen',
 			cashout_hidden = '...und #1# mehr',
             a_xchips = "X#1# Chips",
             a_xchips_minus = "-X#1# Chips",
+            a_score="#1# Punktzahl",
+            a_xscore="X#1# Punktzahl",
+            a_xscore_minus="-X#1# Punktzahl",
+            a_blind_size="#1# Blind-Größe",
+            a_xblind_size="X#1# Blind-Größe",
+            a_xblind_size_minus="-X#1# Blind-Größe",
             smods_version_mismatch = {
                 "Deine Version von Steamodded hat sich geändert",
                 "seit dieser Durchlauf gestartet wurde!",
