@@ -204,22 +204,22 @@ return {
             },
             card_extra_blind_size = {
                 text = {
-                    "{C:blind}#1#{} Blind Size",
+                    "{C:blind}#1#{} extra Blind Size",
                 },
             },
             card_extra_h_blind_size = {
                 text = {
-                    "{C:blind}#1#{} Blind Size when held",
+                    "{C:blind}#1#{} extra Blind Size when held",
                 },
             },
             card_extra_x_blind_size = {
                 text = {
-                    "{X:blind,C:white}X#1#{} Blind Size",
+                    "{X:blind,C:white}X#1#{} extra Blind Size",
                 },
             },
             card_extra_h_x_blind_size = {
                 text = {
-                    "{X:blind,C:white}X#1#{} Blind Size when held",
+                    "{X:blind,C:white}X#1#{} extra Blind Size when held",
                 },
             },
             artist = {
