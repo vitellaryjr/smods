@@ -150,6 +150,109 @@ return {
                     "auf der Hand ist",
                 },
             },
+            card_extra_repetitions = {
+                text = {
+                    "Löse diese Karte",
+                    "{C:attention}#1#{} #2# aus",
+                },
+            },
+            card_score = {
+                text = {
+                    "{C:purple}#1#{} Punktzahl",
+                },
+            },
+            card_h_score = {
+                text = {
+                    "{C:purple}#1#{} Punktzahl",
+                    "während sich diese Karte",
+                    "auf der Hand befindet",
+                },
+            },
+            card_x_score = {
+                text = {
+                    "{X:purple,C:white}X#1#{} Punktzahl",
+                },
+            },
+            card_h_x_score = {
+                text = {
+                    "{X:purple,C:white}X#1#{} Punktzahl",
+                    "während sich diese Karte",
+                    "auf der Hand befindet",
+                },
+            },
+            card_extra_score = {
+                text = {
+                    "{C:purple}#1#{} Extra-Punktzahl",
+                },
+            },
+            card_extra_h_score = {
+                text = {
+                    "{C:purple}#1#{} Extra-Punktzahl",
+                    "während sich diese Karte",
+                    "auf der Hand befindet",
+                },
+            },
+            card_extra_x_score = {
+                text = {
+                    "{X:purple,C:white}X#1#{} Extra-Punktzahl",
+                },
+            },
+            card_extra_h_x_score = {
+                text = {
+                    "{X:purple,C:white}X#1#{} Extra-Punktzahl",
+                    "während sich diese Karte",
+                    "auf der Hand befindet",
+                },
+            },
+            card_blind_size = {
+                text = {
+                    "{C:blind}#1#{} Blind-Größe",
+                },
+            },
+            card_h_blind_size = {
+                text = {
+                    "{C:blind}#1#{} Blind-Größe",
+                     "während sich diese Karte",
+                    "auf der Hand befindet",
+                },
+            },
+            card_x_blind_size = {
+                text = {
+                    "{X:blind,C:white}X#1#{} Blind-Größe",
+                },
+            },
+            card_h_x_blind_size = {
+                text = {
+                    "{X:blind,C:white}X#1#{} Blind-Größe",
+                    "während sich diese Karte",
+                    "auf der Hand befindet",
+                },
+            },
+            card_extra_blind_size = {
+                text = {
+                    "{C:blind}#1#{} Extra-Blind-Größe",
+                },
+            },
+            card_extra_h_blind_size = {
+                text = {
+                    "{C:blind}#1#{} Extra-Blind-Größe",
+                    "während sich diese Karte",
+                    "auf der Hand befindet",
+                },
+            },
+            card_extra_x_blind_size = {
+                text = {
+                    "{X:blind,C:white}X#1#{} Extra-Blind-Größe",
+                },
+            },
+            card_extra_h_x_blind_size = {
+                text = {
+                    "{X:blind,C:white}X#1#{} Extra-Blind-Größe",
+                    "während sich diese Karte",
+                    "auf der Hand befindet",
+                },
+            },
+
             card_chips_minus = {
                 text = {
                     '{C:chips}#1#{} Chips'
@@ -248,7 +351,9 @@ return {
             b_deckskins_lc = 'Niedrigkontrast-Farben',
             b_deckskins_hc = 'Hochkontrast-Farben',
             b_deckskins_def = 'Standardfarben',
-            b_limit = 'Bis zu '
+            b_limit = 'Bis zu ',
+            b_retrigger_single = 'weiteres Mal',
+            b_retrigger_plural = 'weitere Male',
 		},
 		v_dictionary = {
 			c_types = '#1# Typen',
