@@ -2179,7 +2179,7 @@ end
 function SMODS.get_mods_scoring_targets(_context)
     local ret = {}
     for _, mod in ipairs(SMODS.mod_list) do
-        local func = _context == 'calc_dollar_bonus' and 'calc_dollar_bonus' or 'calculate'
+        local func = type(_context) == "string" and _context or 'calculate'
         if mod.can_load and type(mod[func]) == "function" then
             table.insert(ret, mod)
         end
@@ -2190,7 +2190,7 @@ end
 function SMODS.get_stake_scoring_targets(_context)
     local ret = {}
     for _, stake in ipairs(G.GAME.applied_stakes or {}) do
-        local func = _context == 'calc_dollar_bonus' and 'calc_dollar_bonus' or 'calculate'
+        local func = type(_context) == "string" and _context or 'calculate'
         if type(G.P_CENTER_POOLS.Stake[stake][func]) == "function" then
             table.insert(ret, G.P_CENTER_POOLS.Stake[stake])
         end
