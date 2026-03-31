@@ -1281,6 +1281,16 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
         SMODS.mod_score({ add = amount, card = effect.message_card or effect.juice_card or scored_card or effect.card or effect.focus, effect = effect, from_edition = from_edition })
         return true
     end
+    if (key == 'xblind_size' or key == 'h_xblind_size' or key == 'x_blind_size' or key == 'h_x_blindsize' or key == 'xblindsize' or key == 'h_xblindsize' or key == 'x_blindsize' or key == 'h_x_blindsize') and amount ~= 1 then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
+        SMODS.mod_blind_size({ mult = amount, card = effect.message_card or effect.juice_card or scored_card or effect.card or effect.focus, effect = effect, from_edition = from_edition })
+        return true
+    end
+    if (key == 'blind_size' or key == 'h_blind_size' or key == 'blindsize' or key == 'h_blindsize') and amount ~= 0 then
+        if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
+        SMODS.mod_blind_size({ add = amount, card = effect.message_card or effect.juice_card or scored_card or effect.card or effect.focus, effect = effect, from_edition = from_edition })
+        return true
+    end
 
     if key == 'message' and not SMODS.no_resolve then
         if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
@@ -1500,6 +1510,8 @@ SMODS.other_calculation_keys = {
     'p_dollars', 'dollars', 'h_dollars',
     'score', 'h_score',
     'xscore', 'x_score', 'h_x_score', 'h_xscore',
+    'blind_size', 'blindsize', 'h_blind_size',  'h_blindsize',
+    'xblind_size', 'x_blind_size', 'xblindsize', 'x_blindsize', 'h_x_blind_size', 'h_xblind_size',  'h_x_blindsize', 'h_xblindsize',
     'swap', 'balance',
     'saved', 'effect', 'remove',
     'debuff', 'prevent_debuff', 'debuff_text',
@@ -3238,6 +3250,18 @@ function SMODS.localize_perma_bonuses(specific_vars, desc_nodes)
     if specific_vars and specific_vars.perma_h_x_score then
         localize{type = 'other', key = 'card_extra_h_x_score', nodes = desc_nodes, vars = {(specific_vars.perma_h_x_score)}}
     end
+    if specific_vars and specific_vars.perma_blind_size then
+        localize{type = 'other', key = 'card_extra_blind_size', nodes = desc_nodes, vars = {SMODS.signed(specific_vars.perma_blind_size)}}
+    end
+    if specific_vars and specific_vars.perma_h_blind_size then
+        localize{type = 'other', key = 'card_extra_h_blind_size', nodes = desc_nodes, vars = {SMODS.signed(specific_vars.perma_h_blind_size)}}
+    end
+    if specific_vars and specific_vars.perma_x_blind_size then
+        localize{type = 'other', key = 'card_extra_x_blind_size', nodes = desc_nodes, vars = {(specific_vars.perma_x_blind_size)}}
+    end
+    if specific_vars and specific_vars.perma_h_x_blind_size then
+        localize{type = 'other', key = 'card_extra_h_x_blind_size', nodes = desc_nodes, vars = {(specific_vars.perma_h_x_blind_size)}}
+    end
     if specific_vars and specific_vars.bonus_repetitions then
         localize{type = 'other', key = 'card_extra_repetitions', nodes = desc_nodes, vars = {specific_vars.bonus_repetitions, localize(specific_vars.bonus_repetitions > 1 and 'b_retrigger_plural' or 'b_retrigger_single')}}
     end
@@ -3706,7 +3730,6 @@ SMODS.mod_score = function(score_mod)
         score_fx[#score_fx+1] = {key = score_mod.mult < 0 and "a_xscore_minus" or "a_xscore", value = absoluted, sound = "xscore", message_key = "xscore_message"}
     end
     if score_mod.add and score_mod.add ~= 0 then
-        local absoluted = math.abs(score_mod.add)
         score_cal = score_cal + score_mod.add
         table.insert(G.SCORE_DISPLAY_QUEUE, old)
         score_fx[#score_fx+1] = { key = "a_score", value = score_mod.add, sound = "gong", message_key = 'score_message'}
@@ -3731,6 +3754,49 @@ SMODS.mod_score = function(score_mod)
         end
     elseif score_mod.effect then
         score_mod.effect.update_score = true
+    end
+    delay(0.2)
+end
+
+-- function to modify blind score: normally accepts add and mult argument and additionally card argument
+SMODS.mod_blind_size = function(blind_size_mod)
+    blind_size_mod = blind_size_mod or {}
+    local blind_size_fx = {}
+    local blind_size_cal = blind_size_mod.set or G.GAME.blind.chips
+    local old = G.GAME.blind.chips
+    G.BLIND_SIZE_DISPLAY_QUEUE = G.BLIND_SIZE_DISPLAY_QUEUE or {}
+    -- TARGET: higher priority score operation
+    if blind_size_mod.mult then
+        local absoluted = math.abs(blind_size_mod.mult)
+        blind_size_cal = blind_size_cal * blind_size_mod.mult
+        table.insert(G.BLIND_SIZE_DISPLAY_QUEUE, blind_size_cal)
+        blind_size_fx[#blind_size_fx+1] = {key = blind_size_mod.mult < 0 and "a_xblind_size_minus" or "a_xblind_size", value = absoluted, sound = "xblindsize", message_key = "xblind_size_message"}
+    end
+    if blind_size_mod.add and blind_size_mod.add ~= 0 then
+        blind_size_cal = blind_size_cal + blind_size_mod.add
+        table.insert(G.BLIND_SIZE_DISPLAY_QUEUE, blind_size_cal)
+        blind_size_fx[#blind_size_fx+1] = { key = "a_blind_size", value = blind_size_mod.add, sound = "timpani", message_key = 'blind_size_message'}
+    end
+    -- TARGET: lower priority blind_size operation
+    G.GAME.blind.chips = blind_size_cal
+
+    if not (blind_size_mod.effect and blind_size_mod.effect.remove_default_message) and blind_size_mod.card then
+        for _,v in ipairs(blind_size_fx) do
+            if blind_size_mod.from_edition then
+                card_eval_status_text(blind_size_mod.card, 'jokers', nil, percent, nil, {message = localize{type = 'variable', key = v.key, vars = {v.value}}, update_blind_size = true, colour = G.C.EDITION, edition = true, sound = v.sound, volume = 0.5 })
+            elseif blind_size_mod.effect and blind_size_mod.effect[v.message_key] then
+                blind_size_mod.effect[v.message_key].update_blind_size = true
+                card_eval_status_text(blind_size_mod.card, 'extra', v.value, percent, nil, blind_size_mod.effect[v.message_key])
+            else
+                card_eval_status_text(blind_size_mod.card, 'jokers', nil, percent, nil, {message = localize{type='variable',key= v.key,vars={v.value}}, update_blind_size = true, volume = 0.5, sound_override = v.sound, colour = G.C.DYN_UI.DARK}) -- or use G.C.UI.FILTER
+            end
+        end 
+        -- this check is in case some skip animation mods is there, may be removed in the future
+        if G.CARD_EVAL_TRIGGERED then
+            G.BLIND_SIZE_DISPLAY_QUEUE = nil
+        end
+    elseif blind_size_mod.effect then
+        blind_size_mod.effect.update_blind_size = true
     end
     delay(0.2)
 end

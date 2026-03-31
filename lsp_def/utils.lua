@@ -821,3 +821,14 @@ function SMODS.mod_score(mod_score) end
 ---@field card? Card Card responsible for score modification action, crucial for score display to work properly
 ---@field effect? table Table of effects that were calculated
 ---@field from_edition? boolean 
+
+---Modifies current blind size
+---@param mod_blind_size Blind_Size_Mod_Parameter Blindcore modification parameter
+function SMODS.mod_blind_size(mod_blind_size) end
+
+---@class Blind_Size_Mod_Parameter
+---@field add? number Add this number to blind size
+---@field mult? number Multiply blind size by this number
+---@field card? Card Card responsible for blind size modification action, crucial for blind size display to work properly
+---@field effect? table Table of effects that were calculated
+---@field from_edition? boolean 
