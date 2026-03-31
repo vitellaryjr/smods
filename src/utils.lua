@@ -3832,7 +3832,6 @@ function UIElement:set_element_shader(shader, send, shadow)
             G.SHADERS[shader]:send("uie_details", {element.VT.x * tile_scale, element.VT.y * tile_scale, element.VT.w * tile_scale, element.VT.h * tile_scale})
             G.SHADERS[shader]:send("uie_scale", element.VT.scale)
             G.SHADERS[shader]:send("uie_rot", element.VT.r)
-            G.SHADERS[shader]:send("uie_shadow", not not shadow)
         end
     })
 end
