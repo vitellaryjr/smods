@@ -2938,6 +2938,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 return
             end
             self.id = self.key
+            if not self.deck.type then self.deck.type = SMODS.Challenge.deck.type end
             -- only needs to be called once
             SMODS.insert_pool(G.CHALLENGES, self)
             SMODS.Challenge.super.register(self)
