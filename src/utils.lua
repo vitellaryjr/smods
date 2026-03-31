@@ -3716,6 +3716,7 @@ function SMODS.get_badge_text_colour(key)
     end
 end
 
+
 function SMODS.resolve_ui_shaders(shader, send)
     local shaders = {}
     -- simple single shader
@@ -3936,4 +3937,9 @@ SMODS.mod_blind_size = function(blind_size_mod)
         blind_size_mod.effect.update_blind_size = true
     end
     delay(0.2)
+end
+
+-- Simple unlock text function, created to give mod authors an option to hook rather than patch for their use cases.
+function SMODS.create_unlock_text(center)
+	return localize('k_'..string.lower(center and center.set or 'unknown'))
 end

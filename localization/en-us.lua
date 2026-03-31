@@ -373,7 +373,8 @@ return {
             b_deckskins_def = 'Default Colours',
             b_limit = 'Up to ',
             b_retrigger_single = 'time',
-            b_retrigger_plural = 'times'
+            b_retrigger_plural = 'times',
+			k_enhanced = 'Enhancement'
 		},
 		v_dictionary = {
 			c_types = '#1# Types',
