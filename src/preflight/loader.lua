@@ -667,7 +667,7 @@ function loadMods(modsDirectory)
     local prefix_counter = 1
     for _, mod in pairs(SMODS.Mods) do
         mod.can_load = check_dependencies(mod)
-        if not mod.can_load and mod.load_issues.prefix_conflicts then
+        if not mod.can_load and next(mod.load_issues.prefix_conflicts or {}) then
             mod.prefix = '$pc'..prefix_counter
             prefix_counter = prefix_counter + 1
         end
