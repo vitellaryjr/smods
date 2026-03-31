@@ -2907,6 +2907,7 @@ end
 local game_start_run = Game.start_run
 function Game:start_run(args)
     game_start_run(self, args)
+    G.SCORE_DISPLAY_QUEUE = nil
     G.E_MANAGER:add_event(Event({
         trigger = 'immediate',
         func = function()
