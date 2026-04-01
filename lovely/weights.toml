@@ -46,6 +46,20 @@ if not forced_key and SMODS.optional_features.object_weights then forced_key = S
 
 '''
 
+# Bypass get_next_tag_key()
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+match_indent = true
+position = 'after'
+pattern = '''
+if G.FORCE_TAG then return G.FORCE_TAG end
+'''
+payload = '''
+if SMODS.optional_features.object_weights then return SMODS.poll_object({type = 'Tag'}) end
+'''
+
+
 # These patches add functionality for polling blinds, but are a precursor for full support of modded small and big blinds
 # TODO: move to blind related toml
 # Adjust vanilla blinds max ante property
