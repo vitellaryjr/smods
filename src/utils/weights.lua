@@ -5,7 +5,7 @@
 function SMODS.poll_object(args)
     assert(args, "SMODS.poll_object called with no args."..SMODS.log_crash_info(debug.getinfo(2)))
     assert((args.type or (args.types and type(args.types) == 'table') or (args.attributes and type(args.attributes) == 'table') or (args.pool and type(args.pool) == 'table')), "SMODS.poll_object called without a pool source." .. SMODS.log_crash_info(debug.getinfo(2)))
-    print(args.type or 'polling something else')
+
     -- Prepare pool
     local pool = args.pool or {}
     local types = args.attributes or args.types or {args.type}
