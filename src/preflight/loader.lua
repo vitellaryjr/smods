@@ -506,9 +506,28 @@ function loadMods(modsDirectory)
         end
     end
 
+    -- i don't think it's even possible for a zip and a non-zip to share a blacklist name, but i'm still adding it just in case
+    local function load_type_order(mod)
+        return (mod.load_type == 'zip' and 2 or 0) + (mod.json and -1 or 0)
+    end
     for k, mods in pairs(SMODS.Mods) do
         if mods[1] then
             -- we found more than one mod with this ID
+            -- cull duplicates with the same blacklist name
+            -- (such duplicates would always get disabled otherwise)
+            local blacklist_dict = {}
+            for _,mod in ipairs(mods) do
+                blacklist_dict[mod.blacklist_name] = blacklist_dict[mod.blacklist_name] or {}
+                table.insert(blacklist_dict[mod.blacklist_name], mod)
+            end
+            mods = {}
+            -- prefer directories and json files
+            for _,v in pairs(blacklist_dict) do
+                if #v > 1 then
+                    table.sort(v, function(a,b) return load_type_order(a) < load_type_order(b) end)
+                end
+                table.insert(mods, v[1])
+            end
             -- identify the highest enabled version
             local enabled_mods = {}
             for _,mod in ipairs(mods) do
