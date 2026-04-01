@@ -336,6 +336,15 @@ return {
                     "{C:mult}#1#{} Mult",
                 },
             },
+            m_lucky={
+                name="Glückskarte",
+                text={
+                    "{C:green}#1#-zu-#3#{} Chance,",
+                    "{C:mult}+#2#{} Mult zu erhalten",
+                    "{C:green}#6#-zu-#5#{} Chance,",
+                    "{C:money}#4# ${} zu gewinnen",
+                },
+            },
         }
     },
     misc = {
