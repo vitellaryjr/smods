@@ -318,9 +318,9 @@ return {
             m_gold={
                 name="Gold-Karte",
                 text={
-                    "{C:money}#1#{} wenn diese",
-                    "Karte in der Hand",
-                    "am Ende der Runde",
+                    "{C:money}#1#{}, wenn diese Karte",
+                    "zum Ende der Runde",
+                    "auf der Hand ist",
                 },
             },
             m_stone={
