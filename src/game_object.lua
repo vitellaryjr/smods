@@ -1201,6 +1201,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             if self.attributes then
                 for _, attribute in ipairs(self.attributes) do
                     if SMODS.Attributes[attribute] then
+                        self.attributes[attribute] = true
                         SMODS.Attributes[attribute].keys = SMODS.merge_lists({SMODS.Attributes[attribute].keys or {}, {self.key}})
                     end
                 end

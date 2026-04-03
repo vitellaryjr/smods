@@ -47,10 +47,20 @@ function SMODS.populate_attributes()
     for _, attribute in pairs(SMODS.Attributes) do
         for _, key in ipairs(attribute.keys) do
             if G.P_CENTERS[key] then
-                G.P_CENTERS[key].attributes = SMODS.merge_lists({G.P_CENTERS[key].attributes or {}, {attribute.key}})
+                G.P_CENTERS[key].attributes = G.P_CENTERS[key].attributes or {}
+                G.P_CENTERS[key].attributes[attribute.key] = true
             end
         end
     end
+end
+
+function Card:has_attribute(attribute)
+    if not SMODS.Attributes[attribute] then return false end
+    if self.config.center.attributes[attribute] then return true end
+    for _, att in ipairs(SMODS.Attributes[attribute].alias or {}) do
+        if self.config.center.attributes[att] then return true end
+    end
+    return false
 end
 
 SMODS.Attribute({
