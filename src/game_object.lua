@@ -3801,6 +3801,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         key = 'chips',
         default_value = 0,
         colour = G.C.UI_CHIPS,
+        juice_on_update = true,
         calculation_keys = {'chips', 'h_chips', 'chip_mod', 'x_chips', 'xchips', 'Xchip_mod',},
         calc_effect = function(self, effect, scored_card, key, amount, from_edition)
             if not SMODS.Calculation_Controls.chips then return end
