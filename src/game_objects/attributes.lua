@@ -113,9 +113,9 @@ SMODS.Attribute({
     key = 'scaling',
     keys = {
         'j_ceremonial', 'j_selzer', 'j_ride_the_bus', 'j_egg', 'j_runner',
-        'j_ice_cream', 'j_constellation', 'j_hiker', 'j_green_joker', 'j_red_card',
+        'j_ice_cream', 'j_constellation', 'j_green_joker', 'j_red_card',
         'j_madness', 'j_square', 'j_vampire', 'j_hologram', 'j_rocket', 'j_turtle_bean',
-        'j_obelisk', 'j_gift', 'j_flash', 'j_lucky_cat',
+        'j_obelisk', 'j_flash', 'j_lucky_cat',
         'j_popcorn', 'j_trousers', 'j_ramen', 'j_castle', 'j_campfire',
         'j_throwback', 'j_glass', 'j_wee', 'j_hit_the_road', 'j_caino', 'j_yorick'
     }
@@ -444,5 +444,19 @@ SMODS.Attribute({
     key = 'on_sell',
     keys = {
         'j_luchador', 'j_diet_cola', 'j_invisible'
+    }
+})
+
+SMODS.Attribute({
+    key = 'boss_blind',
+    keys = {
+        'j_rocket', 'j_luchador', 'j_campfire', 'j_matador', 'j_chicot'
+    }
+})
+
+SMODS.Attribute({
+    key = 'perma_bonus',
+    keys = {
+        'j_hiker'
     }
 })
