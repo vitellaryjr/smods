@@ -286,7 +286,7 @@ function SMODS.create_poll_pool(labels, args)
         local temp_pool = {}
         local join_func = (args.attributes and not args.union) and SMODS.intersect_lists or join_lists
         for i=1, #(args.rarities or {true}) do
-            local _p = label == 'Blind' and SMODS.create_blind_pool(args.blind_type or 'boss') or SMODS.Attributes[label] and SMODS.get_attribute_pool(label) or get_current_pool(label, args.rarities and args.rarities[i])
+            local _p = label == 'Blind' and SMODS.create_blind_pool(args.blind_type or 'boss') or SMODS.Attributes[label] and SMODS.get_attribute_pool(label) or get_current_pool(label, args.rarities and args.rarities[i], nil, args.append)
             if SMODS.Attributes[label] then
                 _p = SMODS.cull_pool(_p, args)
             end
