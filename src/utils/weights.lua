@@ -458,7 +458,7 @@ function SMODS.cull_pool(pool, args)
             if v.no_pool_flag and G.GAME.pool_flags[v.no_pool_flag] then add = nil end
             if v.yes_pool_flag and not G.GAME.pool_flags[v.yes_pool_flag] then add = nil end
             
-            add = in_pool and (add or pool_opts.override_base_checks)
+            add = in_pool and (add or ((not _rarity or _rarity == v.rarity) and pool_opts.override_base_checks))
             
             if add and not G.GAME.banned_keys[v.key] then 
                 final_pool[#final_pool + 1] = v.key
