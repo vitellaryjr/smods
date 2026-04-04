@@ -27,7 +27,7 @@ function SMODS.poll_object(args)
     for _, key in ipairs(pool) do
         local weight_table = {}
         
-        local w, m_w = SMODS.get_weight_of_object(G[SMODS.game_table_from_type[key.type] or 'P_CENTERS'][key.key or key], key.weight)
+        local w, m_w = SMODS.get_weight_of_object(G[SMODS.game_table_from_type[key.type] or 'P_CENTERS'][key.key or key], key.weight, args)
         weight_table = {key = key.key or key, weight = m_w}
         
         total_weight = total_weight + w
@@ -97,10 +97,10 @@ end
 
 -- Returns the `weight` and `modified_weight` or a given object
 ---@param args table|{key: string, no_mod: boolean?} 
-function SMODS.get_weight_of_object(obj, opt_weight)
+function SMODS.get_weight_of_object(obj, opt_weight, args)
     if not obj then return 10, 10 end
     local w = opt_weight or obj.weight or 10
-    local m = not opt_weight and obj.get_weight and obj:get_weight(w) or w
+    local m = not opt_weight and obj.get_weight and obj:get_weight(w, args) or w
 
     return w, m
 end
