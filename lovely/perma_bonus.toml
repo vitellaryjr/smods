@@ -280,7 +280,7 @@ function Card:get_bonus_score()
 end
 
 function Card:get_bonus_x_score()
-    if self.debuff then return 1 end
+    if self.debuff then return 0 end
     local ret = SMODS.multiplicative_stacking(1, self.ability.perma_x_score or 0)
     -- TARGET: get_bonus_x_score
     return ret
@@ -294,7 +294,7 @@ function Card:get_bonus_h_score()
 end
 
 function Card:get_bonus_h_x_score()
-    if self.debuff then return 1 end
+    if self.debuff then return 0 end
     local ret = SMODS.multiplicative_stacking(1, self.ability.perma_h_x_score or 0)
     -- TARGET: get_bonus_h_x_score
     return ret
