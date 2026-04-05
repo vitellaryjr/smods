@@ -375,7 +375,7 @@ function SMODS.create_card(t)
     -- move setting enhancement into card creation
     if t.enhancement then
         if t.key then
-            sendWarnMessage(("SMODS.create_card called with incompatible arguments key = '%s', enhancement = '%s'! Ignoring key, using enhancement."):format(t.key, t.enhancement))
+            sendWarnMessage(("SMODS.create_card called with incompatible arguments key = '%s', enhancement = '%s'! Ignoring key, using enhancement."):format(t.key, t.enhancement), 'Util')
         end
         t.key = t.enhancement
         t.set = 'Enhanced'
@@ -448,7 +448,7 @@ function SMODS.debuff_card(card, debuff, source)
     debuff = debuff or nil
     source = source and tostring(source) or nil
     if debuff == 'reset' then
-        sendWarnMessage("SMODS.debuff_card(card, 'reset', source) is deprecated")
+        sendWarnMessage("SMODS.debuff_card(card, 'reset', source) is deprecated", "Util")
         card.ability.debuff_sources = {};
         return
     end
@@ -1581,7 +1581,7 @@ SMODS.insert_repetitions = function(ret, eval, effect_card, _type)
     repeat
         eval.repetitions = eval.repetitions or 0
         if eval.repetitions <= 0 then
-            sendWarnMessage('Found effect table with no assigned repetitions during repetition check')
+            sendWarnMessage('Found effect table with no assigned repetitions during repetition check', 'Util')
         end
         local effect = {}
         for k,v in pairs(eval) do
