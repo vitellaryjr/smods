@@ -4023,7 +4023,7 @@ SMODS.mod_blind_size = function(blind_size_mod)
     local blind_size_cal = blind_size_mod.set or G.GAME.blind.chips
     local old = G.GAME.blind.chips
     G.BLIND_SIZE_DISPLAY_QUEUE = G.BLIND_SIZE_DISPLAY_QUEUE or {}
-    -- TARGET: higher priority score operation
+    -- TARGET: higher priority blind_size operation
     if blind_size_mod.mult then
         local absoluted = math.abs(blind_size_mod.mult)
         blind_size_cal = blind_size_cal * blind_size_mod.mult
