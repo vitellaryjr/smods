@@ -2559,7 +2559,8 @@ function SMODS.signed(val)
 end
 
 function SMODS.signed_dollars(val)
-    return val and (val > 0 and '$'..val or '-$'..-val) or '0'
+    local sign = (val or 0) < 0 and '-' or ''
+    return val and sign..'$'..math.abs(val) or '0'
 end
 
 function SMODS.multiplicative_stacking(base, perma)
