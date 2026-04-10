@@ -1076,6 +1076,17 @@ function SMODS.shatters(card)
     end
 end
 
+function SMODS.get_ability_reset_keys(card)
+    local reset_keys = {'name', 'effect', 'set', 'extra', 'played_this_ante', 'perma_debuff'}
+    for _, mod in ipairs(SMODS.mod_list) do
+        if mod.set_ability_reset_keys then
+            local keys = mod.set_ability_reset_keys()
+            for _, v in pairs(keys) do table.insert(reset_keys, v) end
+        end
+    end
+    return reset_keys
+end
+
 function SMODS.calculate_quantum_enhancements(card, effects, context)
     if not SMODS.optional_features.quantum_enhancements then return end
     if context.extra_enhancement or context.check_enhancement or SMODS.extra_enhancement_calc_in_progress then return end
@@ -1096,8 +1107,9 @@ function SMODS.calculate_quantum_enhancements(card, effects, context)
         end
     end
     table.sort(extra_enhancements_list, function(a, b) return G.P_CENTERS[a].order < G.P_CENTERS[b].order end)
+
     for _, k in ipairs(extra_enhancements_list) do
-        card:set_ability(G.P_CENTERS[k], nil, 'quantum')
+        card:quantum_set_ability(G.P_CENTERS[k])
         card.ability.extra_enhancement = k
         local eval = eval_card(card, context)
         table.insert(effects, eval)
