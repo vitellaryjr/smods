@@ -1606,6 +1606,7 @@ SMODS.insert_repetitions = function(ret, eval, effect_card, _type)
         elseif _type == 'individual_retrigger' then
             effect.retrigger_card = effect_card.object
             effect.message_card = effect.message_card or effect_card.scored_card
+            effect.retrigger_flag = true
         elseif not _type then
             effect.card = effect.card or effect_card
         end
