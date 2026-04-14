@@ -14,7 +14,11 @@ function get_new_boss()
 '''
 payload = '''
 -- Use SMODS object weight system when enabled
-if SMODS.optional_features.object_weights then return SMODS.poll_object({type = 'Blind'}) end
+    if SMODS.optional_features.object_weights then
+        local ret_boss = SMODS.poll_object({type = 'Blind'})
+        G.GAME.bosses_used[ret_boss] = G.GAME.bosses_used[ret_boss] + 1
+        return ret_boss
+    end
 '''
 
 # Bypass create_card_for_shop()
