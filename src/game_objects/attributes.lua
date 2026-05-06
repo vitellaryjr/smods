@@ -511,7 +511,7 @@ SMODS.Attribute({
 SMODS.Attribute({
     key = 'booster',
     keys = {
-        'j_red_card'
+        'j_red_card', 'j_hallucination', 'j_astronomer'
     }
 })
 
