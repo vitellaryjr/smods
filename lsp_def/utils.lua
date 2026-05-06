@@ -668,8 +668,9 @@ function SMODS.get_multi_boxes(multi_box) end
 ---@param bypass_eternal boolean?
 ---@param immediate boolean?
 ---@param skip_anim boolean?
+---@param colours table?
 --- Destroys the cards passed to the function, handling calculation events that need to happen
-function SMODS.destroy_cards(cards, bypass_eternal, immediate, skip_anim) end
+function SMODS.destroy_cards(cards, bypass_eternal, immediate, skip_anim, colours) end
 
 ---@param hand_space number
 --- Used to draw cards to hand outside of the normal card draw
