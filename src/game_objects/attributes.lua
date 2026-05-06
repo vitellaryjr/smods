@@ -518,6 +518,6 @@ SMODS.Attribute({
 SMODS.Attribute({
     key = 'hand_level',
     keys = {
-        'j_space'
+        'j_space', 'j_burnt'
     }
 })
