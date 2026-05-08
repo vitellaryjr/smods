@@ -543,7 +543,7 @@ SMODS.Attribute({
     alias = {'consumeable'},
     keys = {
         'j_perkeo', 'j_astronomer', 'j_constellation', 'j_satellite', 'j_8_ball', 'j_superposition', 
-        'j_vagabond', 'j_hallucination', 'j_fortune_teller', 'j_cartomancer', 'j_sixth_sense', 'j_seance',
+        'j_vagabond', 'j_gift', 'j_hallucination', 'j_fortune_teller', 'j_cartomancer', 'j_sixth_sense', 'j_seance',
 
         'c_fool', 'c_high_priestess', 'c_emperor',
 
@@ -578,7 +578,7 @@ SMODS.Attribute({
 SMODS.Attribute({
     key = 'joker',
     keys = {
-        "j_abstract", "j_riff_raff", "j_swashbuckler", 'j_invisible',
+        "j_abstract", "j_riff_raff", "j_swashbuckler", 'j_invisible', 'j_gift',
 
         'c_wheel_of_fortune', 'c_temperance', 'c_judgement', 'c_ectoplasm', 'c_ankh', 'c_hex',
 
