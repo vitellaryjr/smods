@@ -250,6 +250,9 @@ SMODS.Attribute({
         'j_duo', 'j_trio', 'j_family', 'j_order', 'j_tribe',
         'j_burnt', 'j_card_sharp', 'j_space',
 
+        'c_mercury', 'c_venus', 'c_earth', 'c_mars', 'c_jupiter', 'c_saturn',
+        'c_uranus', 'c_neptune', 'c_pluto', 'c_planet_x', 'c_ceres', 'c_eris',
+
         'v_telescope', 'v_observatory',
 
         'bl_mouth', 'bl_eye'
@@ -831,6 +834,9 @@ SMODS.Attribute({
     key = 'hand_level',
     keys = {
         'j_space', 'j_burnt',
+
+        'c_mercury', 'c_venus', 'c_earth', 'c_mars', 'c_jupiter', 'c_saturn',
+        'c_uranus', 'c_neptune', 'c_pluto', 'c_planet_x', 'c_ceres', 'c_eris',
 
         'tag_orbital',
 
