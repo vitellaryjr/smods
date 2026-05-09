@@ -174,10 +174,11 @@ SMODS.Attribute({
         'j_certificate', 'j_invisible', 'j_cartomancer', 'j_perkeo',
 
         'c_fool', 'c_high_priestess', 'c_emperor', 'c_judgement',
-        'c_familiar', 'c_grim', 'c_incantation', 'c_wraith', 'c_ankh',
-        'c_trance', 'c_medium', 'c_cryptid',
+        'c_familiar', 'c_grim', 'c_incantation', 'c_wraith', 'c_ankh','c_cryptid',
 
-        'tag_uncommon', 'tag_rare', 'tag_negative', 'tag_foil', 'tag_holo', 'tag_polychrome', 'tag_double', 'tag_top_up'
+        'tag_uncommon', 'tag_rare', 'tag_double', 'tag_top_up',
+
+        'Blue', 'Purple' -- seal
     }
 })
 
@@ -255,7 +256,7 @@ SMODS.Attribute({
 
         'v_telescope', 'v_observatory',
 
-        'bl_mouth', 'bl_eye'
+        'bl_ox', 'bl_mouth', 'bl_eye'
     }
 })
 
@@ -419,7 +420,10 @@ SMODS.Attribute({
 SMODS.Attribute({
     key = 'space',
     keys = {
-        'j_supernova', 'j_space', 'j_constellation', 'j_rocket', 'j_satellite', 'j_astronomer'
+        'j_supernova', 'j_space', 'j_constellation', 'j_rocket', 'j_satellite', 'j_astronomer',
+
+        'c_mercury', 'c_venus', 'c_earth', 'c_mars', 'c_jupiter', 'c_saturn',
+        'c_uranus', 'c_neptune', 'c_pluto', 'c_planet_x', 'c_ceres', 'c_eris'
     }
 })
 
@@ -446,7 +450,7 @@ SMODS.Attribute({
         'j_credit_card', 'j_chaos', 'j_delayed_grat', 'j_business', 'j_egg',
         'j_faceless', 'j_todo_list', 'j_cloud_9', 'j_rocket', 'j_gift',
         'j_reserved_parking', 'j_mail', 'j_to_the_moon', 'j_golden',
-        'j_trading', 'j_ticket', 'j_rough_gem', 'j_matador', 'j_satellite',
+        'j_trading', 'j_ticket', 'j_rough_gem', 'j_matador', 'j_satellite', 'j_astronomer',
 
         'c_hermit', 'c_temperance', 'c_immolate',
 
@@ -502,8 +506,6 @@ SMODS.Attribute({
         'p_arcana_normal_1', 'p_arcana_normal_2', 'p_arcana_normal_3', 'p_arcana_normal_4',
         'p_arcana_jumbo_1', 'p_arcana_jumbo_2', 'p_arcana_mega_1', 'p_arcana_mega_2',
 
-        'tag_charm',
-
         'Purple' -- seal
     }
 })
@@ -520,8 +522,6 @@ SMODS.Attribute({
         'p_celestial_normal_1', 'p_celestial_normal_2', 'p_celestial_normal_3', 'p_celestial_normal_4',
         'p_celestial_jumbo_1', 'p_celestial_jumbo_2', 'p_celestial_mega_1', 'p_celestial_mega_2',
 
-        'tag_meteor',
-
         'Blue' -- seal
     }
 })
@@ -533,8 +533,7 @@ SMODS.Attribute({
 
         'v_omen_globe',
 
-        'p_spectral_normal_1', 'p_spectral_normal_2', 'p_spectral_jumbo_1', 'p_spectral_mega_1',
-        'tag_ethereal'
+        'p_spectral_normal_1', 'p_spectral_normal_2', 'p_spectral_jumbo_1', 'p_spectral_mega_1'
     }
 })
 
@@ -569,23 +568,22 @@ SMODS.Attribute({
         'v_magic_trick', 'v_illusion',
 
         'p_standard_normal_1', 'p_standard_normal_2', 'p_standard_normal_3', 'p_standard_normal_4',
-        'p_standard_jumbo_1', 'p_standard_jumbo_2', 'p_standard_mega_1', 'p_standard_mega_2',
-
-        'tag_standard'
+        'p_standard_jumbo_1', 'p_standard_jumbo_2', 'p_standard_mega_1', 'p_standard_mega_2'
     }
 })
 
 SMODS.Attribute({
     key = 'joker',
     keys = {
-        "j_abstract", "j_riff_raff", "j_swashbuckler", 'j_invisible', 'j_gift',
+        "j_abstract", "j_riff_raff", "j_baseball", "j_swashbuckler", 'j_invisible', 'j_gift',
 
-        'c_wheel_of_fortune', 'c_temperance', 'c_judgement', 'c_ectoplasm', 'c_ankh', 'c_hex',
+        'c_wheel_of_fortune', 'c_temperance', 'c_judgement', 'c_wraith', 'c_ectoplasm', 'c_ankh', 'c_hex',
 
         'p_buffoon_normal_1', 'p_buffoon_normal_2', 'p_buffoon_jumbo_1', 'p_buffoon_mega_1',
 
-        'tag_uncommon', 'tag_rare', 'tag_negative', 'tag_foil', 'tag_holo', 'tag_polychrome',
-        'tag_buffoon', 'tag_top_up'
+        'tag_uncommon', 'tag_rare', 'tag_negative', 'tag_foil', 'tag_holo', 'tag_polychrome', 'tag_top_up',
+
+        'bl_final_heart'
     }
 })
 
@@ -804,6 +802,8 @@ SMODS.Attribute({
     key = 'position',
     keys = {
         'j_blueprint', 'j_ceremonial', 'j_brainstorm', 'j_hanging_chad', 'j_photograph',
+
+        'c_death'
     }
 })
 

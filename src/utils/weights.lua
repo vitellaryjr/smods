@@ -10,16 +10,7 @@ function SMODS.poll_object(args)
     
     -- Prepare pool
     local pool = args.pool or {}
-    if args.type then
-        args.types = {}
-        if args.type == 'Consumeables' then
-            for _, v in pairs(SMODS.ConsumableTypes) do
-                args.types[#args.types+1] = v.key
-            end
-        else
-            args.types = {args.type}
-        end
-    end
+    if args.type then args.types = {args.type} end
     if args.types then args.type = args.types[1] end
     local types = args.attributes or args.types
 
@@ -520,7 +511,7 @@ function SMODS.cull_pool(pool, args)
                 end
             end
 
-            if args.types and not args.types[v.set] then add = nil end
+            if args.types and (not args.types[v.set] and not (args.types['Consumeables'] and SMODS.ConsumableTypes[v.set])) then add = nil end
             if v.no_pool_flag and G.GAME.pool_flags[v.no_pool_flag] then add = nil end
             if v.yes_pool_flag and not G.GAME.pool_flags[v.yes_pool_flag] then add = nil end
             
