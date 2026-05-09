@@ -3135,6 +3135,7 @@ function SMODS.scale_card(card, args)
     for _, ret in ipairs(scaling_responses) do
         SMODS.calculate_effect(ret, ret.source)
     end
+    return args.ref_table[args.ref_value], scalar_value * scalar_factor
 end
 
 function SMODS.additive_scaling(ref_table, ref_value, initial, modifier)
