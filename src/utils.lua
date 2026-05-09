@@ -3163,7 +3163,12 @@ function SMODS.reset_card(card, args)
             if obj.calc_resetting and type(obj.calc_resetting) == "function" then
                 local ret = obj:calc_resetting(_card, card, initial, reset_value, args)
                 if ret then
-                    if ret.override and not args.block_override then override = true; SMODS.calculate_effect(ret.override, _card) end
+                    if ret.override and not args.block_override then
+                        override = true
+                        if type(ret.override) == "table" then
+                            SMODS.calculate_effect(ret.override, _card)
+                        end
+                    end
                     if ret.post then ret.post.source = _card; reset_responses[#reset_responses + 1] = ret.post end
                     SMODS.calculate_effect(ret, _card)
                 end
@@ -3175,7 +3180,12 @@ function SMODS.reset_card(card, args)
         if edition.calc_resetting and type(edition.calc_resetting) == 'function' then
             local ret = edition:calc_resetting(card, card, initial, reset_value, args)
             if ret then
-                if ret.override and not args.block_override then override = true; SMODS.calculate_effect(ret.override, card) end
+                if ret.override and not args.block_override then
+                    override = true
+                    if type(ret.override) == "table" then
+                        SMODS.calculate_effect(ret.override, card)
+                    end
+                end
                 if ret.post then ret.post.source = card; reset_responses[#reset_responses + 1] = ret.post end
                 SMODS.calculate_effect(ret, card)
             end
