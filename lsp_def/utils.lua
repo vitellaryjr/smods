@@ -5,7 +5,7 @@
 --- Internal class referring args passed as `context` in a SMODS object's `calculate` function.
 --- Not all arguments typed here are present in all contexts, see [Calculate Function](https://github.com/Steamodded/smods/wiki/calculate_functions#contexts) for details.
 ---@class CalcContext: table
----@field cardarea? CardArea|"unscored" The CardArea currently being checked.
+---@field cardarea? CardArea|PlayAreas|table The CardArea currently being checked.
 ---@field full_hand? Card[]|table[] All played or selected cards.
 ---@field scoring_hand? Card[]|table[] All scoring cards in played hand.
 ---@field scoring_name? PokerHands|string Key to the scoring poker hand.
@@ -69,8 +69,8 @@
 ---@field debuff_hand? true Check if `true` for calculating if the played hand should be debuffed.
 ---@field check? true `true` when the blind is being checked for if it debuffs the played hand.
 ---@field stay_flipped? true Check if `true` for effects when a card is being drawn.
----@field to_area? CardArea|table CardArea the card is being drawn to.
----@field from_area? CardArea|table CardArea the card is being drawn from.
+---@field to_area? CardArea|PlayAreas|table CardArea the card is being drawn to.
+---@field from_area? CardArea|PlayAreas|table CardArea the card is being drawn from.
 ---@field modify_hand? true Check if `true` for modifying the chips and mult of the played hand.
 ---@field drawing_cards? true `true` when cards are being drawn
 ---@field amount? number Used for in some contexts to specify a numerical amount.
