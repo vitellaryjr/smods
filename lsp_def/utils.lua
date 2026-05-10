@@ -62,7 +62,7 @@
 ---@field ending_booster? true Check if `true` for effects after a Booster Pack ends.
 ---@field starting_shop? true Check if `true` for effects when the shop is first opened.
 ---@field blind_disabled? true Check if `true` for effects when the blind is disabled.
----@field blind_defeated? true Check if `true` for effects when the blind is disabled.
+---@field blind_defeated? true Check if `true` for effects when the blind is defeated.
 ---@field press_play? true Check if `true` for effects when the Play button is pressed.
 ---@field debuff_card? Card|table The card being checked for if it should be debuffed.
 ---@field ignore_debuff? true Sets if `self.debuff` checks are ignored.
