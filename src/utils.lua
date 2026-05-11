@@ -1939,7 +1939,7 @@ function SMODS.update_context_flags(context, flags)
     if flags.modify then
         -- insert general modified value updating here
         if context.modify_ante then context.modify_ante = flags.modify end
-        if context.drawing_cards then context.amount = flags.modify end
+        if context.drawing_cards then context.amount = math.max(flags.modify, 0) end
     end
 end
 
@@ -2858,7 +2858,7 @@ function SMODS.draw_cards(hand_space)
         return true
     end
 
-    local flags = SMODS.calculate_context({drawing_cards = true, amount = hand_space})
+    local flags = SMODS.calculate_context({drawing_cards = true, amount = math.max(hand_space, 0)})
     hand_space = math.min(#G.deck.cards, flags.cards_to_draw or flags.modify or hand_space)
     delay(0.3)
     SMODS.drawn_cards = {}
