@@ -2640,6 +2640,16 @@ function SMODS.seeing_double_check(hand, suit)
     if saw_double(suit_tally, suit) then return true else return false end
 end
 
+local function parse_tooltip_vars(str, separator)
+    separator = separator or ";"
+
+    local vars = {}
+    for res in string.gmatch(str, "([^"..separator.."]+)") do
+        table.insert(vars, res)
+    end
+    return vars
+end
+
 function SMODS.localize_box(lines, args)
     local final_line = {}
     for _, part in ipairs(lines) do
@@ -2738,7 +2748,15 @@ function SMODS.localize_box(lines, args)
         else
             final_line[#final_line+1] = {n=G.UIT.T, config={
                 button = part.control.button,
-                detailed_tooltip = part.control.T and (G.P_CENTERS[part.control.T] or G.P_TAGS[part.control.T]) or nil,
+                detailed_tooltip = part.control.T and (
+                    G.P_CENTERS[part.control.T]
+                    or G.P_TAGS[part.control.T]
+                    or {
+                        set = part.control.T_set or 'Other',
+                        key = part.control.T,
+                        vars = part.control.T_vars and parse_tooltip_vars(part.control.T_vars) or {}
+                    }
+                  ) or nil,
                 text = assembled_string,
                 shadow = args.shadow,
                 colour = thunk.text_col or args.text_colour or loc_colour(nil, args.default_col),
