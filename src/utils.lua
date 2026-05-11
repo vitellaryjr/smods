@@ -2774,7 +2774,7 @@ function SMODS.info_queue_desc_from_rows(desc_nodes, empty, maxw)
   }}
 end
 
-function SMODS.destroy_cards(cards, bypass_eternal, immediate, skip_anim)
+function SMODS.destroy_cards(cards, bypass_eternal, immediate, skip_anim, colours)
     if not cards[1] then
         if Object.is(cards, Card) then
             cards = {cards}
@@ -2809,7 +2809,7 @@ function SMODS.destroy_cards(cards, bypass_eternal, immediate, skip_anim)
             if cards[i].shattered then
                 cards[i]:shatter()
             elseif cards[i].destroyed then
-                cards[i]:start_dissolve()
+                cards[i]:start_dissolve(colours)
             end
         else
             G.E_MANAGER:add_event(Event({
@@ -2817,7 +2817,7 @@ function SMODS.destroy_cards(cards, bypass_eternal, immediate, skip_anim)
                     if cards[i].shattered then
                         cards[i]:shatter()
                     elseif cards[i].destroyed then
-                        cards[i]:start_dissolve(nil, i == #cards)
+                        cards[i]:start_dissolve(colours, i == #cards)
                     end
                     return true
                 end
