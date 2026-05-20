@@ -3393,7 +3393,11 @@ SMODS.UndiscoveredCompat = {
                     file
                 ))
             end
-            
+
+            if love.graphics.getRendererInfo() ~= "OpenGL ES" and (self.mod and not self.mod.gles_alerted) and not love.graphics.validateShader(true, file) then
+                sendWarnMessage(("%s: Some shaders in this mod (first one found: '%s') are not compatible with OpenGL ES. Steamodded will try to repair these shaders if OpenGL ES is being used, e.g. on mobile devices. To test OpenGL ES results on desktop, run Balatro with 'LOVE_GRAPHICS_USE_OPENGLES=1' set as an environment variable."):format(self.mod and self.mod.name, self.key), "Shader")
+                self.mod.gles_alerted = true
+            end
             G.SHADERS[self.key] = love.graphics.newShader(file)
         end,
         process_loc_text = function() end
