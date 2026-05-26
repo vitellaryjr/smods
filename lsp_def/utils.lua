@@ -383,9 +383,10 @@ function SMODS.juice_up_blind() end
 ---@param card Card|table
 ---@param suit? Suits|string Key to the suit.
 ---@param rank? Ranks|string Key to the rank.
+---@param manual_sprites? boolean Set to true to not update the front sprite
 ---@return Card|table? cardOrErr If successful the card. If it failed `nil`.
 ---@return string? msg If it failed, a message describing what went wrong.
-function SMODS.change_base(card, suit, rank) end
+function SMODS.change_base(card, suit, rank, manual_sprites) end
 
 --- Modify a card's rank by the specified amount.
 --- Increase rank if amount is positive, decrease rank if negative.
@@ -393,9 +394,10 @@ function SMODS.change_base(card, suit, rank) end
 ---@nodiscard
 ---@param card Card|table
 ---@param amount number
+---@param manual_sprites? boolean Set to true to not update the front sprite
 ---@return Card|table? cardOrErr If successful the card. If it failed `nil`.
 ---@return string? msg If it failed, a message describing what went wrong.
-function SMODS.modify_rank(card, amount) end
+function SMODS.modify_rank(card, amount, manual_sprites) end
 
 ---@param key string
 ---@param count_debuffed? true
