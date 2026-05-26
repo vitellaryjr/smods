@@ -434,7 +434,7 @@ function SMODS.find_card(key, count_debuffed) end
 ---@field enhancement? Enhancements|string Apply this enhancement.
 ---@field seal? Seals|string Apply this seal.
 ---@field stickers? Stickers[]|string[] Apply all stickers in this array.
----@field force_stickers? Stickers[]|string[] Forces the application of all stickers in this array that are also in stickers.
+---@field force_stickers? true|Stickers[]|string[] Forces the application of all stickers in this array that are also in stickers.
 ---@field allow_duplicates? boolean Allows duplicated cards to be created, even without Showman.
 ---@field rank? Ranks|string|integer Rank of the playing card.
 ---@field suit? Suits|string Suit of the playing card.
