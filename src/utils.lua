@@ -436,7 +436,7 @@ function SMODS.create_card(t)
                 applied_stickers[v] = true
             end
         end
-        for i, v in ipairs(t.stickers) do
+        for i, v in ipairs(t.stickers or {}) do
             if not applied_stickers[v] then
                 _card:add_sticker(v, t.force_stickers == true)
             end
