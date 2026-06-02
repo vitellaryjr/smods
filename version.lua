@@ -1,1 +1,1 @@
-return "1.0.0~BETA-1802c-STEAMODDED"
+return "1.0.0~BETA-1803c-STEAMODDED"
