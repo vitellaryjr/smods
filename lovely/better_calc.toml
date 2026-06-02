@@ -2110,6 +2110,24 @@ if ret then
 end
 '''
 
+# Add context.modify_final_cashout
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+    dollars = dollars + G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5)
+end
+'''
+position = "after"
+payload = '''
+
+    SMODS.cashout_pitch = pitch; SMODS.cashout_index = i; SMODS.cashout_dollars = dollars
+    SMODS.calculate_context({modify_final_cashout = true, amount = dollars})
+    dollars = SMODS.cashout_dollars
+    SMODS.cashout_pitch = nil; SMODS.cashout_index = nil; SMODS.cashout_dollars = nil
+'''
+match_indent = false
+
 # Reload SMODS.last_hand
 [[patches]]
 [patches.pattern]
