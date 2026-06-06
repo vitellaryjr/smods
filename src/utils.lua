@@ -1936,7 +1936,6 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
             else
                 local f = SMODS.trigger_effects(effects, area.scored_card)
                 for k,v in pairs(f) do flags[k] = v end
-                if context.modify_final_cashout and next(flags) then print(area.key) end
                 SMODS.update_context_flags(context, flags)
             end
             ::skip::
