@@ -548,6 +548,12 @@ SMODS.Attribute({
 
         'v_tarot_merchant', 'v_tarot_tycoon', 'v_planet_merchant', 'v_planet_tycoon',
 
+        'p_arcana_normal_1', 'p_arcana_normal_2', 'p_arcana_normal_3', 'p_arcana_normal_4',
+        'p_arcana_jumbo_1', 'p_arcana_jumbo_2', 'p_arcana_mega_1', 'p_arcana_mega_2',
+        'p_celestial_normal_1', 'p_celestial_normal_2', 'p_celestial_normal_3', 'p_celestial_normal_4',
+        'p_celestial_jumbo_1', 'p_celestial_jumbo_2', 'p_celestial_mega_1', 'p_celestial_mega_2',
+        'p_spectral_normal_1', 'p_spectral_normal_2', 'p_spectral_jumbo_1', 'p_spectral_mega_1'
+
         'Blue', 'Purple' -- seal
     }
 })
@@ -555,7 +561,11 @@ SMODS.Attribute({
 SMODS.Attribute({
     key = 'consumable_slot',
     alias = {'consumeable_slot'},
-    keys = { 'v_crystal_ball' }
+    keys = {
+        'v_crystal_ball',
+
+        'e_negative'
+    }
 })
 
 SMODS.Attribute({
@@ -813,9 +823,9 @@ SMODS.Attribute({
         'j_astronomer', 'j_chaos', 'j_flash',
 
         'v_overstock_norm', 'v_overstock_plus', 'v_clearance_sale', 'v_liquidation', 'v_reroll_surplus', 'v_reroll_glut',
-        'v_tarot_merchant', 'v_tarot_tycoon', 'v_planet_merchant', 'v_planet_tycoon',
+        'v_tarot_merchant', 'v_tarot_tycoon', 'v_planet_merchant', 'v_planet_tycoon', 'v_magic_trick', 'v_illusion',
 
-        'tag_voucher', 'tag_coupon', 'tag_d_six'
+        'tag_uncommon', 'tag_rare', 'tag_negative', 'tag_foil', 'tag_holo', 'tag_polychrome', 'tag_voucher', 'tag_coupon', 'tag_d_six'
     }
 })
 
