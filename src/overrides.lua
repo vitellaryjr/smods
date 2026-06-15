@@ -2608,17 +2608,20 @@ end
 
 local stay_flipped = Blind.stay_flipped
 function Blind:stay_flipped(to_area, card, from_area)
-	local ret = stay_flipped(self, to_area, card, from_area)
-	local flags = SMODS.calculate_context({ to_area = to_area, from_area = from_area, other_card = card, stay_flipped = true })
-	local self_eval, self_post = eval_card(card, { to_area = to_area, from_area = from_area, other_card = card, stay_flipped = true })
-	local self_flags = SMODS.trigger_effects({ self_eval, self_post })
-	for k,v in pairs(self_flags) do flags[k] = flags[k] or v end
-	if flags.modify and flags.modify.to_area then
-		SMODS.to_area = flags.modify.to_area
-	end
-	if flags.prevent_stay_flipped then return false end
-	if flags.stay_flipped then return true end
-	return ret
+    local ret = stay_flipped(self, to_area, card, from_area)
+    local context = { to_area = to_area, from_area = from_area, other_card = card, stay_flipped = true }
+    local flags = SMODS.calculate_context(context)
+    SMODS.push_to_context_stack(context, "overrides.lua : Blind:stay_flipped()")
+    local self_eval, self_post = eval_card(card, context)
+    local self_flags = SMODS.trigger_effects({ self_eval, self_post })
+    for k,v in pairs(self_flags) do flags[k] = flags[k] or v end
+    SMODS.pop_from_context_stack(context, "overrides.lua : Blind:stay_flipped()")
+    if flags.modify and flags.modify.to_area then
+        SMODS.to_area = flags.modify.to_area
+    end
+    if flags.prevent_stay_flipped then return false end
+    if flags.stay_flipped then return true end
+    return ret
 end
 
 local modify_hand = Blind.modify_hand
