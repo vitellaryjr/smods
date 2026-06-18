@@ -107,7 +107,7 @@ function SMODS.get_weight_of_object(obj, opt_weight, args)
     if not obj then return 10, 10 end
     local w = opt_weight or obj.weight or 10
     local m = not opt_weight and obj.get_weight and obj:get_weight(w, args) or w
-
+    if obj.set == 'Booster' then w = w*10; m = m*10 end
     return w, m
 end
 
