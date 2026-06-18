@@ -755,6 +755,12 @@ function SMODS.is_eternal(card, trigger) end
 --- Returns the final scaled value, and what it had been scaled by
 function SMODS.scale_card(card, args) end
 
+---@param card Card|table
+---@param args? table|{ref_table: table, ref_value: string, reset_value: number, operation: fun(ref_table: table, ref_value: string, initial: number, reset: number)?, block_override: boolean?, reset_message: table?, message_key: string?, message_colour: table?, message_delay: number?, no_message: boolean?}
+--- Tells Jokers that this card is resetting allowing for resetting detection
+--- Args must contain `ref_table`, `ref_value`, and `reset_value`. It may optionally contain an `operation` function to define the behavior of resetting
+function SMODS.reset_card(card, args) end
+
 ---@param prototype_obj SMODS.GameObject|table
 ---@param args table?
 ---@return boolean?, table?
