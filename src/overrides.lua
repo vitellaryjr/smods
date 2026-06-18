@@ -563,9 +563,9 @@ function G.UIDEF.deck_stake_column(_deck_key)
 	local stake_col = {}
 	local num_stakes = #G.P_CENTER_POOLS['Stake']
 	for i = #G.P_CENTER_POOLS['Stake'], 1, -1 do
-		local _wins = deck_usage and deck_usage.wins[i] or 0
+		local _wins = deck_usage and deck_usage.wins_by_key[SMODS.stake_from_index(i)] or 0
 		local valid_option = nil
-		if (deck_usage and deck_usage.wins[i - 1]) or (not next(G.P_CENTER_POOLS.Stake[i].applied_stakes or {})) or G.PROFILES[G.SETTINGS.profile].all_unlocked then valid_option = true end
+		if (SMODS.stake_is_unlocked(SMODS.stake_from_index(i), _deck_key)) or (not next(G.P_CENTER_POOLS.Stake[i].applied_stakes or {})) or G.PROFILES[G.SETTINGS.profile].all_unlocked then valid_option = true end
 		stake_col[#stake_col + 1] = {n = G.UIT.R, config = {id = i, align = "cm", colour = _wins > 0 and G.C.GREY or G.C.CLEAR, outline = 0, outline_colour = G.C.WHITE, r = 0.1, minh = 2 / num_stakes, minw = valid_option and 0.45 or 0.25, func = 'RUN_SETUP_check_back_stake_highlight'}, nodes = {
 			{n = G.UIT.R, config = {align = "cm", minh = valid_option and 1.36 / num_stakes or 1.04 / num_stakes, minw = valid_option and 0.37 or 0.13, colour = _wins > 0 and get_stake_col(i) or G.C.UI.TRANSPARENT_LIGHT, r = 0.1}, nodes = {}}}}
 		if i > 1 then stake_col[#stake_col + 1] = {n = G.UIT.R, config = {align = "cm", minh = 0.8 / num_stakes, minw = 0.04 }, nodes = {} } end
@@ -2321,8 +2321,10 @@ function get_joker_win_sticker(_center, index)
 		local applied = {}
 		local _count = 0
 		local _stake = nil
-		for k, v in pairs(joker_usage.wins_by_key or {}) do
-			SMODS.build_stake_chain(G.P_STAKES[k], applied)
+		for k, stake in pairs(G.P_STAKES) do
+			if (joker_usage.wins_by_key or {})[k] then
+				SMODS.build_stake_chain(stake, applied)
+			end
 		end
 		for i, v in ipairs(G.P_CENTER_POOLS.Stake) do
 			if applied[v.order] then
@@ -2344,10 +2346,12 @@ function get_deck_win_stake(_deck_key)
 		local deck_count = 0
 		for _, deck in pairs(G.PROFILES[G.SETTINGS.profile].deck_usage) do
 			local deck_won_with = false
-			for key, _ in pairs(deck.wins_by_key or {}) do
-				deck_won_with = true
-				if (G.P_STAKES[key] and G.P_STAKES[key].stake_level or 0) > (_stake and G.P_STAKES[_stake].stake_level or 0) then
-					_stake = key
+			for key, stake in pairs(G.P_STAKES) do
+				if (deck.wins_by_key or {})[key] then
+					deck_won_with = true
+					if (stake.stake_level or 0) > (_stake and G.P_STAKES[_stake].stake_level or 0) then
+						_stake = key
+					end
 				end
 			end
 			if deck_won_with then deck_count = deck_count + 1 end
@@ -2360,9 +2364,11 @@ function get_deck_win_stake(_deck_key)
 	end
 	if G.PROFILES[G.SETTINGS.profile].deck_usage[_deck_key] and G.PROFILES[G.SETTINGS.profile].deck_usage[_deck_key].wins_by_key then
 		local _stake = nil
-		for key, _ in pairs(G.PROFILES[G.SETTINGS.profile].deck_usage[_deck_key].wins_by_key) do
-			if (G.P_STAKES[key] and G.P_STAKES[key].stake_level or 0) > (_stake and G.P_STAKES[_stake].stake_level or 0) then
-				_stake = key
+		for key, stake in pairs(G.P_STAKES) do
+			if G.PROFILES[G.SETTINGS.profile].deck_usage[_deck_key].wins_by_key[key] then
+				if (stake.stake_level or 0) > (_stake and G.P_STAKES[_stake].stake_level or 0) then
+					_stake = key
+				end
 			end
 		end
 		if _stake then return G.P_STAKES[_stake].order end
@@ -2374,9 +2380,11 @@ function get_deck_win_sticker(_center)
 	if G.PROFILES[G.SETTINGS.profile].deck_usage[_center.key] and
 	G.PROFILES[G.SETTINGS.profile].deck_usage[_center.key].wins_by_key then
 		local _stake = nil
-		for key, _ in pairs(G.PROFILES[G.SETTINGS.profile].deck_usage[_center.key].wins_by_key) do
-			if (G.P_STAKES[key] and G.P_STAKES[key].stake_level or 0) > (_stake and G.P_STAKES[_stake].stake_level or 0) then
-				_stake = G.sticker_map[key] and key or _stake
+		for key, stake in pairs(G.P_STAKES) do
+			if G.PROFILES[G.SETTINGS.profile].deck_usage[_center.key].wins_by_key[key] then
+				if (stake.stake_level or 0) > (_stake and G.P_STAKES[_stake].stake_level or 0) then
+					_stake = G.sticker_map[key] and key or _stake
+				end
 			end
 		end
 		if _stake then return G.sticker_map[_stake] end
@@ -2387,16 +2395,14 @@ function set_deck_win()
 	if G.GAME.selected_back and G.GAME.selected_back.effect and G.GAME.selected_back.effect.center and G.GAME.selected_back.effect.center.key then
 		local deck_key = G.GAME.selected_back.effect.center.key
 		local deck_usage = G.PROFILES[G.SETTINGS.profile].deck_usage[deck_key]
-		if not deck_usage then deck_usage = { count = 1, order =
+		if not deck_usage then deck_usage = convert_usage_entry{ count = 1, order =
 			G.GAME.selected_back.effect.center.order, wins = {}, losses = {}, wins_by_key = {}, losses_by_key = {} } end
 		if deck_usage then
-			deck_usage.wins[G.GAME.stake] = (deck_usage.wins[G.GAME.stake] or 0) + 1
 			deck_usage.wins_by_key[SMODS.stake_from_index(G.GAME.stake)] = (deck_usage.wins_by_key[SMODS.stake_from_index(G.GAME.stake)] or 0) + 1
 			local applied = SMODS.build_stake_chain(G.P_STAKES[SMODS.stake_from_index(G.GAME.stake)]) or {}
 			for i, v in ipairs(G.P_CENTER_POOLS.Stake) do
 				if applied[i] then
-					deck_usage.wins[i] = math.max(deck_usage.wins[i] or 0, 1)
-					deck_usage.wins_by_key[SMODS.stake_from_index(i)] = math.max(deck_usage.wins_by_key[SMODS.stake_from_index(i)] or 0, 1)
+					deck_usage.wins_by_key[v.key] = math.max(deck_usage.wins_by_key[v.key] or 0, 1)
 				end
 			end
 		end
@@ -2608,17 +2614,20 @@ end
 
 local stay_flipped = Blind.stay_flipped
 function Blind:stay_flipped(to_area, card, from_area)
-	local ret = stay_flipped(self, to_area, card, from_area)
-	local flags = SMODS.calculate_context({ to_area = to_area, from_area = from_area, other_card = card, stay_flipped = true })
-	local self_eval, self_post = eval_card(card, { to_area = to_area, from_area = from_area, other_card = card, stay_flipped = true })
-	local self_flags = SMODS.trigger_effects({ self_eval, self_post })
-	for k,v in pairs(self_flags) do flags[k] = flags[k] or v end
-	if flags.modify and flags.modify.to_area then
-		SMODS.to_area = flags.modify.to_area
-	end
-	if flags.prevent_stay_flipped then return false end
-	if flags.stay_flipped then return true end
-	return ret
+    local ret = stay_flipped(self, to_area, card, from_area)
+    local context = { to_area = to_area, from_area = from_area, other_card = card, stay_flipped = true }
+    local flags = SMODS.calculate_context(context)
+    SMODS.push_to_context_stack(context, "overrides.lua : Blind:stay_flipped()")
+    local self_eval, self_post = eval_card(card, context)
+    local self_flags = SMODS.trigger_effects({ self_eval, self_post })
+    for k,v in pairs(self_flags) do flags[k] = flags[k] or v end
+    SMODS.pop_from_context_stack(context, "overrides.lua : Blind:stay_flipped()")
+    if flags.modify and flags.modify.to_area then
+        SMODS.to_area = flags.modify.to_area
+    end
+    if flags.prevent_stay_flipped then return false end
+    if flags.stay_flipped then return true end
+    return ret
 end
 
 local modify_hand = Blind.modify_hand
@@ -2701,6 +2710,9 @@ local set_ability = Card.set_ability
 function Card:set_ability(center, initial, delay_sprites)
     if delay_sprites == "quantum" then return self:quantum_set_ability(center) end
 	local old_center = self.config.center
+	if delay_sprites and not initial then 
+		self.delay_center = old_center
+	end
 	set_ability(self, center, initial, delay_sprites)
 	if not initial and (G.STATE ~= G.STATES.SMODS_BOOSTER_OPENED and G.STATE ~= G.STATES.SHOP and not G.SETTINGS.paused or G.TAROT_INTERRUPT) then
 		SMODS.calculate_context({setting_ability = true, old = old_center.key, new = self.config.center_key, other_card = self, unchanged = old_center.key == self.config.center.key})
@@ -2873,6 +2885,22 @@ G.FUNCS.change_viewed_back = function(...)
 	return g_funcs_change_viewed_back_ref(...)
 end
 
+--Patch to allow `type = "name_text"` to take vars
+local oldlocalize = localize
+function localize(args, misc_cat)
+    local ret = oldlocalize(args, misc_cat)
+
+    if type(args) == "table" and type(ret) == "string" and args.type == "name_text" and (args.vars) then
+        for k,v in pairs(args.vars) do
+            if type(k) == "number" then
+                ret = ret:gsub("#"..tostring(k).."#", tostring(v))
+            end
+        end
+    end
+
+    return ret
+end
+
 -- let's misuse this for blind size queue
 G.FUNCS.blind_chip_UI_scale = function(e)
 	if not (G.GAME.blind or {}).chips then return end
@@ -2883,3 +2911,57 @@ G.FUNCS.blind_chip_UI_scale = function(e)
 	G.GAME.blind.chip_text = number_format(blind_chips)
     e.config.scale = scale_number(blind_chips, 0.7, 100000)
 end
+
+	-- patch all shaders on GLSL ES
+	-- stub shader
+    SMODS.shader_stub = love.graphics.newShader [[
+    vec4 effect(vec4 color, Image texture, vec2 tc, vec2 _) {
+        return Texel(texture, tc);
+    }
+    ]]
+    local mt = getmetatable(SMODS.shader_stub)
+	local send = mt.send
+	local sendColor = mt.sendColor
+	function mt:send(...)
+		if self == SMODS.shader_stub then
+			return
+		end
+		send(self, ...)
+	end
+	function mt:sendColor(...)
+		if self == SMODS.shader_stub then
+			return
+		end
+		sendColor(self, ...)
+	end
+
+    -- this is where the patching happens
+	-- code that gets here is usually already patched with its own buffer name. here we patch it as a second catchall buffer name
+    local newShader = love.graphics.newShader
+    function love.graphics.newShader(code, other_code)
+		-- this only supports a single argument passed as code, file names are not supported
+		-- only when we're running GLSL ES do we need to patch
+        if other_code or not string.find(code,'\n') or love.graphics.getRendererInfo() ~= "OpenGL ES" then
+			return newShader(code,other_code)
+		end
+
+        -- we can't patch if lovely is too old
+        local lovely_success, lovely = pcall(require, "lovely")
+        if not lovely_success then return newShader(code) end
+
+        local patched_code = assert(lovely.apply_patches(
+            "GLSL_ES_PATCHES.fs",
+            code
+        ))
+        local success, shader = pcall(newShader, patched_code)
+        if success then return shader end
+
+		-- -- Couldn't compile with patches. Try the original
+		local old_success, old_shader = pcall(newShader, code)
+		if old_success then return old_shader end
+
+        -- Neither worked
+		sendWarnMessage(("Failed to compile or patch shader for GLSL ES! Replacing affected shader with a stub that does nothing. To test on desktop, set LOVE_GRAPHICS_USE_OPENGLES=1 in your environment variables to run GLSL ES if supported. Patched shader code:\n%s\nError:\n%s"):format(patched_code, shader), "Shader")
+
+        return SMODS.shader_stub
+    end

@@ -1,7 +1,7 @@
 -- TODO: how do soul objects fit into this system?
 
 -- Returns a `key` of the polled object type
----@param args table|{type: string?, attributes: table[string]?, pool: table[string]?, seed: string?, chance: number?, guaranteed: boolean?}
+---@param args table|{type: string?, attributes: string[]?, pool: string[]?, seed: string?, chance: number?, guaranteed: boolean?}
 function SMODS.poll_object(args)
     assert(args, "SMODS.poll_object called with no args."..SMODS.log_crash_info(debug.getinfo(2)))
     assert((args.type or (args.types and type(args.types) == 'table') or (args.attributes and type(args.attributes) == 'table') or (args.pool and type(args.pool) == 'table')), "SMODS.poll_object called without a pool source." .. SMODS.log_crash_info(debug.getinfo(2)))
@@ -33,7 +33,18 @@ function SMODS.poll_object(args)
     for _, key in ipairs(pool) do
         local weight_table = {}
         
-        local w, m_w = SMODS.get_weight_of_object(G[SMODS.game_table_from_type[key.type] or 'P_CENTERS'][key.key or key], key.weight, args)
+        local obj_type = SMODS.game_table_from_type[key.type]
+        local obj_pool = G.P_CENTERS
+
+        if obj_type then
+            if type(obj_type) == "table" then
+                obj_pool = obj_type.ref_table[obj_type.ref_value]
+            else
+                obj_pool = G[obj_type]
+            end
+        end
+
+        local w, m_w = SMODS.get_weight_of_object(obj_pool[key.key or key], key.weight, args)
         weight_table = {key = key.key or key, weight = m_w}
         
         total_weight = total_weight + w
@@ -154,10 +165,18 @@ end
 function SMODS.create_blind_pool(blind_type, skip_cull)
     assert(type(blind_type) == 'string', "SMODS.create_blind_pool called with a non-string type argument."..SMODS.log_crash_info(debug.getinfo(2)))
     local eligible_bosses = {}
+
+    local boss_already_chosen = function(key)
+        for _, k in pairs(G.GAME.round_resets.blind_choices) do
+            if k == key then return true end
+        end
+    end
+
     for k, v in pairs(G.P_BLINDS) do
         local res, options = SMODS.add_to_pool(v)
         options = options or {}
         if not v[blind_type] then
+        elseif boss_already_chosen(k) then
         elseif options.ignore_showdown_check then
             eligible_bosses[k] = res and true or nil
         elseif blind_type == 'boss' then
@@ -185,7 +204,7 @@ function SMODS.create_blind_pool(blind_type, skip_cull)
     end
 
     local min_use = 100
-    for k, v in pairs(G.GAME.bosses_used) do
+    for k, v in pairs(G.GAME.bosses_used[blind_type] or G.GAME.bosses_used) do
         if eligible_bosses[k] then
             eligible_bosses[k] = v
             if eligible_bosses[k] <= min_use then 
@@ -196,7 +215,7 @@ function SMODS.create_blind_pool(blind_type, skip_cull)
     local final_pool = {}
     for k, v in pairs(eligible_bosses) do
         if eligible_bosses[k] then
-            if eligible_bosses[k] > min_use then 
+            if eligible_bosses[k] > min_use and not G.P_BLINDS[k][blind_type].allow_duplicates then 
                 eligible_bosses[k] = nil
             else
                 final_pool[#final_pool + 1] = k
@@ -412,10 +431,10 @@ function SMODS.create_shop_card(area)
         type = SMODS.poll_object_type({seed = 'cdt'..G.GAME.round_resets.ante}),
         area = area
     }
-    card_args.key = SMODS.poll_object({type = card_args.type, append = 'sho'})
+    card_args.key = SMODS.poll_object({type = card_args.type, append = 'sho', guaranteed = card_args.type == 'Enhanced'})
     if card_args.key == 'INTERNAL_PLAYING_CARD' then card_args.key = nil; card_args.set = 'Base' end
 
-    local flags = SMODS.calculate_context({create_shop_card = true, set = card_args.type, key = card_args.key, area = card_args.area})
+    local flags = SMODS.calculate_context({create_shop_card = true, set = card_args.type, key = card_args.key, cardarea = card_args.area})
 
     local card = SMODS.create_card(SMODS.merge_defaults(flags.shop_create_flags or {}, card_args))
 
@@ -498,7 +517,7 @@ function SMODS.cull_pool(pool, args)
         if v then
             local in_pool, pool_opts = SMODS.add_to_pool(v, { source = args.append })
             pool_opts = pool_opts or {}
-            if not (G.GAME.used_jokers[v.key] and not pool_opts.allow_duplicates and not SMODS.showman(v.key) and not args.allow_duplicates) and (v.unlocked ~= false or (v.rarity == 4 and args.allow_legendaries)) and (not _rarity or not v.rarity or _rarity == v.rarity) then
+            if not (G.GAME.used_jokers[v.key] and not pool_opts.allow_duplicates and not SMODS.showman(v.key) and not args.allow_duplicates) and (v.unlocked ~= false or v.rarity == 4) and (v.rarity ~= 4 or args.allow_legendaries) and (not _rarity or not v.rarity or _rarity == v.rarity) then
                 if v.enhancement_gate then
                     add = nil
                     for kk, vv in pairs(G.playing_cards or {}) do
