@@ -498,7 +498,7 @@ function SMODS.cull_pool(pool, args)
         if v then
             local in_pool, pool_opts = SMODS.add_to_pool(v, { source = args.append })
             pool_opts = pool_opts or {}
-            if not (G.GAME.used_jokers[v.key] and not pool_opts.allow_duplicates and not SMODS.showman(v.key) and not args.allow_duplicates) and (v.unlocked ~= false or (v.rarity == 4 and args.allow_legendaries)) and (not _rarity or _rarity == v.rarity) then
+            if not (G.GAME.used_jokers[v.key] and not pool_opts.allow_duplicates and not SMODS.showman(v.key) and not args.allow_duplicates) and (v.unlocked ~= false or (v.rarity == 4 and args.allow_legendaries)) and (not _rarity or not v.rarity or _rarity == v.rarity) then
                 if v.enhancement_gate then
                     add = nil
                     for kk, vv in pairs(G.playing_cards or {}) do
