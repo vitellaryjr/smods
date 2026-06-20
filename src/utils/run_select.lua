@@ -576,6 +576,7 @@ end
 function SMODS.RunSelect.Functions.populate_preview_ui(key, to_add, silent, _remove)
     local page_def = SMODS.RunSelect.Pages[key]
     if page_def.selection_limit == 1 and not _remove then
+        G.E_MANAGER:clear_queue('run_select')
         remove_all(SMODS.RunSelect.Internals.preview_area.cards)
         SMODS.RunSelect.Internals.preview_area.cards = {}
         remove_all(SMODS.RunSelect.Internals.preview_area_holding.cards)
@@ -709,6 +710,7 @@ local function order_stake_chain(stake_chain, _stake)
 end
 
 function SMODS.RunSelect.Functions.clean_up(early)
+    G.E_MANAGER:clear_queue('run_select')
     for j = 1, #SMODS.RunSelect.Internals.select_areas do
         if SMODS.RunSelect.Internals.select_areas[j].cards then
             remove_all(SMODS.RunSelect.Internals.select_areas[j].cards)
