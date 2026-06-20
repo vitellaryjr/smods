@@ -1811,13 +1811,12 @@ function Card:set_sprites(_center, _front)
 			if _center.unlocked == false and not self.params.bypass_discovery_center then
 				if _center.locked_atlas or _center.locked_pos then
 					self.children.center = SMODS.create_sprite(self.T.x, self.T.y, self.T.w, self.T.h, _center.locked_atlas or _center.atlas, _center.locked_pos or {x=0, y=0})
-				elseif _center.set == 'Joker' then				
-					self.children.center = SMODS.create_sprite(self.T.x, self.T.y, self.T.w, self.T.h, "Joker", G.j_locked.pos)
 				elseif _center.set == 'Voucher' then					
 					self.children.center = SMODS.create_sprite(self.T.x, self.T.y, self.T.w, self.T.h, "Voucher", G.v_locked.pos)
 				elseif self.config.center.consumeable then
-					print('I am here')			
 					self.children.center = SMODS.create_sprite(self.T.x, self.T.y, self.T.w, self.T.h, "Tarot", G.c_locked.pos)
+				else			
+					self.children.center = SMODS.create_sprite(self.T.x, self.T.y, self.T.w, self.T.h, "Joker", G.j_locked.pos)
 				end
 			elseif not self.params.bypass_discovery_center and (_center.consumeable or SMODS.UndiscoveredCompat[_center.set]) and not _center.discovered then
 				local atlas = SMODS.get_atlas(
