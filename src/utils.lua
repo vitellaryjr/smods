@@ -777,8 +777,7 @@ function SMODS.poll_seal(args)
         type_weight = type_weight + v.weight
     end
 
-    local seal_poll = pseudorandom(pseudoseed(key or 'stdseal'..G.GAME.round_resets.ante))
-    if seal_poll > 1 - (type_weight*mod / total_weight) or guaranteed then -- is a seal generated
+    if guaranteed or pseudorandom(pseudoseed(key or 'stdseal'..G.GAME.round_resets.ante)) > 1 - (type_weight*mod / total_weight) then -- is a seal generated
         local seal_type_poll = pseudorandom(pseudoseed(type_key)) -- which seal is generated
         local weight_i = 0
         for k, v in ipairs(available_seals) do
