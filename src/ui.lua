@@ -3250,7 +3250,7 @@ end
 function SMODS.create_blind_mod_badge()
     if G.GAME.blind and G.GAME.blind.config.blind and G.GAME.blind.config.blind.mod then
         local mod = G.GAME.blind.config.blind.mod
-        local text = DynaText({string = {{ref_table = G.GAME.blind_badge, ref_value = 'name'}}, colours = {mod.badge_text_colour or G.C.WHITE}, shadow = true, silent = true, float = true, scale = 0.36})
+        local text = DynaText({string = {{ref_table = G.GAME.blind_badge, ref_value = 'name'}}, maxw = mod.no_marquee and 4.4, colours = {mod.badge_text_colour or G.C.WHITE}, shadow = true, silent = true, float = true, scale = 0.36})
         local text_scroll = SMODS.UIScrollBox({
                 content = text,
                 container = {
