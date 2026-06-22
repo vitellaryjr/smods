@@ -525,6 +525,7 @@ function SMODS.RunSelect.Functions.update_preview_texts(page_def)
     local preview_texts = SMODS.split_string(page_def.selected_text and page_def:selected_text(SMODS.RunSelect.Setup.choices[page_def.key]) or localize('run_select_nothing'))
     for i, text in ipairs(preview_texts) do
         SMODS.RunSelect.Internals.preview_texts['preview_text_'..i] = text
+        if not G.OVERLAY_MENU then return end
         local dyna_text_container = G.OVERLAY_MENU:get_UIE_by_ID('preview_text_'..i)
         if not dyna_text_container then return end
         dyna_text_container.config.object.scale = 0.7/math.max(1, string.len(text)/8)

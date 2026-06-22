@@ -3239,7 +3239,7 @@ function create_UIBox_blind_choice(type, run_info)
         for i=1, #badges do
             badges[i].nodes[1].config.minw = 2.7
             local text = SMODS.deepfind(badges[i], 'smods_mod_badge_text')
-            if next(text) and text[1].table.object then text[1].table.object.scroll_args.overflow.definition.config.maxw = text[1].table.object.scroll_args.overflow.definition.config.maxw * 2.7/2 end
+            if next(text) and text[1].table.object then text[1].table.object.scroll_args.overflow.definition.config.maxw = (text[1].table.object.scroll_args.overflow.definition.config.maxw or 1) * 2.7/2 end
             table.insert(box.nodes[1].nodes[2].nodes, badges[i])
         end
         box.nodes[1].nodes[3].config.padding = 0.1
