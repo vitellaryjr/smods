@@ -150,7 +150,7 @@ function SMODS.RunSelect.Functions.nav_bar()
                 definition = {n=G.UIT.ROOT, config={align = "cr", colour = G.C.CLEAR}, nodes={
                     {n=G.UIT.R, config={align = "cm", minw = 0.1}, nodes={
                         {n=G.UIT.C, config={maxw = 3.1}, nodes = {
-                            create_text_input({id = 'run_select_seeded_input', w = 3, max_length = 2500, extended_corpus = true, ref_table = SMODS.RunSelect.Setup.choices, ref_value = 'seed', prompt_text = localize('k_enter_seed'), colour = SMODS.RunSelect.Colours.seed_input, hooked_colour = darken(SMODS.RunSelect.Colours.seed_input, 0.3)})
+                            create_text_input({id = 'run_select_seeded_input', w = 3, max_length = 8, all_caps = true, ref_table = SMODS.RunSelect.Setup.choices, ref_value = 'seed', prompt_text = localize('k_enter_seed'), colour = SMODS.RunSelect.Colours.seed_input, hooked_colour = darken(SMODS.RunSelect.Colours.seed_input, 0.3)})
                         }},
                         {n=G.UIT.C, config={align = "cm", minw = 0.1}},
                         UIBox_button({id = 'run_select_seeded_paste', label = localize('ml_paste_seed'), minw = 1, minh = 0.6, button = 'run_select_paste_seed', colour = SMODS.RunSelect.Colours.seed_input, scale = 0.3, col = true})
