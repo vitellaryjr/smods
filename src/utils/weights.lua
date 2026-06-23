@@ -144,6 +144,7 @@ SMODS.no_repoll = {
 }
 
 SMODS.game_table_from_type = {
+    [1] = 'P_CENTERS',
     Seal = 'P_SEALS',
     Tag = 'P_TAGS',
     Blind = 'P_BLINDS',
@@ -321,7 +322,10 @@ function SMODS.create_poll_pool(labels, args)
             local _p = label == 'Blind' and SMODS.create_blind_pool(args.blind_type or 'boss') or SMODS.Attributes[label] and SMODS.get_attribute_pool(label) or get_current_pool(label, args.rarities and args.rarities[i], nil, args.append)
             SMODS.poll_object_allow_duplicates = nil
             if SMODS.Attributes[label] then
+                print(_p)
                 _p = SMODS.cull_pool(_p, args)
+                print('culled')
+                print(_p)
             end
             if label == 'Edition' then
                 local _options = {}
@@ -556,6 +560,7 @@ function SMODS.cull_pool(pool, args)
                 if add and not G.GAME.banned_keys[v.key] then 
                     final_pool[#final_pool + 1] = v.key
                 else
+                    print(key, add, args.types, v.set)
                     final_pool[#final_pool + 1] = 'UNAVAILABLE'
                 end
             end
