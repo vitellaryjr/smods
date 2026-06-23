@@ -322,10 +322,7 @@ function SMODS.create_poll_pool(labels, args)
             local _p = label == 'Blind' and SMODS.create_blind_pool(args.blind_type or 'boss') or SMODS.Attributes[label] and SMODS.get_attribute_pool(label) or get_current_pool(label, args.rarities and args.rarities[i], nil, args.append)
             SMODS.poll_object_allow_duplicates = nil
             if SMODS.Attributes[label] then
-                print(_p)
                 _p = SMODS.cull_pool(_p, args)
-                print('culled')
-                print(_p)
             end
             if label == 'Edition' then
                 local _options = {}
