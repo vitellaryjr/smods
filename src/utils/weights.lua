@@ -557,7 +557,6 @@ function SMODS.cull_pool(pool, args)
                 if add and not G.GAME.banned_keys[v.key] then 
                     final_pool[#final_pool + 1] = v.key
                 else
-                    print(key, add, args.types, v.set)
                     final_pool[#final_pool + 1] = 'UNAVAILABLE'
                 end
             end
