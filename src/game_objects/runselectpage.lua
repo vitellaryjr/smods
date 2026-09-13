@@ -10,6 +10,7 @@ SMODS.RunSelectPage = SMODS.GameObject:extend({
     selection_limit = 1,
     stack_size = 1,
     silent = false,
+    double_click_advance = true,
     register = function(self)
         if self.registered then
             sendWarnMessage(('Detected duplicate register call on object %s'):format(self.key), self.set)
@@ -38,6 +39,11 @@ SMODS.RunSelectPage = SMODS.GameObject:extend({
     handle_choice = function(self, choice, remove)
         SMODS.RunSelect.Setup.choices[self.key] = SMODS.RunSelect.Setup.choices[self.key] or {}
         if not remove then
+            if self.double_click_advance then
+                if (self.selection_limit > 1 and SMODS.RunSelect.Setup.choices[self.key][choice.config.center.key]) or SMODS.RunSelect.Setup.choices[self.key] == choice.config.center.key then
+                    return SMODS.RunSelect.Functions.double_click_advance(self)
+                end
+            end
             if self.selection_limit > 1 then
                 if SMODS.table_size(SMODS.RunSelect.Setup.choices[self.key]) < self.selection_limit and not SMODS.RunSelect.Setup.choices[self.key][choice.config.center.key] then
                     SMODS.RunSelect.Setup.choices[self.key][choice.config.center.key] = true
@@ -112,6 +118,7 @@ SMODS.RunSelectPage({
     area_type = 'deck',
     automatic_preview = true,
     random_select = true,
+    double_click_advance = true,
     generate_pool = function(self)
         return G.P_CENTER_POOLS.Back
     end,
@@ -144,6 +151,7 @@ SMODS.RunSelectPage({
     area_type = 'deck',
     grid_size = {4, 8},
     random_select = true,
+    double_click_advance = true,
     type = 'Stake',
     generate_pool = function(self)
         return G.P_CENTER_POOLS.Stake
@@ -156,6 +164,9 @@ SMODS.RunSelectPage({
         if not choice or not G.P_STAKES[choice] then return 'stake_white' else return self.is_stake_unlocked(G.P_STAKES[choice]) and choice or 'stake_white' end
     end,
     handle_choice = function(self, choice, remove)
+        if SMODS.RunSelect.Setup.choices[self.key] == choice then
+            return SMODS.RunSelect.Functions.double_click_advance(self)
+        end
         SMODS.RunSelect.Setup.choices[self.key] = choice
         G.E_MANAGER:clear_queue('run_select')
         SMODS.RunSelect.Functions.populate_stake_tower(choice)
