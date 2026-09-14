@@ -135,7 +135,7 @@ SMODS.RunSelectPage({
         card.sprite_facing = 'back'
         card.facing = 'back'
         card.children.back:remove()
-        card.children.back = SMODS.create_sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS[card.config.center.unlocked and card.config.center.atlas or 'centers'], card.config.center.unlocked and card.config.center.pos or {x = 4, y = 0})
+        card.children.back = SMODS.create_sprite(card.T.x, card.T.y, card.T.w, card.T.h, G.ASSET_ATLAS[card.config.center.unlocked and card.config.center.atlas or 'centers'], card.config.center.unlocked and card.config.center.pos or {x = 4, y = 0}, card.config.center.sprite_args)
         stick(card)
         if card_number == SMODS.RunSelect.Internals.stack_size then
             card.sticker = get_deck_win_sticker(card.config.center)
@@ -200,7 +200,7 @@ SMODS.RunSelectPage({
             card.params.stake_chip_locked = true
         end
         card.children.back:remove()
-        card.children.back = SMODS.create_sprite(card.T.x, card.T.y, card.T.w, card.T.h, unlocked and G.P_STAKES[stake_key].atlas or 'locked_stake', unlocked and G.P_STAKES[stake_key].pos or {x=0, y=0})
+        card.children.back = SMODS.create_sprite(card.T.x, card.T.y, card.T.w, card.T.h, unlocked and G.P_STAKES[stake_key].atlas or 'locked_stake', unlocked and G.P_STAKES[stake_key].pos or {x=0, y=0}, card.config.center.sprite_args)
         card.children.back.draw = function(_sprite)
             _sprite.ARGS.send_to_shader = _sprite.ARGS.send_to_shader or {}
             _sprite.ARGS.send_to_shader[1] = math.min(_sprite.VT.r*3, 1) + G.TIMERS.REAL/(18) + (_sprite.juice and _sprite.juice.r*20 or 0) + 1
