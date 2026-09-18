@@ -803,7 +803,8 @@ target = "game.lua"
 pattern = 'function Game:delete_run()'
 position = 'after'
 payload = '''    G.in_delete_run = true
-    booster_obj = nil'''
+    booster_obj = nil
+    G.TAROT_INTERRUPT = nil'''
 match_indent = true
 [[patches]]
 [patches.pattern]
