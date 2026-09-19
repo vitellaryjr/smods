@@ -825,18 +825,20 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         post_inject_class = function(self)
             -- sort stakes into the correct spot
-            local stakes_fixed = false
-            repeat
-                table.sort(G.P_CENTER_POOLS[self.set], function(a, b) return a.order < b.order end)
-                stakes_fixed = true
-                for i, v in ipairs(G.P_CENTER_POOLS[self.set]) do
-                    if v.above_stake and G.P_STAKES[v.above_stake] and v.order < G.P_STAKES[v.above_stake].order then
-                        v.order = G.P_STAKES[v.above_stake].order + 1
-                        stakes_fixed = false
+            table.sort(G.P_CENTER_POOLS[self.set], function(a, b) return a.order > b.order end)
+            for i, v in ipairs(G.P_CENTER_POOLS[self.set]) do
+                if v.above_stake and G.P_STAKES[v.above_stake] and v.order ~= G.P_STAKES[v.above_stake].order + 1 then
+                    local new_order = G.P_STAKES[v.above_stake].order + 1
+                    v.order = new_order
+                    for _, stake in pairs(G.P_STAKES) do
+                        if stake ~= v and stake.order >= new_order then stake.order = stake.order + 1 end
                     end
                 end
-            until stakes_fixed
+            end
+            -- until stakes_fixed
+            table.sort(G.P_CENTER_POOLS[self.set], function(a, b) return a.order < b.order end)
             for i,v in ipairs(G.P_CENTER_POOLS[self.set]) do
+                print(v.key, i)
                 G.P_STAKES[v.key].order = i
             end
             for _,stake in pairs(G.P_CENTER_POOLS.Stake) do
