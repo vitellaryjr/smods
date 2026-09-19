@@ -343,6 +343,13 @@ function SMODS.RunSelect.Functions.start_run(_quick_start, _skip_wipe)
     end
 
     G.PROFILES[G.SETTINGS.profile].last_choices = copy_table(run_args)
+    if not G.GAME or (not G.GAME.won and not G.GAME.seeded) then
+      if G.SAVED_GAME ~= nil then
+        if not G.SAVED_GAME.GAME.won then 
+          G.PROFILES[G.SETTINGS.profile].high_scores.current_streak.amt = 0
+        end
+      end
+    end
     G:save_settings()
     
     run_args.deck_choice = {name = G.P_CENTERS[run_args.deck_choice].name}
