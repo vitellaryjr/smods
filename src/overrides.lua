@@ -3017,7 +3017,7 @@ function AnimatedSprite:animate()
 		local fps = self.sprite_args.fps or self.atlas.fps or G.ANIMATION_FPS
         self.current_animation.frame_duration = frame_duration / fps
         local _x = self.animation.w * ((self.sprite_args.start_pos.x + self.current_animation.current) % self.atlas.columns)
-        local _y = self.animation.h * (self.sprite_args.start_pos.y + math.floor(self.current_animation.current / self.atlas.columns))
+        local _y = self.animation.h * (self.sprite_args.start_pos.y + math.floor((self.sprite_args.start_pos.x + self.current_animation.current) / self.atlas.columns))
         self.sprite:setViewport(
             _x,
             _y,
