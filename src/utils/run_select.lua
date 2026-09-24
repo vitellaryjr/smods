@@ -363,19 +363,6 @@ function SMODS.RunSelect.Functions.start_run(_quick_start, _skip_wipe)
     end
 end
 
-local start_run = Game.start_run
-function Game:start_run(args)
-    start_run(self, args)
-    if not G.SETTINGS.tutorial_complete then return end
-    if args.savetext then return end
-    for _, value in ipairs(SMODS.RunSelectPage.obj_buffer) do
-        local page = SMODS.RunSelect.Pages[value]
-        if (not page.optional or (page.optional and page:optional())) and page.start_run and type(page.start_run) == 'function' and (not page.pool or G.PROFILES[G.SETTINGS.profile].last_choices[value])  then
-            page:start_run(G.PROFILES[G.SETTINGS.profile].last_choices[value])
-        end
-    end
-end
-
 function SMODS.RunSelect.Functions.get_page_key(change)
     local next_page = SMODS.RunSelect.Internals.current_page+change
     local valid_page = false

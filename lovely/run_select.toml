@@ -70,3 +70,19 @@ else
     G.FUNCS.run_select_quick_start(true)
 end
 '''
+
+# start_run on all RunSelectPages when the run starts
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+match_indent = true
+position = 'after'
+pattern = '''self.GAME.selected_back:apply_to_run()'''
+payload = '''
+for _, value in ipairs(SMODS.RunSelectPage.obj_buffer) do
+    local page = SMODS.RunSelect.Pages[value]
+    if (not page.optional or (page.optional and page:optional())) and page.start_run and type(page.start_run) == 'function' and (not page.pool or G.PROFILES[G.SETTINGS.profile].last_choices[value])  then
+        page:start_run(G.PROFILES[G.SETTINGS.profile].last_choices[value])
+    end
+end
+'''
