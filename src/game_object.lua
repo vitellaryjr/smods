@@ -824,16 +824,28 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             -- should only need to do this once per injection routine
         end,
         post_inject_class = function(self)
+            local function get_stake_above_key(stake, t)
+                local key = stake.above_stake
+                if not key or (t[key] == stake.key) then return key end
+
+                while t[key] and t[key] ~= key and key ~= stake.key do
+                    key = t[key]
+                end
+                return key ~= stake.key and key
+            end
             -- sort stakes into the correct spot
             local sorted = false
+            local above_alias = {}
             while not sorted do
                 sorted = true
                 table.sort(G.P_CENTER_POOLS[self.set], function(a, b) return a.order > b.order end)
                 for i, v in ipairs(G.P_CENTER_POOLS[self.set]) do
-                    if v.above_stake and G.P_STAKES[v.above_stake] and v.order ~= G.P_STAKES[v.above_stake].order + 1 then
+                    local above_key = get_stake_above_key(v, above_alias)
+                    if above_key and G.P_STAKES[above_key] and (v.order ~= G.P_STAKES[above_key].order + 1 and v.order ~= G.P_STAKES[v.above_stake].order + 1) then
                         sorted = false
-                        local new_order = G.P_STAKES[v.above_stake].order + 1
+                        local new_order = G.P_STAKES[above_key].order + 1
                         v.order = new_order
+                        above_alias[above_key] = above_alias[above_key] or v.key
                         for _, stake in pairs(G.P_STAKES) do
                             if stake ~= v and stake.order >= new_order then stake.order = stake.order + 1 end
                         end
