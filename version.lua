@@ -1,1 +1,1 @@
-return "26.924.0~dev-b"
+return "26.924.0~dev-c"

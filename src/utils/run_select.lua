@@ -41,9 +41,11 @@ function G.UIDEF.run_select_galdur(type)
     end
     G.SETTINGS.current_setup = type
   
-    for key, page in pairs(SMODS.RunSelect.Pages) do
+    for _, key in ipairs(SMODS.RunSelectPage.obj_buffer) do
+        local page = SMODS.RunSelect.Pages[key]
         SMODS.RunSelect.Setup.choices[key] = page:set_default(G.PROFILES[G.SETTINGS.profile].last_choices[key])
     end
+    
     SMODS.RunSelect.Setup.choices.seed = ''
     
     SMODS.RunSelect.Internals.current_page = 1
